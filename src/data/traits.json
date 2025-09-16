@@ -1,0 +1,17 @@
+{
+  "devices": [
+    { "id": "iphone16", "w": 1179, "h": 2556, "name": "iPhone 16" },
+    { "id": "iphone16Plus", "w": 1290, "h": 2796, "name": "iPhone 16 Plus" },
+    { "id": "iphone16ProMax", "w": 1320, "h": 2868, "name": "iPhone 16 Pro Max" }
+  ],
+  "backgrounds": [
+    { "id": "bg-black", "label": "Black", "src": "/backgrounds/black.png" }
+  ],
+  "birds": [
+    { "id": "red", "label": "Red", "src": "/birds/red.png" }
+  ],
+  "headwear": [
+
+    { "id": "tinyCrown", "label": "Tiny Crown", "src": "/headwear/tinyCrown.png" }
+  ]
+}
