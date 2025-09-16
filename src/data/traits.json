@@ -8,7 +8,8 @@
     { "id": "bg-black", "label": "Black", "src": "/backgrounds/black.png" }
   ],
   "birds": [
-    { "id": "red", "label": "Red", "src": "/birds/red.png" }
+    { "id": "red", "label": "Red", "src": "/birds/red.png" },
+    { "id": "pink", "label": "Pink", "src": "/birds/pink.png" }
   ],
   "headwear": [
 
