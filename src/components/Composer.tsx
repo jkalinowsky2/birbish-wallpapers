@@ -100,7 +100,7 @@ export default function Composer({ config }: { config: Config }) {
           </select>
         </Field>
 
-        <Field label="Bird color">
+        <Field label="Birb">
           <select value={bird} onChange={(e) => setBird(e.target.value)}>
             {config.birds.map((x) => (
               <option key={x.id} value={x.id}>
@@ -126,7 +126,7 @@ export default function Composer({ config }: { config: Config }) {
         </div>
 
         <small>
-          Tip: Export all layers at the same canvas size so alignment is pixel-perfect.
+          {/* Tip: Export all layers at the same canvas size so alignment is pixel-perfect. */}
         </small>
       </div>
 
