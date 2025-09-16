@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 type Layer = { id: string; label: string; src: string };
 type Device = { id: string; w: number; h: number; name: string };
-type Config = {
+export type Config = {
   devices: Device[];
   backgrounds: Layer[];
   birds: Layer[];
