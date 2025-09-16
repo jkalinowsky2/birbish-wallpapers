@@ -5,11 +5,15 @@
     { "id": "iphone16ProMax", "w": 1320, "h": 2868, "name": "iPhone 16 Pro Max" }
   ],
   "backgrounds": [
-    { "id": "bg-black", "label": "Black", "src": "/backgrounds/black.png" }
+    { "id": "bg-black", "label": "Black", "src": "/backgrounds/black.png" },
+    { "id": "bg-red", "label": "Red", "src": "/backgrounds/red.png" }
+
   ],
   "birds": [
-    { "id": "red", "label": "Red", "src": "/birds/red.png" },
-    { "id": "pink", "label": "Pink", "src": "/birds/pink.png" }
+    { "id": "red", "label": "Birb", "src": "/birds/red.png" },
+    { "id": "pink", "label": "Pip", "src": "/birds/pink.png" },
+    { "id": "blue", "label": "Zen", "src": "/birds/blue.png" }
+
   ],
   "headwear": [
     { "id": "none", "label": "None", "src": "/headwear/none.png" },
