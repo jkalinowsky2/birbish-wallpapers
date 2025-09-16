@@ -202,15 +202,15 @@ export default function Composer({ config }: { config: Config }) {
           </select>
         </Field>
 
-        <div className="flex flex-wrap gap-2">
-          <button onClick={() => download("png")}>Download PNG</button>
-          <button onClick={() => download("jpeg")}>Download JPEG</button>
-          {/* <button onClick={openImage}>Open Image</button> */}
-          {canNativeShare && (
+        <div className="flex flex-col gap-2">
+        <button onClick={() => download("png")}>Download PNG</button>
+        <button onClick={() => download("jpeg")}>Download JPEG</button>
+        {/* <button onClick={openImage}>Open Image</button> */}
+        {canNativeShare && (
             <button onClick={shareImage} title="Share to Photos/Files">
-              Share / Save
+            Share / Save
             </button>
-          )}
+        )}
         </div>
 
         {isDrawing && <small>Rendering…</small>}
