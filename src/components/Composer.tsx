@@ -205,7 +205,7 @@ export default function Composer({ config }: { config: Config }) {
         <div className="flex flex-wrap gap-2">
           <button onClick={() => download("png")}>Download PNG</button>
           <button onClick={() => download("jpeg")}>Download JPEG</button>
-          <button onClick={openImage}>Open Image</button>
+          {/* <button onClick={openImage}>Open Image</button> */}
           {canNativeShare && (
             <button onClick={shareImage} title="Share to Photos/Files">
               Share / Save
