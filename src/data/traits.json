@@ -13,6 +13,8 @@
   ],
   "headwear": [
     { "id": "none", "label": "None", "src": "/headwear/none.png" },
-    { "id": "tinyCrown", "label": "Tiny Crown", "src": "/headwear/tinyCrown.png" }
+    { "id": "tinyCrown", "label": "Tiny Crown", "src": "/headwear/tinyCrown.png" },
+    { "id": "halo", "label": "Halo", "src": "/headwear/halo.png" },
+    { "id": "skull", "label": "Skull", "src": "/headwear/skull.png" }
   ]
 }
