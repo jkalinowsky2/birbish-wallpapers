@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 type Layer = { id: string; label: string; src: string };
 type Device = { id: string; w: number; h: number; name: string };
+
 export type Config = {
   devices: Device[];
   backgrounds: Layer[];
@@ -11,20 +12,26 @@ export type Config = {
 };
 
 export default function Composer({ config }: { config: Config }) {
+  // --- State ---
   const [previewUrl, setPreviewUrl] = useState<string>("");
-  const [deviceId, setDeviceId] = useState(config.devices[0].id);
+  const [isDrawing, setIsDrawing] = useState<boolean>(false);
+
+  const [deviceId, setDeviceId] = useState<string>(config.devices[0].id);
   const device = useMemo(
     () => config.devices.find((d) => d.id === deviceId)!,
     [deviceId, config.devices]
   );
 
-  const [bg, setBg] = useState(config.backgrounds[0].id);
-  const [bird, setBird] = useState(config.birds[0].id);
-  const [hat, setHat] = useState(config.headwear[0].id);
+  const [bg, setBg] = useState<string>(config.backgrounds[0].id);
+  const [bird, setBird] = useState<string>(config.birds[0].id);
+  const [hat, setHat] = useState<string>(config.headwear[0].id);
 
+  // --- Refs ---
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  // --- Helpers ---
   const get = (arr: Layer[], id: string) => arr.find((x) => x.id === id)!;
+
   const load = (src: string) =>
     new Promise<HTMLImageElement>((resolve, reject) => {
       const img = new Image();
@@ -34,44 +41,58 @@ export default function Composer({ config }: { config: Config }) {
       img.src = src;
     });
 
-  useEffect(() => {
-    let canceled = false;
-    (async () => {
-      const c = canvasRef.current!;
+  const draw = async () => {
+    const c = canvasRef.current;
+    if (!c) return;
+
+    setIsDrawing(true);
+    try {
+      // Ensure target size for pixel-perfect exports
       c.width = device.w;
       c.height = device.h;
-      const ctx = c.getContext("2d")!;
+
+      const ctx = c.getContext("2d");
+      if (!ctx) return;
+
       ctx.clearRect(0, 0, c.width, c.height);
 
+      // Load all layers in parallel
       const [bgImg, birdImg, hatImg] = await Promise.all([
         load(get(config.backgrounds, bg).src),
         load(get(config.birds, bird).src),
         load(get(config.headwear, hat).src),
       ]);
-      if (canceled) return;
 
       // Draw in order: background -> bird -> headwear
       ctx.drawImage(bgImg, 0, 0, c.width, c.height);
       ctx.drawImage(birdImg, 0, 0, c.width, c.height);
       ctx.drawImage(hatImg, 0, 0, c.width, c.height);
 
-      //
-      // after all ctx.drawImage(...) calls:
-const dataUrl = c.toDataURL("image/png");
-const imgEl = document.getElementById("mobile-preview") as HTMLImageElement | null;
-if (imgEl) imgEl.src = dataUrl;
+      // Mirror to <img> for mobile long-press save
+      const dataUrl = c.toDataURL("image/png");
+      setPreviewUrl(dataUrl);
+      const imgEl = document.getElementById("mobile-preview") as HTMLImageElement | null;
+      if (imgEl) imgEl.src = dataUrl;
+    } finally {
+      setIsDrawing(false);
+    }
+  };
 
-// also keep a ref/state if you want to use it for "Open in new tab" / share
-setPreviewUrl?.(dataUrl); // you can add a useState for this
-
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (cancelled) return;
+      await draw();
     })();
     return () => {
-      canceled = true;
+      cancelled = true;
     };
-  }, [bg, bird, hat, device, config]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bg, bird, hat, deviceId]); // redraw on any selection change
 
   const download = (format: "png" | "jpeg" = "png") => {
-    const c = canvasRef.current!;
+    const c = canvasRef.current;
+    if (!c) return;
     const mime = format === "png" ? "image/png" : "image/jpeg";
     c.toBlob(
       (blob) => {
@@ -88,8 +109,58 @@ setPreviewUrl?.(dataUrl); // you can add a useState for this
     );
   };
 
+  const openImage = () => {
+    if (previewUrl) {
+      // Data URL path (fastest)
+      window.open(previewUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
+    // Fallback: create on-the-fly blob from canvas
+    const c = canvasRef.current;
+    if (!c) return;
+    c.toBlob((blob) => {
+      if (!blob) return;
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank", "noopener,noreferrer");
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    }, "image/png");
+  };
+
+  const canNativeShare =
+  typeof navigator !== "undefined" &&
+  typeof navigator.canShare === "function";
+
+  const shareImage = () => {
+    const c = canvasRef.current;
+    if (!c) return;
+    c.toBlob(async (blob) => {
+      if (!blob) return;
+      const file = new File([blob], `wallpaper-${device.id}.png`, { type: "image/png" });
+
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: "Moonbirds Wallpaper",
+            text: "Custom wallpaper",
+          });
+        } catch {
+          // user canceled or share failed; silently ignore
+        }
+      } else {
+        // Fallback: open in new tab for manual save
+        const url = URL.createObjectURL(blob);
+        window.open(url, "_blank", "noopener,noreferrer");
+        setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      }
+    }, "image/png");
+  };
+
+  // --- UI ---
   return (
     <div className="grid gap-6 md:grid-cols-[360px_minmax(0,1fr)]">
+      {/* Controls */}
       <div className="space-y-4">
         <Field label="Device">
           <select value={deviceId} onChange={(e) => setDeviceId(e.target.value)}>
@@ -131,50 +202,38 @@ setPreviewUrl?.(dataUrl); // you can add a useState for this
           </select>
         </Field>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button onClick={() => download("png")}>Download PNG</button>
           <button onClick={() => download("jpeg")}>Download JPEG</button>
+          <button onClick={openImage}>Open Image</button>
+          {canNativeShare && (
+            <button onClick={shareImage} title="Share to Photos/Files">
+              Share / Save
+            </button>
+          )}
         </div>
 
-        <small>
-          {/* Tip: Export all layers at the same canvas size so alignment is pixel-perfect. */}
-        </small>
+        {isDrawing && <small>Rendering…</small>}
       </div>
 
+      {/* Preview */}
       <div className="rounded-lg border p-3">
-        {/* Scaled preview so it fits on desktop */}
-            <canvas
-                ref={canvasRef}
-                className="hidden md:block"
-                style={{ width: Math.round(device.w / 3), height: Math.round(device.h / 3) }}
-            />
+        {/* Desktop / precise-pointer preview (canvas) */}
+        <canvas
+          ref={canvasRef}
+          className="hidden md:block"
+          style={{ width: Math.round(device.w / 3), height: Math.round(device.h / 3) }}
+        />
 
-              {/* Mobile preview (image) — enables long-press Save Image */}
+        {/* Mobile preview (image) — enables long-press “Save Image” */}
         <img
-            id="mobile-preview"
-            className="block md:hidden"
-            alt="Wallpaper preview"
-            // width/height for layout; browser will downscale the dataURL image
-            style={{ width: "100%", height: "auto" }}
+          id="mobile-preview"
+          className="block md:hidden"
+          alt="Wallpaper preview"
+          style={{ width: "100%", height: "auto" }}
+          // `src` is set by the effect; leave empty initially
         />
       </div>
-
-        <button
-        onClick={() => {
-            // If using data URL:
-            window.open(previewUrl, "_blank");
-            // If you prefer a Blob (often better memory-wise):
-            // canvasRef.current!.toBlob(b => {
-            //   if (!b) return;
-            //   const url = URL.createObjectURL(b);
-            //   window.open(url, "_blank");
-            //   setTimeout(() => URL.revokeObjectURL(url), 60_000);
-            // }, "image/png");
-        }}
-        >
-        Open Image
-        </button>
-
     </div>
   );
 }
