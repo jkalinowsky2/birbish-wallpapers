@@ -11,6 +11,7 @@ export type Config = {
 };
 
 export default function Composer({ config }: { config: Config }) {
+  const [previewUrl, setPreviewUrl] = useState<string>("");
   const [deviceId, setDeviceId] = useState(config.devices[0].id);
   const device = useMemo(
     () => config.devices.find((d) => d.id === deviceId)!,
@@ -53,6 +54,16 @@ export default function Composer({ config }: { config: Config }) {
       ctx.drawImage(bgImg, 0, 0, c.width, c.height);
       ctx.drawImage(birdImg, 0, 0, c.width, c.height);
       ctx.drawImage(hatImg, 0, 0, c.width, c.height);
+
+      //
+      // after all ctx.drawImage(...) calls:
+const dataUrl = c.toDataURL("image/png");
+const imgEl = document.getElementById("mobile-preview") as HTMLImageElement | null;
+if (imgEl) imgEl.src = dataUrl;
+
+// also keep a ref/state if you want to use it for "Open in new tab" / share
+setPreviewUrl?.(dataUrl); // you can add a useState for this
+
     })();
     return () => {
       canceled = true;
@@ -132,11 +143,38 @@ export default function Composer({ config }: { config: Config }) {
 
       <div className="rounded-lg border p-3">
         {/* Scaled preview so it fits on desktop */}
-        <canvas
-          ref={canvasRef}
-          style={{ width: Math.round(device.w / 3), height: Math.round(device.h / 3) }}
+            <canvas
+                ref={canvasRef}
+                className="hidden md:block"
+                style={{ width: Math.round(device.w / 3), height: Math.round(device.h / 3) }}
+            />
+
+              {/* Mobile preview (image) — enables long-press Save Image */}
+        <img
+            id="mobile-preview"
+            className="block md:hidden"
+            alt="Wallpaper preview"
+            // width/height for layout; browser will downscale the dataURL image
+            style={{ width: "100%", height: "auto" }}
         />
       </div>
+
+        <button
+        onClick={() => {
+            // If using data URL:
+            window.open(previewUrl, "_blank");
+            // If you prefer a Blob (often better memory-wise):
+            // canvasRef.current!.toBlob(b => {
+            //   if (!b) return;
+            //   const url = URL.createObjectURL(b);
+            //   window.open(url, "_blank");
+            //   setTimeout(() => URL.revokeObjectURL(url), 60_000);
+            // }, "image/png");
+        }}
+        >
+        Open Image
+        </button>
+
     </div>
   );
 }
