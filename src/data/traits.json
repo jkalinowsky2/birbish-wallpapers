@@ -12,7 +12,7 @@
     { "id": "pink", "label": "Pink", "src": "/birds/pink.png" }
   ],
   "headwear": [
-
+    { "id": "none", "label": "None", "src": "/headwear/none.png" },
     { "id": "tinyCrown", "label": "Tiny Crown", "src": "/headwear/tinyCrown.png" }
   ]
 }
