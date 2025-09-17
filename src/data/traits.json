@@ -24,7 +24,9 @@
     { "id": "beanie", "label": "Beanie", "src": "/headwear/beanie.png" },
     { "id": "captain", "label": "Captain's Cap", "src": "/headwear/captain.png" },
     { "id": "pirate", "label": "Pirate's Hat", "src": "/headwear/pirate.png" },
-    { "id": "cowboy", "label": "Cowboy Hat", "src": "/headwear/cowboy.png" }
+    { "id": "cowboy", "label": "Cowboy Hat", "src": "/headwear/cowboy.png" },
+    { "id": "tomato", "label": "Tomato Bird", "src": "/headwear/tomato.png" }
+
 
 
   ]
