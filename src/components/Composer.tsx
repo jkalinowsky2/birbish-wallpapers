@@ -67,10 +67,26 @@ export default function Composer({ config }: { config: Config }) {
       ]);
 
       // Draw in order: background -> text -> bird -> headwear
-      ctx.drawImage(bgImg, 0, 0, c.width, c.height);
-      ctx.drawImage(textImg, 0, 0, c.width, c.height);
-      ctx.drawImage(birdImg, 0, 0, c.width, c.height);
-      ctx.drawImage(hatImg, 0, 0, c.width, c.height);
+      if (bgImg.width >= c.width && bgImg.height >= c.height) {
+            // Crop the center area of the big background to match the canvas size
+            const sx = Math.floor((bgImg.width  - c.width)  / 2);
+            const sy = Math.floor((bgImg.height - c.height) / 2);
+            const sw = c.width;
+            const sh = c.height;
+
+            // draw at 1:1 pixels (no scaling)
+            ctx.drawImage(bgImg, sx, sy, sw, sh, 0, 0, sw, sh);
+            } else {
+            // Failsafe: if somehow the bg is smaller than the canvas, scale to cover
+            ctx.drawImage(bgImg, 0, 0, c.width, c.height);
+            }
+      //ctx.drawImage(bgImg, 0, 0, c.width, c.height);
+    //   ctx.drawImage(textImg, 0, 0, c.width, c.height);
+    //   ctx.drawImage(birdImg, 0, 0, c.width, c.height);
+    //   ctx.drawImage(hatImg, 0, 0, c.width, c.height);
+    drawCenteredNoScale(ctx, textImg, c);
+    drawBottomOffsetNoScale(ctx, birdImg, c,0);
+    drawBottomOffsetNoScale(ctx, hatImg, c, 35);
 
       // Mirror to <img> for mobile long-press save
       const dataUrl = c.toDataURL("image/png");
@@ -98,7 +114,7 @@ export default function Composer({ config }: { config: Config }) {
   useEffect(() => {
   const updateScale = () => {
     const maxHeight = window.innerHeight * 0.8; // fit within 80% of viewport height
-    const scale = Math.min(maxHeight / device.h, 1); // never upscale
+    const scale = Math.min(maxHeight / device.h, 1) * 0.9; // never upscale
     setPreviewHeight(device.h * scale);
   };
   updateScale();
@@ -274,4 +290,45 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
       {children}
     </label>
   );
+
+  
+}
+
+function drawCenteredNoScale(
+  ctx: CanvasRenderingContext2D,
+  img: HTMLImageElement,
+  c: HTMLCanvasElement
+) {
+  // draw size = the smaller of image/canvas in each dimension (no scaling)
+  const dw = Math.min(img.width, c.width);
+  const dh = Math.min(img.height, c.height);
+
+  // crop source from the image center if image is bigger than canvas
+  const sx = Math.max(0, Math.floor((img.width  - dw) / 2));
+  const sy = Math.max(0, Math.floor((img.height - dh) / 2));
+
+  // center destination rect on the canvas
+  const dx = Math.floor((c.width  - dw) / 2);
+  const dy = Math.floor((c.height - dh) / 2);
+
+  // draw 1:1 pixels, centered; crops if needed, never scales
+  ctx.drawImage(img, sx, sy, dw, dh, dx, dy, dw, dh);
+}
+
+function drawBottomOffsetNoScale(
+  ctx: CanvasRenderingContext2D,
+  img: HTMLImageElement,
+  c: HTMLCanvasElement,
+  offset: number // distance up from bottom in px
+) {
+  const dw = Math.min(img.width, c.width);
+  const dh = Math.min(img.height, c.height);
+
+  const sx = Math.max(0, Math.floor((img.width - dw) / 2));
+  const sy = Math.max(0, Math.floor((img.height - dh) / 2));
+
+  const dx = Math.floor((c.width - dw) / 2);   // horizontally centered
+  const dy = c.height - dh - offset;           // bottom-align + offset
+
+  ctx.drawImage(img, sx, sy, dw, dh, dx, dy, dw, dh);
 }

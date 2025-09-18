@@ -2,7 +2,10 @@
   "devices": [
     { "id": "iphone16", "w": 1179, "h": 2556, "name": "iPhone 16" },
     { "id": "iphone16Plus", "w": 1290, "h": 2796, "name": "iPhone 16 Plus" },
-    { "id": "iphone16ProMax", "w": 1320, "h": 2868, "name": "iPhone 16 Pro Max" }
+    { "id": "iphone16ProMax", "w": 1320, "h": 2868, "name": "iPhone 16 Pro Max" },
+
+    { "id": "iPad", "w": 2040, "h": 2732, "name": "iPad" }
+
   ],
   "backgrounds": [
     { "id": "bg-black", "label": "Black", "src": "/backgrounds/black.png" },
