@@ -9,6 +9,11 @@
     { "id": "bg-red", "label": "Red", "src": "/backgrounds/red.png" }
 
   ],
+
+  "texts": [
+    { "id": "bg-black", "label": "Black", "src": "/texts/birbish.png" }
+
+  ],
   "birds": [
     { "id": "red", "label": "Birb", "src": "/birds/red.png" },
     { "id": "pink", "label": "Pip", "src": "/birds/pink.png" },

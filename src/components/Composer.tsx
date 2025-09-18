@@ -7,6 +7,7 @@ type Device = { id: string; w: number; h: number; name: string };
 export type Config = {
   devices: Device[];
   backgrounds: Layer[];
+  texts: Layer[];
   birds: Layer[];
   headwear: Layer[];
 };
@@ -23,6 +24,7 @@ export default function Composer({ config }: { config: Config }) {
   );
 
   const [bg, setBg] = useState<string>(config.backgrounds[0].id);
+  const [text, setText] = useState<string>(config.texts[0].id);
   const [bird, setBird] = useState<string>(config.birds[0].id);
   const [hat, setHat] = useState<string>(config.headwear[0].id);
 
@@ -174,6 +176,16 @@ export default function Composer({ config }: { config: Config }) {
 
         <Field label="Background">
           <select value={bg} onChange={(e) => setBg(e.target.value)}>
+            {config.backgrounds.map((x) => (
+              <option key={x.id} value={x.id}>
+                {x.label}
+              </option>
+            ))}
+          </select>
+        </Field>
+
+        <Field label="Text">
+          <select value={bg} onChange={(e) => setText(e.target.value)}>
             {config.backgrounds.map((x) => (
               <option key={x.id} value={x.id}>
                 {x.label}
