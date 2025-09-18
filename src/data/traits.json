@@ -11,7 +11,7 @@
   ],
 
   "texts": [
-    { "id": "bg-black", "label": "Black", "src": "/texts/birbish.png" }
+    { "id": "birbish", "label": "birbish", "src": "/texts/birbish.png" }
 
   ],
   "birds": [

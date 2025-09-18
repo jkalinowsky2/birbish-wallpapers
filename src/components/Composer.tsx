@@ -59,14 +59,16 @@ export default function Composer({ config }: { config: Config }) {
       ctx.clearRect(0, 0, c.width, c.height);
 
       // Load all layers in parallel
-      const [bgImg, birdImg, hatImg] = await Promise.all([
+      const [bgImg, textImg, birdImg, hatImg] = await Promise.all([
         load(get(config.backgrounds, bg).src),
+        load(get(config.texts, text).src),
         load(get(config.birds, bird).src),
         load(get(config.headwear, hat).src),
       ]);
 
       // Draw in order: background -> bird -> headwear
       ctx.drawImage(bgImg, 0, 0, c.width, c.height);
+      ctx.drawImage(textImg, 0, 0, c.width, c.height);
       ctx.drawImage(birdImg, 0, 0, c.width, c.height);
       ctx.drawImage(hatImg, 0, 0, c.width, c.height);
 
