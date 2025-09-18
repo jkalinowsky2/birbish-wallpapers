@@ -66,7 +66,7 @@ export default function Composer({ config }: { config: Config }) {
         load(get(config.headwear, hat).src),
       ]);
 
-      // Draw in order: background -> bird -> headwear
+      // Draw in order: background -> text -> bird -> headwear
       ctx.drawImage(bgImg, 0, 0, c.width, c.height);
       ctx.drawImage(textImg, 0, 0, c.width, c.height);
       ctx.drawImage(birdImg, 0, 0, c.width, c.height);
@@ -92,7 +92,7 @@ export default function Composer({ config }: { config: Config }) {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bg, bird, hat, deviceId]); // redraw on any selection change
+  }, [bg, text, bird, hat, deviceId]); // redraw on any selection change
 
   const download = (format: "png" | "jpeg" = "png") => {
     const c = canvasRef.current;
@@ -187,8 +187,8 @@ export default function Composer({ config }: { config: Config }) {
         </Field>
 
         <Field label="Text">
-          <select value={bg} onChange={(e) => setText(e.target.value)}>
-            {config.backgrounds.map((x) => (
+          <select value={text} onChange={(e) => setText(e.target.value)}>
+            {config.texts.map((x) => (
               <option key={x.id} value={x.id}>
                 {x.label}
               </option>
