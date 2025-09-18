@@ -9,7 +9,8 @@
   ],
   "backgrounds": [
     { "id": "bg-black", "label": "Black", "src": "/backgrounds/black.png" },
-    { "id": "bg-red", "label": "Red", "src": "/backgrounds/red.png" }
+    { "id": "bg-red", "label": "Red", "src": "/backgrounds/red.png" },
+    { "id": "bg-blue", "label": "Blue", "src": "/backgrounds/blue.png" }
 
   ],
 
