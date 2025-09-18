@@ -31,6 +31,8 @@
     { "id": "captain", "label": "Captain's Cap", "src": "/headwear/captain.png" },
     { "id": "pirate", "label": "Pirate's Hat", "src": "/headwear/pirate.png" },
     { "id": "cowboy", "label": "Cowboy Hat", "src": "/headwear/cowboy.png" },
+    { "id": "witch", "label": "Witch's Hat", "src": "/headwear/witch.png" },
+    { "id": "flower", "label": "Flower", "src": "/headwear/flower.png" },
     { "id": "tomato", "label": "Tomato Bird", "src": "/headwear/tomato.png" }
 
 
