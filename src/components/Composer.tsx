@@ -22,7 +22,7 @@ export default function Composer({ config }: { config: Config }) {
     () => config.devices.find((d) => d.id === deviceId)!,
     [deviceId, config.devices]
   );
-
+  const [previewHeight, setPreviewHeight] = useState<number>(0); //NEW
   const [bg, setBg] = useState<string>(config.backgrounds[0].id);
   const [text, setText] = useState<string>(config.texts[0].id);
   const [bird, setBird] = useState<string>(config.birds[0].id);
@@ -93,6 +93,20 @@ export default function Composer({ config }: { config: Config }) {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bg, text, bird, hat, deviceId]); // redraw on any selection change
+
+  //NEW
+  useEffect(() => {
+  const updateScale = () => {
+    const maxHeight = window.innerHeight * 0.8; // fit within 80% of viewport height
+    const scale = Math.min(maxHeight / device.h, 1); // never upscale
+    setPreviewHeight(device.h * scale);
+  };
+  updateScale();
+  window.addEventListener("resize", updateScale);
+  return () => window.removeEventListener("resize", updateScale);
+}, [device]);
+
+// END NEW
 
   const download = (format: "png" | "jpeg" = "png") => {
     const c = canvasRef.current;
@@ -231,23 +245,24 @@ export default function Composer({ config }: { config: Config }) {
       </div>
 
       {/* Preview */}
-      <div className="rounded-lg border p-3">
-        {/* Desktop / precise-pointer preview (canvas) */}
-        <canvas
-          ref={canvasRef}
-          className="hidden md:block"
-          style={{ width: Math.round(device.w / 3), height: Math.round(device.h / 3) }}
-        />
+<div className="rounded-lg border p-3 max-h-[80vh] overflow-auto">
+  {/* Desktop / precise-pointer preview (canvas) */}
+  <canvas
+    ref={canvasRef}
+    className="hidden md:block max-w-full h-auto"
+    style={{
+      height: previewHeight,
+      width: (device.w / device.h) * previewHeight, // keep aspect ratio
+    }}
+  />
 
-        {/* Mobile preview (image) — enables long-press “Save Image” */}
-        <img
-          id="mobile-preview"
-          className="block md:hidden"
-          alt="Wallpaper preview"
-          style={{ width: "100%", height: "auto" }}
-          // `src` is set by the effect; leave empty initially
-        />
-      </div>
+  {/* Mobile preview (image) — enables long-press “Save Image” */}
+  <img
+    id="mobile-preview"
+    className="block md:hidden max-w-full h-auto"
+    alt="Wallpaper preview"
+  />
+</div>
     </div>
   );
 }
