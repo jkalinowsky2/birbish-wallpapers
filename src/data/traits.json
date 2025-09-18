@@ -33,6 +33,8 @@
     { "id": "cowboy", "label": "Cowboy Hat", "src": "/headwear/cowboy.png" },
     { "id": "witch", "label": "Witch's Hat", "src": "/headwear/witch.png" },
     { "id": "flower", "label": "Flower", "src": "/headwear/flower.png" },
+    { "id": "crescent", "label": "Crescent", "src": "/headwear/crescent.png" },
+    { "id": "mooncap", "label": "Moon Cap", "src": "/headwear/mooncap.png" },
     { "id": "tomato", "label": "Tomato Bird", "src": "/headwear/tomato.png" }
 
 
