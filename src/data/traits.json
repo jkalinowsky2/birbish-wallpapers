@@ -40,6 +40,7 @@
     { "id": "flower", "label": "Flower", "src": "/headwear/flower.png" },
     { "id": "crescent", "label": "Crescent", "src": "/headwear/crescent.png" },
     { "id": "mooncap", "label": "Moon Cap", "src": "/headwear/mooncap.png" },
+    { "id": "rain", "label": "Rain Cloud", "src": "/headwear/rain.png" },
     { "id": "tomato", "label": "Tomato Bird", "src": "/headwear/tomato.png" }
 
 
