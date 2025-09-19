@@ -47,13 +47,33 @@ export default function Composer({ config }: { config: Config }) {
             `https://collection-assets.proof.xyz/moonbirds/images_no_bg/${id}.png`
         )}&v=${Date.now()}`; // <- bust any caches
     async function loadMoonbirdById(id: string) {
-        // basic validation (Moonbirds are 1..10000, adjust if needed)
+        // --- Easter egg for your friend ---
+        // Compare numerically to avoid any string/whitespace issues.
+        if (Number(id) === 6421) {
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+
+            // Make sure this path matches your real file location under /public
+            // If the file is at: public/traits/birds/spida.png  -> use "/traits/birds/spida.png"
+            // If it's at:        public/birds/spida.png        -> use "/birds/spida.png"
+            img.src = "/birds/spida.png";
+
+            await new Promise<void>((resolve, reject) => {
+                img.onload = () => resolve();
+                img.onerror = reject;
+            });
+
+            moonbirdImgRef.current = img;
+            return; // IMPORTANT: stop here so we don't fetch the Proof URL
+        }
+
+        // --- normal token loading (unchanged) ---
         const n = Number(id);
         if (!Number.isInteger(n) || n < 1 || n > 10000) throw new Error("Invalid token ID");
 
         const img = new Image();
         img.crossOrigin = "anonymous";
-        img.src = buildTokenUrl(id);
+        img.src = buildTokenUrl(id); // hits your /api/proxy?... for other IDs
 
         await new Promise<void>((resolve, reject) => {
             img.onload = () => resolve();
@@ -133,9 +153,15 @@ export default function Composer({ config }: { config: Config }) {
             // AFTER:
             // draw token bird OR normal bird
             if (useToken && moonbirdImgRef.current) {
-                drawBottomScaled(ctx, moonbirdImgRef.current, c, 0.4, 0);
+                if (parseInt(tokenId, 10) === 6421) {
+                    // Easter egg: draw full-size, bottom-aligned (no scale)
+                    drawBottomOffsetNoScale(ctx, moonbirdImgRef.current, c, 0);
+                } else {
+                    // All other tokens: scale to 0.4 and bottom-center
+                    drawBottomScaled(ctx, moonbirdImgRef.current, c, 0.4, 0);
+                }
             } else if (birdImgOrNull) {
-                // your preferred bird rendering (bottom/center/scale)
+                // Regular birds: no scaling, bottom-center
                 drawBottomOffsetNoScale(ctx, birdImgOrNull, c, 0);
             }
             // (no else — if neither, we simply don't draw a bird layer)
