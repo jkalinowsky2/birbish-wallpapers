@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Birbish Wallpaper Builder",
+  title: "Birbish Papers",
   description: "Created by JK",
 };
 
