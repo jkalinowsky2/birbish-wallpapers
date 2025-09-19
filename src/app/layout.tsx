@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Birbish Papers",
-  description: "Created by JK",
+  title: "Birbish Wallpaper Builder",
+  description: "Created by JK. Create custom Moonbird wallpapers for your phone or tablet",
 };
 
 export default function RootLayout({
