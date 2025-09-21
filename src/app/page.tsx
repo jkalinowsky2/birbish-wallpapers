@@ -1,16 +1,21 @@
 // src/app/page.tsx
-import Composer from "@/components/Composer";
-import config from "@/data/traits.json";
+import Composer, { type Config } from "@/components/Composer";
+import traits from "@/data/traits.json";
 
 export default function Page() {
+  // Tell TS that the JSON matches Composer's Config shape
+  const config = traits as unknown as Config;
+
   return (
     <main className="min-h-dvh bg-[#dddddd] text-neutral-900">
       {/* Header */}
-      <header className="border-b bg-[#dddddd] backdrop-blur">
+      <header className="border-b bg-[#dddddd]">
         <div className="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between">
           <h1 className="text-xl font-semibold tracking-tight">Birbish Wallpapers</h1>
           <nav className="text-sm text-neutral-600">
-            <a href="https://genmerch.webflow.io" className="hover:underline">Generational Merch</a>
+            <a href="https://genmerch.webflow.io" className="hover:underline">
+              Generational Merch
+            </a>
           </nav>
         </div>
       </header>
@@ -23,7 +28,7 @@ export default function Page() {
           </p>
         </div>
 
-        <Composer config={config as any} />
+        <Composer config={config} />
       </div>
 
       {/* Footer */}

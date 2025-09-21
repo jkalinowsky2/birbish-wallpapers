@@ -23,7 +23,7 @@ export default function Composer({ config }: { config: Config }) {
     const moonbirdImgRef = useRef<HTMLImageElement | null>(null);
     const pixelBirdImgRef = useRef<HTMLImageElement | null>(null);    // pixel
     const [artStyle, setArtStyle] = useState<"illustrated" | "pixel">("illustrated");
-    const PIXEL_DEFAULT_SCALE = 3.0; // tweak to taste
+    //const PIXEL_DEFAULT_SCALE = 1.0; // tweak to taste
 
 
 
@@ -380,22 +380,22 @@ export default function Composer({ config }: { config: Config }) {
         );
     };
 
-    const openImage = () => {
-        if (previewUrl) {
-            // Data URL path (fastest)
-            window.open(previewUrl, "_blank", "noopener,noreferrer");
-            return;
-        }
-        // Fallback: create on-the-fly blob from canvas
-        const c = canvasRef.current;
-        if (!c) return;
-        c.toBlob((blob) => {
-            if (!blob) return;
-            const url = URL.createObjectURL(blob);
-            window.open(url, "_blank", "noopener,noreferrer");
-            setTimeout(() => URL.revokeObjectURL(url), 60_000);
-        }, "image/png");
-    };
+    // const openImage = () => {
+    //     if (previewUrl) {
+    //         // Data URL path (fastest)
+    //         window.open(previewUrl, "_blank", "noopener,noreferrer");
+    //         return;
+    //     }
+    //     // Fallback: create on-the-fly blob from canvas
+    //     const c = canvasRef.current;
+    //     if (!c) return;
+    //     c.toBlob((blob) => {
+    //         if (!blob) return;
+    //         const url = URL.createObjectURL(blob);
+    //         window.open(url, "_blank", "noopener,noreferrer");
+    //         setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    //     }, "image/png");
+    // };
 
     const canNativeShare =
         typeof navigator !== "undefined" &&
