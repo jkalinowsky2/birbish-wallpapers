@@ -1,5 +1,38 @@
 @import "tailwindcss";
 
+@layer utilities {
+  .bg-page { background-color: #000000; }
+}
+
+/* Simple, reusable UI tokens */
+
+@layer components {
+  .input {
+    @apply w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm
+           outline-none ring-0 transition focus:border-neutral-400 focus:bg-white;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center rounded-lg border border-neutral-300
+           bg-white px-3 py-2 text-sm font-medium text-neutral-800
+           transition hover:bg-neutral-100 active:bg-neutral-200;
+  }
+  .btn-primary {
+    @apply border-transparent bg-neutral-900 text-white hover:bg-neutral-800 active:bg-neutral-900;
+  }
+  .btn-ghost {
+    @apply border-transparent bg-transparent hover:bg-neutral-100;
+  }
+} 
+
+
+
+
+
+
+/*
+@import "tailwindcss";
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -24,3 +57,5 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+*/
