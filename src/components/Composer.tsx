@@ -714,14 +714,15 @@ function getImgSize(img: HTMLImageElement, fallbackW = 1600, fallbackH = 1600) {
 function getIntegerPixelScale(
     img: HTMLImageElement,
     c: HTMLCanvasElement,
-    targetWidthRatio = 0.6
+    targetWidthRatio = 0.6,
+    maxScale = 3   // <-- new
 ) {
     const { w, h } = getImgSize(img);
     const maxByWidth = (c.width * targetWidthRatio) / w;
     const maxByHeight = (c.height * .9) / h; // keep it from getting too tall; tweak if you like
     const raw = Math.min(maxByWidth, maxByHeight);
     // force a minimum of 1, and make it an integer to avoid seams
-    return Math.max(1, Math.floor(raw));
+    return Math.max(1, Math.min(maxScale, Math.floor(raw))); // <-- clamp
 }
 
 // Draw with nearest-neighbor and integer positioning to avoid gaps.
