@@ -3,6 +3,7 @@
     { "id": "iphone16", "w": 1179, "h": 2556, "name": "1179 x 2556 (iPhone 16)" },
     { "id": "iphone16Plus", "w": 1290, "h": 2796, "name": "1290 x 2796 (iPhone 16 Plus)" },
     { "id": "iphone16ProMax", "w": 1320, "h": 2868, "name": "1329 x 2868 (iPhone 16 Pro Max)" },
+    { "id": "bigBiceps", "w": 1440, "h": 3120, "name": "1440 x 3120 (Big Biceps Mode)" },
 
     { "id": "iPad", "w": 2040, "h": 2732, "name": "2040 x 2732 (Tablet)" }
 
