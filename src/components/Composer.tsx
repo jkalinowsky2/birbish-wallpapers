@@ -540,23 +540,7 @@ export default function Composer({ config }: { config: Config }) {
                                         alert("Could not load that token image. Double-check the ID.");
                                     }
                                 }}
-                                // className="btn btn-primary"
-                                // onClick={async () => {
-                                //     try {
-                                //         const id = tokenId.trim();
-                                //         if (!id) return;
-                                //         if (artStyle === "pixel") {
-                                //             await loadPixelBirdById(id);
-                                //         } else {
-                                //             await loadMoonbirdById(id);
-                                //         }
-                                //         setHat("none");
-                                //         setTokenVersion((v) => v + 1);
-                                //         await draw();
-                                //     } catch {
-                                //         alert("Could not load that token image. Double-check the ID.");
-                                //     }
-                                // }}
+
                                 disabled={!tokenId}
                             >
                                 Load
