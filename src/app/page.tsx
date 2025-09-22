@@ -1,5 +1,6 @@
 // src/app/page.tsx
-import Composer, { type Config } from "@/components/Composer";
+import Composer from "@/components/Composer";
+import type { Config } from "@/components/Composer";
 import traits from "@/data/traits.json";
 
 export default function Page() {
