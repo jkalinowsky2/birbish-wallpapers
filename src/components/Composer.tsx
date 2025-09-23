@@ -24,18 +24,14 @@ export default function Composer({ config }: { config: Config }) {
     const pixelBirdImgRef = useRef<HTMLImageElement | null>(null);    // pixel
     const [artStyle, setArtStyle] = useState<"illustrated" | "pixel">("illustrated");
     //const PIXEL_DEFAULT_SCALE = 1.0; // tweak to taste
+
     // .env (Vercel -> Project Settings -> Environment Variables)
-
-// .env (Vercel -> Project Settings -> Environment Variables)
-    const PIXEL_SHA = process.env.NEXT_PUBLIC_PIXEL_SHA; // string | undefined
-    const PIXEL_BASE = PIXEL_SHA
-        ? `https://cdn.jsdelivr.net/gh/jkalinowsky2/birb-assets@${PIXEL_SHA}/pixel_clean`
-        : `https://cdn.jsdelivr.net/gh/jkalinowsky2/birb-assets@main/pixel_clean`;
-
-    // const PIXEL_BASE =
-    //     "https://raw.githubusercontent.com/jkalinowsky2/birb-assets/main/pixel_clean";
-    // Or use raw GitHub if you prefer:
-    // const PIXEL_BASE = "https://raw.githubusercontent.com/jkalinowsky2/birb-assets/main/pixel_clean";
+    // near top of Composer.tsx
+    // Read once at build-time. Must be NEXT_PUBLIC_* to be available client-side.
+    const PIXEL_SHA = process.env.NEXT_PUBLIC_PIXEL_SHA || "main"; // fallback if not set
+    const PIXEL_BASE = `https://cdn.jsdelivr.net/gh/jkalinowsky2/birb-assets@${PIXEL_SHA}/pixel_clean`;
+    // const PIXEL_SHA = process.env.NEXT_PUBLIC_PIXEL_SHA!;
+    // const PIXEL_BASE = `https://cdn.jsdelivr.net/gh/jkalinowsky2/birb-assets@${PIXEL_SHA}/pixel_clean`;
 
 
 
@@ -78,24 +74,16 @@ export default function Composer({ config }: { config: Config }) {
 
     //NEW
     async function loadPixelBirdById(id: string): Promise<HTMLImageElement> {
-
         const n = Number(id);
-        if (!Number.isInteger(n) || n < 0 || n > 9999) {
-            throw new Error("Invalid token ID");
-        }
+        if (!Number.isInteger(n) || n < 0 || n > 9999) throw new Error("Invalid token ID");
 
-        const url = `/api/pixelproxy?id=${n}&v=${Date.now()}`; // cache-buster while testing
+        const url = `${PIXEL_BASE}/${n}.png`; // SHA-pinned; safely cached
         const img = new Image();
-        img.crossOrigin = "anonymous"; // harmless now; same-origin response
-        // img.src = url;
-        img.src = `${PIXEL_BASE}/${n}.png`; // no cache-buster needed for SHA
-        console.log("[pixel] src:", url, "size:", img.naturalWidth, "x", img.naturalHeight);
+        img.crossOrigin = "anonymous";
+        img.src = url;
+
         await new Promise<void>((resolve, reject) => {
-            img.onload = () => {
-                // Optional: sanity check in DevTools
-                console.log("[pixel] loaded", url, img.naturalWidth, "x", img.naturalHeight);
-                resolve();
-            };
+            img.onload = () => resolve();
             img.onerror = (e) => {
                 console.error("[pixel] FAILED", url, e);
                 reject(e);
@@ -104,24 +92,6 @@ export default function Composer({ config }: { config: Config }) {
 
         return img;
     }
-    // async function loadPixelBirdById(id: string): Promise<HTMLImageElement> {
-    //     const n = Number(id);
-    //     if (!Number.isInteger(n) || n < 0 || n > 9999) {
-    //         throw new Error("Invalid token ID");
-    //     }
-
-    //     const img = new Image();
-    //     img.crossOrigin = "anonymous"; // harmless for same-origin; keep for parity
-    //     // img.src = `/pixel_clean/${n}.png?v=${Date.now()}`; // served statically from /public
-    //     img.src = `${PIXEL_BASE}/${n}.png`; // no cache-buster so the CDN can cache
-
-    //     await new Promise<void>((resolve, reject) => {
-    //         img.onload = () => resolve();
-    //         img.onerror = reject;
-    //     });
-
-    //     return img;
-    // }
 
     const [deviceId, setDeviceId] = useState<string>(config.devices[0].id);
     const device = useMemo(
