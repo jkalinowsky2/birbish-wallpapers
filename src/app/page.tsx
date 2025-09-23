@@ -12,7 +12,7 @@ export default function Page() {
       {/* Header */}
       <header className="border-b bg-[#dddddd]">
         <div className="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-semibold tracking-tight">Birbish Wallpapers</h1>
+          <h1 className="text-3xl font-semibold tracking-tight">Birbish Wallpapers</h1>
           <nav className="text-sm text-neutral-600">
             <a href="https://genmerch.webflow.io" className="hover:underline">
               Generational Merch
