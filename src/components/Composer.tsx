@@ -5,11 +5,11 @@ type Layer = { id: string; label: string; src: string };
 type Device = { id: string; w: number; h: number; name: string };
 
 export type Config = {
-  devices: { id: string; w: number; h: number; name: string }[];
-  backgrounds: { id: string; label: string; src: string }[];
-  texts: { id: string; label: string; src: string }[];
-  birds: { id: string; label: string; src: string }[];
-  headwear: { id: string; label: string; src: string }[];
+    devices: { id: string; w: number; h: number; name: string }[];
+    backgrounds: { id: string; label: string; src: string }[];
+    texts: { id: string; label: string; src: string }[];
+    birds: { id: string; label: string; src: string }[];
+    headwear: { id: string; label: string; src: string }[];
 };
 
 export default function Composer({ config }: { config: Config }) {
@@ -51,7 +51,10 @@ export default function Composer({ config }: { config: Config }) {
         `/api/imgproxy?url=${encodeURIComponent(
             `https://collection-assets.proof.xyz/moonbirds/images_no_bg/${id}.png`
         )}&v=${Date.now()}`; // <- bust any caches
+
     async function loadMoonbirdById(id: string): Promise<HTMLImageElement> {
+        const n = Number(id);
+        if (!Number.isInteger(n) || n < 0 || n > 9999) throw new Error("Invalid token ID");
         const img = new Image();
         img.crossOrigin = "anonymous";
         img.src = buildTokenUrl(id);
@@ -80,26 +83,6 @@ export default function Composer({ config }: { config: Config }) {
 
         return img;
     }
-    // async function loadPixelBirdById(id: string): Promise<HTMLImageElement> {
-    //     const apiUrl = new URL("/api/pixelbird", window.location.origin);
-    //     apiUrl.searchParams.set("id", id);
-    //     apiUrl.searchParams.set("v", String(Date.now()));
-
-    //     const res = await fetch(apiUrl.toString(), { cache: "no-store" });
-    //     const svgText = await res.text();
-    //     const blob = new Blob([svgText], { type: "image/svg+xml" });
-    //     const url = URL.createObjectURL(blob);
-
-    //     const img = new Image();
-    //     img.crossOrigin = "anonymous";
-    //     img.src = url;
-    //     await new Promise<void>((resolve, reject) => {
-    //         img.onload = () => resolve();
-    //         img.onerror = reject;
-    //     });
-    //     return img;
-    // }
-
 
     const [deviceId, setDeviceId] = useState<string>(config.devices[0].id);
     const device = useMemo(
@@ -133,7 +116,7 @@ export default function Composer({ config }: { config: Config }) {
 
         setIsDrawing(true);
         try {
-            // Ensure target size for pixel-perfect exports
+            // target canvas size for export
             c.width = device.w;
             c.height = device.h;
 
@@ -142,12 +125,12 @@ export default function Composer({ config }: { config: Config }) {
 
             ctx.clearRect(0, 0, c.width, c.height);
 
-            // Token is considered "active" if there’s a tokenId AND at least one cached image (illustrated or pixel)
+            // token is "active" if we have an id and at least one cached token image
             const useToken = Boolean(
                 tokenId.trim() && (moonbirdImgRef.current || pixelBirdImgRef.current)
             );
 
-            // Load static layers in parallel; skip bird layer when using token art
+            // load static layers in parallel; skip built-in bird if token art is used
             const [bgImg, textImg, birdImgOrNull, hatImg] = await Promise.all([
                 load(get(config.backgrounds, bg).src),
                 load(get(config.texts, text).src),
@@ -155,7 +138,7 @@ export default function Composer({ config }: { config: Config }) {
                 load(get(config.headwear, hat).src),
             ] as const);
 
-            // --- Background (center-crop if larger than canvas) ---
+            // --- background (center-crop if larger than canvas) ---
             if (bgImg.width >= c.width && bgImg.height >= c.height) {
                 const sx = Math.floor((bgImg.width - c.width) / 2);
                 const sy = Math.floor((bgImg.height - c.height) / 2);
@@ -163,65 +146,37 @@ export default function Composer({ config }: { config: Config }) {
                 const sh = c.height;
                 ctx.drawImage(bgImg, sx, sy, sw, sh, 0, 0, sw, sh);
             } else {
-                // Fallback: scale to cover if smaller
                 ctx.drawImage(bgImg, 0, 0, c.width, c.height);
             }
 
-            // --- Text ---
+            // --- text ---
             drawCenteredNoScale(ctx, textImg, c);
 
-            // --- Bird / Token art ---
+            // --- bird / token art ---
             if (useToken) {
-                const tokenImg = artStyle === "pixel"
-                    ? (pixelBirdImgRef.current ?? moonbirdImgRef.current)
-                    : (moonbirdImgRef.current ?? pixelBirdImgRef.current);
+                const tokenImg =
+                    artStyle === "pixel"
+                        ? (pixelBirdImgRef.current ?? moonbirdImgRef.current)
+                        : (moonbirdImgRef.current ?? pixelBirdImgRef.current);
 
                 if (tokenImg) {
                     if (artStyle === "pixel") {
-                        const s = getIntegerPixelScale(tokenImg, c, /* targetWidthRatio */ 1);
-                        drawBottomScaledCrisp(ctx, tokenImg, c, s, 0);
+                        const s = getIntegerPixelScale(tokenImg, c, /*targetWidthRatio*/ 1);
+                        drawBottomScaled(ctx, tokenImg, c, 1, 0);
                     } else {
-                        const isSpida = parseInt(tokenId, 10) === 6421;
-                        isSpida
-                            ? drawBottomOffsetNoScale(ctx, tokenImg, c, 0)
-                            : drawBottomScaled(ctx, tokenImg, c, 0.4, 0);
+                        // illustrated: uniform scale
+                        drawBottomScaled(ctx, tokenImg, c, 0.4, 0);
                     }
                 }
-            }
-            // if (useToken) {
-            //     // Pick which cached token image to draw based on current artStyle (with fallback)
-            //     const tokenImg =
-            //         artStyle === "pixel"
-            //             ? (pixelBirdImgRef.current ?? moonbirdImgRef.current)
-            //             : (moonbirdImgRef.current ?? pixelBirdImgRef.current);
-
-            //     if (tokenImg) {
-            //         if (artStyle === "pixel") {
-            //             // Pixels: use your pixel scale
-            //             //drawBottomScaled(ctx, tokenImg, c, PIXEL_DEFAULT_SCALE, 0);
-            //             const s = getIntegerPixelScale(tokenImg, c, /*targetWidthRatio=*/1);
-            //             drawBottomScaledCrisp(ctx, tokenImg, c, s, 0);
-            //         } else {
-            //             // Illustrated: special-case Spida (no scale), otherwise scale to 0.4
-            //             const isSpida = parseInt(tokenId, 10) === 6421;
-            //             if (isSpida) {
-            //                 drawBottomOffsetNoScale(ctx, tokenImg, c, 0);
-            //             } else {
-            //                 drawBottomScaled(ctx, tokenImg, c, 0.4, 0);
-            //             }
-            //         }
-            //     }
-            // } 
-
-            else if (birdImgOrNull) {
-                // Regular built-in bird (no scaling, bottom-center)
+            } else if (birdImgOrNull) {
+                // built-in bird (no scaling, bottom-center)
                 drawBottomOffsetNoScale(ctx, birdImgOrNull, c, 0);
             }
 
-            // --- Headwear ---
+            // --- headwear ---
             drawBottomOffsetNoScale(ctx, hatImg, c, 35);
 
-            // Mirror to <img> for mobile long-press save
+            // mirror to <img> for mobile long-press save
             const dataUrl = c.toDataURL("image/png");
             setPreviewUrl(dataUrl);
             const imgEl = document.getElementById("mobile-preview") as HTMLImageElement | null;
@@ -623,23 +578,23 @@ function getIntegerPixelScale(
     return Math.max(1, Math.min(maxScale, Math.floor(raw))); // <-- clamp
 }
 
-// Draw with nearest-neighbor and integer positioning to avoid gaps.
-function drawBottomScaledCrisp(
-    ctx: CanvasRenderingContext2D,
-    img: HTMLImageElement,
-    c: HTMLCanvasElement,
-    scale: number,
-    offset = 0
-) {
-    const { w: iw, h: ih } = getImgSize(img);
-    const dw = Math.round(iw * scale);
-    const dh = Math.round(ih * scale);
+// // Draw with nearest-neighbor and integer positioning to avoid gaps.
+// function drawBottomScaledCrisp(
+//     ctx: CanvasRenderingContext2D,
+//     img: HTMLImageElement,
+//     c: HTMLCanvasElement,
+//     scale: number,
+//     offset = 0
+// ) {
+//     const { w: iw, h: ih } = getImgSize(img);
+//     const dw = Math.round(iw * scale);
+//     const dh = Math.round(ih * scale);
 
-    const dx = Math.round((c.width - dw) / 2);  // center on whole pixels
-    const dy = Math.round(c.height - dh - offset);
+//     const dx = Math.round((c.width - dw) / 2);  // center on whole pixels
+//     const dy = Math.round(c.height - dh - offset);
 
-    const prev = ctx.imageSmoothingEnabled;
-    ctx.imageSmoothingEnabled = false;          // nearest-neighbor
-    ctx.drawImage(img, dx, dy, dw, dh);
-    ctx.imageSmoothingEnabled = prev;
-}
+//     const prev = ctx.imageSmoothingEnabled;
+//     ctx.imageSmoothingEnabled = false;          // nearest-neighbor
+//     ctx.drawImage(img, dx, dy, dw, dh);
+//     ctx.imageSmoothingEnabled = prev;
+// }
