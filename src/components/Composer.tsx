@@ -45,7 +45,6 @@ export default function Composer({ config }: { config: Config }) {
         setTokenVersion((v) => v + 1);
     }
 
-
     // build URL & load through proxy
     const buildTokenUrl = (id: string) =>
         `/api/imgproxy?url=${encodeURIComponent(
