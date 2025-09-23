@@ -24,6 +24,18 @@ export default function Composer({ config }: { config: Config }) {
     const pixelBirdImgRef = useRef<HTMLImageElement | null>(null);    // pixel
     const [artStyle, setArtStyle] = useState<"illustrated" | "pixel">("illustrated");
     //const PIXEL_DEFAULT_SCALE = 1.0; // tweak to taste
+    // .env (Vercel -> Project Settings -> Environment Variables)
+
+// .env (Vercel -> Project Settings -> Environment Variables)
+    const PIXEL_SHA = process.env.NEXT_PUBLIC_PIXEL_SHA; // string | undefined
+    const PIXEL_BASE = PIXEL_SHA
+        ? `https://cdn.jsdelivr.net/gh/jkalinowsky2/birb-assets@${PIXEL_SHA}/pixel_clean`
+        : `https://cdn.jsdelivr.net/gh/jkalinowsky2/birb-assets@main/pixel_clean`;
+
+    // const PIXEL_BASE =
+    //     "https://raw.githubusercontent.com/jkalinowsky2/birb-assets/main/pixel_clean";
+    // Or use raw GitHub if you prefer:
+    // const PIXEL_BASE = "https://raw.githubusercontent.com/jkalinowsky2/birb-assets/main/pixel_clean";
 
 
 
@@ -66,22 +78,50 @@ export default function Composer({ config }: { config: Config }) {
 
     //NEW
     async function loadPixelBirdById(id: string): Promise<HTMLImageElement> {
+
         const n = Number(id);
         if (!Number.isInteger(n) || n < 0 || n > 9999) {
             throw new Error("Invalid token ID");
         }
 
+        const url = `/api/pixelproxy?id=${n}&v=${Date.now()}`; // cache-buster while testing
         const img = new Image();
-        img.crossOrigin = "anonymous"; // harmless for same-origin; keep for parity
-        img.src = `/pixel_clean/${n}.png?v=${Date.now()}`; // served statically from /public
-
+        img.crossOrigin = "anonymous"; // harmless now; same-origin response
+        // img.src = url;
+        img.src = `${PIXEL_BASE}/${n}.png`; // no cache-buster needed for SHA
+        console.log("[pixel] src:", url, "size:", img.naturalWidth, "x", img.naturalHeight);
         await new Promise<void>((resolve, reject) => {
-            img.onload = () => resolve();
-            img.onerror = reject;
+            img.onload = () => {
+                // Optional: sanity check in DevTools
+                console.log("[pixel] loaded", url, img.naturalWidth, "x", img.naturalHeight);
+                resolve();
+            };
+            img.onerror = (e) => {
+                console.error("[pixel] FAILED", url, e);
+                reject(e);
+            };
         });
 
         return img;
     }
+    // async function loadPixelBirdById(id: string): Promise<HTMLImageElement> {
+    //     const n = Number(id);
+    //     if (!Number.isInteger(n) || n < 0 || n > 9999) {
+    //         throw new Error("Invalid token ID");
+    //     }
+
+    //     const img = new Image();
+    //     img.crossOrigin = "anonymous"; // harmless for same-origin; keep for parity
+    //     // img.src = `/pixel_clean/${n}.png?v=${Date.now()}`; // served statically from /public
+    //     img.src = `${PIXEL_BASE}/${n}.png`; // no cache-buster so the CDN can cache
+
+    //     await new Promise<void>((resolve, reject) => {
+    //         img.onload = () => resolve();
+    //         img.onerror = reject;
+    //     });
+
+    //     return img;
+    // }
 
     const [deviceId, setDeviceId] = useState<string>(config.devices[0].id);
     const device = useMemo(
@@ -152,22 +192,46 @@ export default function Composer({ config }: { config: Config }) {
             drawCenteredNoScale(ctx, textImg, c);
 
             // --- bird / token art ---
+            // --- bird / token art ---
             if (useToken) {
+                // pick strictly by style (no fallback to the other style)
                 const tokenImg =
                     artStyle === "pixel"
-                        ? (pixelBirdImgRef.current ?? moonbirdImgRef.current)
-                        : (moonbirdImgRef.current ?? pixelBirdImgRef.current);
+                        ? pixelBirdImgRef.current
+                        : moonbirdImgRef.current;
 
                 if (tokenImg) {
                     if (artStyle === "pixel") {
                         const s = getIntegerPixelScale(tokenImg, c, /*targetWidthRatio*/ 1);
-                        drawBottomScaled(ctx, tokenImg, c, 1, 0);
+                        drawBottomScaled(ctx, tokenImg, c, s, 0);
                     } else {
-                        // illustrated: uniform scale
                         drawBottomScaled(ctx, tokenImg, c, 0.4, 0);
                     }
+                } else {
+                    // Optional: tiny hint while the correct asset is loading
+                    // console.log("[token] waiting for", artStyle, "asset to load…");
                 }
             } else if (birdImgOrNull) {
+                // built-in bird (no scaling, bottom-center)
+                drawBottomOffsetNoScale(ctx, birdImgOrNull, c, 0);
+            }
+            // if (useToken) {
+            //     const tokenImg =
+            //         artStyle === "pixel"
+            //             ? (pixelBirdImgRef.current ?? moonbirdImgRef.current)
+            //             : (moonbirdImgRef.current ?? pixelBirdImgRef.current);
+
+            //     if (tokenImg) {
+            //         if (artStyle === "pixel") {
+            //             const s = getIntegerPixelScale(tokenImg, c, /*targetWidthRatio*/ 1);
+            //             drawBottomScaled(ctx, tokenImg, c, s, 0);   // ← use s
+            //         } else {
+            //             // drawBottomScaled(ctx, tokenImg, c, 0.4, 0);
+            //             drawBottomScaled(ctx, tokenImg, c, 0.4, 0);
+            //         }
+            //     }
+            // } 
+            else if (birdImgOrNull) {
                 // built-in bird (no scaling, bottom-center)
                 drawBottomOffsetNoScale(ctx, birdImgOrNull, c, 0);
             }

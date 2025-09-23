@@ -10,7 +10,7 @@ import sharp from "sharp";
 
 // Token range
 const START_ID = 0;
-const END_ID = 9999;
+const END_ID = 1;
 
 // Where PNGs will be written
 const OUT_DIR = path.resolve("downloads/pixel_clean/png");
@@ -28,8 +28,8 @@ const SCALE = 3; // e.g. 1 (=336px), 2 (=672px), 3 (=1008px), 4 (=1344px), etc.
 const LINE3_IDS = new Set([2080, 2941, 3904, 5249, 8398, 8959]);
 
 // Upstream URL builder
-// const upstreamUrl = (id) =>
-//   `https://raw.githubusercontent.com/proofxyz/moonbirds-assets/main/collection/svg/${id}.svg`;
+const upstreamUrl = (id) =>
+  `https://raw.githubusercontent.com/proofxyz/moonbirds-assets/main/collection/svg/${id}.svg`;
 
 // ------------------------
 // Helpers
