@@ -30,10 +30,6 @@ export default function Composer({ config }: { config: Config }) {
     // Read once at build-time. Must be NEXT_PUBLIC_* to be available client-side.
     const PIXEL_SHA = process.env.NEXT_PUBLIC_PIXEL_SHA || "main"; // fallback if not set
     const PIXEL_BASE = `https://cdn.jsdelivr.net/gh/jkalinowsky2/birb-assets@${PIXEL_SHA}/pixel_clean`;
-    // const PIXEL_SHA = process.env.NEXT_PUBLIC_PIXEL_SHA!;
-    // const PIXEL_BASE = `https://cdn.jsdelivr.net/gh/jkalinowsky2/birb-assets@${PIXEL_SHA}/pixel_clean`;
-
-
 
     // choose your default bird when reverting from token mode
     const DEFAULT_BIRD_ID =
@@ -75,9 +71,14 @@ export default function Composer({ config }: { config: Config }) {
     //NEW
     async function loadPixelBirdById(id: string): Promise<HTMLImageElement> {
         const n = Number(id);
-        if (!Number.isInteger(n) || n < 0 || n > 9999) throw new Error("Invalid token ID");
+        if (!Number.isInteger(n) || n < 0 || n > 9999) {
+            throw new Error("Invalid token ID");
+        }
 
-        const url = `${PIXEL_BASE}/${n}.png`; // SHA-pinned; safely cached
+        // If you ever want a “local dev” switch, you can set NEXT_PUBLIC_PIXEL_SHA=local
+        // and use /public assets instead. For now, always use the pinned CDN SHA:
+        const url = `${PIXEL_BASE}/${n}.png`;
+
         const img = new Image();
         img.crossOrigin = "anonymous";
         img.src = url;
@@ -85,11 +86,10 @@ export default function Composer({ config }: { config: Config }) {
         await new Promise<void>((resolve, reject) => {
             img.onload = () => resolve();
             img.onerror = (e) => {
-                console.error("[pixel] FAILED", url, e);
+                console.error("[pixel] failed to load", url, e);
                 reject(e);
             };
         });
-
         return img;
     }
 
@@ -185,22 +185,7 @@ export default function Composer({ config }: { config: Config }) {
                 // built-in bird (no scaling, bottom-center)
                 drawBottomOffsetNoScale(ctx, birdImgOrNull, c, 0);
             }
-            // if (useToken) {
-            //     const tokenImg =
-            //         artStyle === "pixel"
-            //             ? (pixelBirdImgRef.current ?? moonbirdImgRef.current)
-            //             : (moonbirdImgRef.current ?? pixelBirdImgRef.current);
 
-            //     if (tokenImg) {
-            //         if (artStyle === "pixel") {
-            //             const s = getIntegerPixelScale(tokenImg, c, /*targetWidthRatio*/ 1);
-            //             drawBottomScaled(ctx, tokenImg, c, s, 0);   // ← use s
-            //         } else {
-            //             // drawBottomScaled(ctx, tokenImg, c, 0.4, 0);
-            //             drawBottomScaled(ctx, tokenImg, c, 0.4, 0);
-            //         }
-            //     }
-            // } 
             else if (birdImgOrNull) {
                 // built-in bird (no scaling, bottom-center)
                 drawBottomOffsetNoScale(ctx, birdImgOrNull, c, 0);
@@ -414,34 +399,6 @@ export default function Composer({ config }: { config: Config }) {
                                         alert("Could not load that token image. Double-check the ID.");
                                     }
                                 }}
-                                // onClick={async () => {
-                                //     try {
-                                //         const id = tokenId.trim();
-                                //         if (!id) return;
-
-                                //         // always clear previous
-                                //         moonbirdImgRef.current = null;
-                                //         pixelBirdImgRef.current = null;
-
-                                //         // load illustrated
-                                //         const illu = await loadMoonbirdById(id);
-                                //         moonbirdImgRef.current = illu;
-
-                                //         // load pixel
-                                //         try {
-                                //             const pix = await loadPixelBirdById(id);
-                                //             pixelBirdImgRef.current = pix;
-                                //         } catch {
-                                //             console.warn("Pixel version not available for this token.");
-                                //         }
-
-                                //         setHat("none");
-                                //         setTokenVersion(v => v + 1);
-                                //         await draw();
-                                //     } catch {
-                                //         alert("Could not load that token image. Double-check the ID.");
-                                //     }
-                                // }}
 
                                 disabled={!tokenId}
                             >
