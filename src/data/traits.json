@@ -28,7 +28,10 @@
   "birds": [
     { "id": "red", "label": "Birb", "src": "/birds/red.png" },
     { "id": "pink", "label": "Pip", "src": "/birds/pink.png" },
-    { "id": "blue", "label": "Zen", "src": "/birds/blue.png" }
+    { "id": "blue", "label": "Zen", "src": "/birds/blue.png" },
+    { "id": "toobins", "label": "Toobins", "src": "/birds/toobins.png" },
+    { "id": "ddroobins", "label": "Droobins", "src": "/birds/droobins.png" }
+
 
   ],
   "headwear": [
