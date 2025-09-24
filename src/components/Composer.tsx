@@ -385,7 +385,7 @@ export default function Composer({ config }: { config: Config }) {
                     </p>
 
                     {/* <Field label="Moonbird Token" className="!mt-8"> */}
-                    <Field label="Moonbird Token">
+                    <Field label="Token ID">
                         <div className="flex gap-2">
                             <input
                                 type="number"
