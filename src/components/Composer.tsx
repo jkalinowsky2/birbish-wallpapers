@@ -22,7 +22,11 @@ export default function Composer({ config }: { config: Config }) {
     const [tokenVersion, setTokenVersion] = useState(0);
     const moonbirdImgRef = useRef<HTMLImageElement | null>(null);
     const pixelBirdImgRef = useRef<HTMLImageElement | null>(null);    // pixel
-    const [artStyle, setArtStyle] = useState<"illustrated" | "pixel">("illustrated");
+
+    type ArtStyle = "illustrated" | "pixel" | "oddity";
+    const [artStyle, setArtStyle] = useState<ArtStyle>("illustrated");
+    //const [artStyle, setArtStyle] = useState<"illustrated" | "pixel">("illustrated");
+    const oddityImgRef = useRef<HTMLImageElement | null>(null);
     //const PIXEL_DEFAULT_SCALE = 1.0; // tweak to taste
 
     // .env (Vercel -> Project Settings -> Environment Variables)
@@ -30,6 +34,8 @@ export default function Composer({ config }: { config: Config }) {
     // Read once at build-time. Must be NEXT_PUBLIC_* to be available client-side.
     const PIXEL_SHA = process.env.NEXT_PUBLIC_PIXEL_SHA || "main"; // fallback if not set
     const PIXEL_BASE = `https://cdn.jsdelivr.net/gh/jkalinowsky2/birb-assets@${PIXEL_SHA}/pixel_clean`;
+    const ODDITY_SHA = process.env.NEXT_PUBLIC_ODDITY_CDN_SHA || "main";
+    const ODDITY_BASE = `https://cdn.jsdelivr.net/gh/jkalinowsky2/birb-assets@${ODDITY_SHA}/oddities_clean`;
 
     // choose your default bird when reverting from token mode
     const DEFAULT_BIRD_ID =
@@ -89,6 +95,20 @@ export default function Composer({ config }: { config: Config }) {
                 console.error("[pixel] failed to load", url, e);
                 reject(e);
             };
+        });
+        return img;
+    }
+    async function loadOddityById(id: string): Promise<HTMLImageElement> {
+        const n = Number(id);
+        if (!Number.isInteger(n) || n < 0 || n > 9999) throw new Error("Invalid token ID");
+
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.src = `${ODDITY_BASE}/${n}.png`; // no cache-buster so CDN can cache
+
+        await new Promise<void>((resolve, reject) => {
+            img.onload = () => resolve();
+            img.onerror = reject;
         });
         return img;
     }
@@ -164,24 +184,27 @@ export default function Composer({ config }: { config: Config }) {
             // --- bird / token art ---
             // --- bird / token art ---
             if (useToken) {
-                // pick strictly by style (no fallback to the other style)
                 const tokenImg =
                     artStyle === "pixel"
-                        ? pixelBirdImgRef.current
-                        : moonbirdImgRef.current;
+                        ? (pixelBirdImgRef.current ?? moonbirdImgRef.current ?? oddityImgRef.current)
+                        : artStyle === "oddity"
+                            ? (oddityImgRef.current ?? moonbirdImgRef.current ?? pixelBirdImgRef.current)
+                            : (moonbirdImgRef.current ?? pixelBirdImgRef.current ?? oddityImgRef.current);
 
                 if (tokenImg) {
                     if (artStyle === "pixel") {
-                        const s = getIntegerPixelScale(tokenImg, c, /*targetWidthRatio*/ 1);
+                        const s = getIntegerPixelScale(tokenImg, c, 1);
                         drawBottomScaled(ctx, tokenImg, c, s, 0);
+                    } else if (artStyle === "oddity") {
+                        // 👇 adjust this scale factor to taste (0.5, 0.6, etc.)
+                        drawBottomScaled(ctx, tokenImg, c, 0.8, 0);
                     } else {
+                        // illustrated
                         drawBottomScaled(ctx, tokenImg, c, 0.4, 0);
                     }
-                } else {
-                    // Optional: tiny hint while the correct asset is loading
-                    // console.log("[token] waiting for", artStyle, "asset to load…");
                 }
-            } else if (birdImgOrNull) {
+            }
+            else if (birdImgOrNull) {
                 // built-in bird (no scaling, bottom-center)
                 drawBottomOffsetNoScale(ctx, birdImgOrNull, c, 0);
             }
@@ -382,15 +405,18 @@ export default function Composer({ config }: { config: Config }) {
                                         // clear any previous
                                         moonbirdImgRef.current = null;
                                         pixelBirdImgRef.current = null;
+                                        oddityImgRef.current = null;
 
                                         // kick off both in parallel
-                                        const [illu, pix] = await Promise.allSettled([
+                                        const [illu, pix, odd] = await Promise.allSettled([
                                             loadMoonbirdById(id),     // illustrated PNG via /api/imgproxy (your existing helper)
                                             loadPixelBirdById(id),    // pixel PNG from /public/pixel_clean
+                                            loadOddityById(id),
                                         ]);
 
                                         if (illu.status === "fulfilled") moonbirdImgRef.current = illu.value;
                                         if (pix.status === "fulfilled") pixelBirdImgRef.current = pix.value;
+                                        if (odd.status === "fulfilled") oddityImgRef.current = odd.value;
 
                                         setHat("none");
                                         setTokenVersion(v => v + 1);
@@ -420,7 +446,7 @@ export default function Composer({ config }: { config: Config }) {
 
 
                     <Field label="Art Style">
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-3 gap-2">
                             <button
                                 type="button"
                                 className={`btn ${artStyle === "illustrated" ? "btn-primary" : "btn-ghost"}`}
@@ -434,6 +460,13 @@ export default function Composer({ config }: { config: Config }) {
                                 onClick={() => setArtStyle("pixel")}
                             >
                                 Pixel
+                            </button>
+                            <button
+                                type="button"
+                                className={`btn ${artStyle === "oddity" ? "btn-primary" : "btn-ghost"}`}
+                                onClick={() => setArtStyle("oddity")}
+                            >
+                                Oddity
                             </button>
                         </div>
                     </Field>
