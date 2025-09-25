@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { PIXEL_BASE, ODDITY_BASE, ILLU_PROXY } from "@/lib/assets";
 
 type Layer = { id: string; label: string; src: string };
 type Device = { id: string; w: number; h: number; name: string };
@@ -29,13 +30,18 @@ export default function Composer({ config }: { config: Config }) {
     const oddityImgRef = useRef<HTMLImageElement | null>(null);
     //const PIXEL_DEFAULT_SCALE = 1.0; // tweak to taste
 
-    // .env (Vercel -> Project Settings -> Environment Variables)
-    // near top of Composer.tsx
-    // Read once at build-time. Must be NEXT_PUBLIC_* to be available client-side.
-    const PIXEL_SHA = process.env.NEXT_PUBLIC_PIXEL_SHA || "main"; // fallback if not set
-    const PIXEL_BASE = `https://cdn.jsdelivr.net/gh/jkalinowsky2/birb-assets@${PIXEL_SHA}/pixel_clean`;
-    const ODDITY_SHA = process.env.NEXT_PUBLIC_ODDITY_CDN_SHA || "main";
-    const ODDITY_BASE = `https://cdn.jsdelivr.net/gh/jkalinowsky2/birb-assets@${ODDITY_SHA}/oddities_clean`;
+    // One pinned SHA for both pixel & oddities (safer than @main)
+const ASSETS_SHA = process.env.NEXT_PUBLIC_BIRB_ASSETS_SHA || "main"; // use "main" only for local testing
+
+// CDN bases
+// const PIXEL_BASE  = `https://cdn.jsdelivr.net/gh/jkalinowsky2/birb-assets@${ASSETS_SHA}/pixel_clean`;
+// const ODDITY_BASE = `https://cdn.jsdelivr.net/gh/jkalinowsky2/birb-assets@${ASSETS_SHA}/oddities_clean`;
+
+// Illustrated goes through your proxy (same as before)
+// const ILLU_PROXY  = process.env.NEXT_PUBLIC_ILLUSTRATED_PROXY || "/api/imgproxy";
+
+console.log("[BIRB ASSETS] SHA:", ASSETS_SHA);
+console.log("[BIRB ASSETS] ODDITY_BASE:", ODDITY_BASE);
 
     // choose your default bird when reverting from token mode
     const DEFAULT_BIRD_ID =
