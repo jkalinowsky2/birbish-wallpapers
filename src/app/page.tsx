@@ -80,17 +80,5 @@ export default function Page() {
   );
 }
 
-// import Composer, { type Config } from "@/components/Composer";
-// import configJson from "@/data/traits.json"; // or wherever you placed it under src/
-
-// export default function Page() {
-//   const config = configJson as Config; // type-safe cast, not `any`
-//   return (
-//     <main className="max-w-6xl mx-auto p-6">
-//       <h1 className="text-2xl font-semibold mb-4">Birbish Papers</h1>
-//       <Composer config={config} />
-//     </main>
-//   );
-// }
 
 
