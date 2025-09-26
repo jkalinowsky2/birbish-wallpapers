@@ -41,9 +41,10 @@ const BG_OPTIONS: { id: string; label: string; src: string }[] = [
 /** Center overlay (logo / phrase) choices. Always centered; no scale/pos controls. */
 const CENTER_OPTIONS: { id: string; label: string; src: string }[] = [
     { id: "none", label: "None", src: "" },
-    { id: "birbish", label: "Birbish", src: "/bannertext/birbish.png" },
-    { id: "control", label: "Birbs in Control", src: "/bannertext/control.png" },
-    { id: "logo", label: "Logo", src: "/bannertext/logo.png" },
+    { id: "birbish", label: "birbish", src: "/bannertext/birbish.png" },
+    { id: "control", label: "birbs in Control", src: "/bannertext/control.png" },
+    { id: "gbirb", label: "gbirb.", src: "/bannertext/gbirb.png" },
+    { id: "logo", label: "logo", src: "/bannertext/logo.png" },
     { id: "toobins", label: "Toobins", src: "/bannertext/toobins.png" },
 ];
 

@@ -19,8 +19,9 @@
 
   "texts": [
     { "id": "none", "label": "None", "src": "/texts/none.png" },
-    { "id": "birbish", "label": "birbish", "src": "/texts/birbish.png" },
+    { "id": "birbish", "label": "birbish.", "src": "/texts/birbish.png" },
     { "id": "control", "label": "birbs in control", "src": "/texts/control.png" },
+    { "id": "gbirb", "label": "gbirb.", "src": "/texts/gbirb.png" },
     { "id": "birblogo", "label": "birb logo", "src": "/texts/birblogo.png" }
 
 
