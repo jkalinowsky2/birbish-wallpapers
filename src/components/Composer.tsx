@@ -33,12 +33,6 @@ export default function Composer({ config }: { config: Config }) {
     // One pinned SHA for both pixel & oddities (safer than @main)
     const ASSETS_SHA = process.env.NEXT_PUBLIC_BIRB_ASSETS_SHA || "main"; // use "main" only for local testing
 
-    // CDN bases
-    // const PIXEL_BASE  = `https://cdn.jsdelivr.net/gh/jkalinowsky2/birb-assets@${ASSETS_SHA}/pixel_clean`;
-    // const ODDITY_BASE = `https://cdn.jsdelivr.net/gh/jkalinowsky2/birb-assets@${ASSETS_SHA}/oddities_clean`;
-
-    // Illustrated goes through your proxy (same as before)
-    // const ILLU_PROXY  = process.env.NEXT_PUBLIC_ILLUSTRATED_PROXY || "/api/imgproxy";
 
     console.log("[BIRB ASSETS] SHA:", ASSETS_SHA);
     console.log("[BIRB ASSETS] ODDITY_BASE:", ODDITY_BASE);
@@ -564,16 +558,6 @@ function drawCenteredNoScale(
     // draw 1:1 pixels, centered; crops if needed, never scales
     ctx.drawImage(img, sx, sy, dw, dh, dx, dy, dw, dh);
 }
-// function drawBottomOffsetNoScale(ctx: CanvasRenderingContext2D, img: HTMLImageElement, c: HTMLCanvasElement, offset: number) {
-//     const { w: iw, h: ih } = getImgSize(img);
-//     const dw = Math.min(iw, c.width);
-//     const dh = Math.min(ih, c.height);
-//     const sx = Math.max(0, Math.floor((iw - dw) / 2));
-//     const sy = Math.max(0, Math.floor((ih - dh) / 2));
-//     const dx = Math.floor((c.width - dw) / 2);
-//     const dy = c.height - dh - offset;
-//     ctx.drawImage(img, sx, sy, dw, dh, dx, dy, dw, dh);
-// }
 
 function drawBottomOffsetNoScale(
     ctx: CanvasRenderingContext2D,
