@@ -31,17 +31,17 @@ export default function Composer({ config }: { config: Config }) {
     //const PIXEL_DEFAULT_SCALE = 1.0; // tweak to taste
 
     // One pinned SHA for both pixel & oddities (safer than @main)
-const ASSETS_SHA = process.env.NEXT_PUBLIC_BIRB_ASSETS_SHA || "main"; // use "main" only for local testing
+    const ASSETS_SHA = process.env.NEXT_PUBLIC_BIRB_ASSETS_SHA || "main"; // use "main" only for local testing
 
-// CDN bases
-// const PIXEL_BASE  = `https://cdn.jsdelivr.net/gh/jkalinowsky2/birb-assets@${ASSETS_SHA}/pixel_clean`;
-// const ODDITY_BASE = `https://cdn.jsdelivr.net/gh/jkalinowsky2/birb-assets@${ASSETS_SHA}/oddities_clean`;
+    // CDN bases
+    // const PIXEL_BASE  = `https://cdn.jsdelivr.net/gh/jkalinowsky2/birb-assets@${ASSETS_SHA}/pixel_clean`;
+    // const ODDITY_BASE = `https://cdn.jsdelivr.net/gh/jkalinowsky2/birb-assets@${ASSETS_SHA}/oddities_clean`;
 
-// Illustrated goes through your proxy (same as before)
-// const ILLU_PROXY  = process.env.NEXT_PUBLIC_ILLUSTRATED_PROXY || "/api/imgproxy";
+    // Illustrated goes through your proxy (same as before)
+    // const ILLU_PROXY  = process.env.NEXT_PUBLIC_ILLUSTRATED_PROXY || "/api/imgproxy";
 
-console.log("[BIRB ASSETS] SHA:", ASSETS_SHA);
-console.log("[BIRB ASSETS] ODDITY_BASE:", ODDITY_BASE);
+    console.log("[BIRB ASSETS] SHA:", ASSETS_SHA);
+    console.log("[BIRB ASSETS] ODDITY_BASE:", ODDITY_BASE);
 
     // choose your default bird when reverting from token mode
     const DEFAULT_BIRD_ID =
@@ -124,7 +124,7 @@ console.log("[BIRB ASSETS] ODDITY_BASE:", ODDITY_BASE);
         () => config.devices.find((d) => d.id === deviceId)!,
         [deviceId, config.devices]
     );
-    const [previewHeight, setPreviewHeight] = useState<number>(0); //NEW
+    //const [previewHeight, setPreviewHeight] = useState<number>(0); //NEW
     const [bg, setBg] = useState<string>(config.backgrounds[0].id);
     const [text, setText] = useState<string>(config.texts[0].id);
     const [bird, setBird] = useState<string>(config.birds[0].id);
@@ -173,49 +173,45 @@ console.log("[BIRB ASSETS] ODDITY_BASE:", ODDITY_BASE);
                 load(get(config.headwear, hat).src),
             ] as const);
 
-            // --- background (center-crop if larger than canvas) ---
-            if (bgImg.width >= c.width && bgImg.height >= c.height) {
-                const sx = Math.floor((bgImg.width - c.width) / 2);
-                const sy = Math.floor((bgImg.height - c.height) / 2);
-                const sw = c.width;
-                const sh = c.height;
-                ctx.drawImage(bgImg, sx, sy, sw, sh, 0, 0, sw, sh);
-            } else {
-                ctx.drawImage(bgImg, 0, 0, c.width, c.height);
+            // --- background (always tile pattern) ---
+            const pattern = ctx.createPattern(bgImg, "repeat");
+            if (pattern) {
+                ctx.fillStyle = pattern;
+                ctx.fillRect(0, 0, c.width, c.height);
             }
 
             // --- text ---
-            drawCenteredNoScale(ctx, textImg, c);
+            // drawCenteredNoScale(ctx, textImg, c);
+            // --- text (centered vertically & horizontally, no crop) ---
+            drawTextCenteredVertically(ctx, textImg, c);
 
-            // --- bird / token art ---
             // --- bird / token art ---
             if (useToken) {
                 const tokenImg =
                     artStyle === "pixel"
-                        ? (pixelBirdImgRef.current ?? moonbirdImgRef.current ?? oddityImgRef.current)
+                        ? (pixelBirdImgRef.current ??
+                            moonbirdImgRef.current ??
+                            oddityImgRef.current)
                         : artStyle === "oddity"
-                            ? (oddityImgRef.current ?? moonbirdImgRef.current ?? pixelBirdImgRef.current)
-                            : (moonbirdImgRef.current ?? pixelBirdImgRef.current ?? oddityImgRef.current);
+                            ? (oddityImgRef.current ??
+                                moonbirdImgRef.current ??
+                                pixelBirdImgRef.current)
+                            : (moonbirdImgRef.current ??
+                                pixelBirdImgRef.current ??
+                                oddityImgRef.current);
 
                 if (tokenImg) {
                     if (artStyle === "pixel") {
                         const s = getIntegerPixelScale(tokenImg, c, 1);
                         drawBottomScaled(ctx, tokenImg, c, s, 0);
                     } else if (artStyle === "oddity") {
-                        // 👇 adjust this scale factor to taste (0.5, 0.6, etc.)
                         drawBottomScaled(ctx, tokenImg, c, 0.8, 0);
                     } else {
                         // illustrated
                         drawBottomScaled(ctx, tokenImg, c, 0.4, 0);
                     }
                 }
-            }
-            else if (birdImgOrNull) {
-                // built-in bird (no scaling, bottom-center)
-                drawBottomOffsetNoScale(ctx, birdImgOrNull, c, 0);
-            }
-
-            else if (birdImgOrNull) {
+            } else if (birdImgOrNull) {
                 // built-in bird (no scaling, bottom-center)
                 drawBottomOffsetNoScale(ctx, birdImgOrNull, c, 0);
             }
@@ -226,28 +222,18 @@ console.log("[BIRB ASSETS] ODDITY_BASE:", ODDITY_BASE);
             // mirror to <img> for mobile long-press save
             const dataUrl = c.toDataURL("image/png");
             setPreviewUrl(dataUrl);
-            const imgEl = document.getElementById("mobile-preview") as HTMLImageElement | null;
+            const imgEl = document.getElementById(
+                "mobile-preview"
+            ) as HTMLImageElement | null;
             if (imgEl) imgEl.src = dataUrl;
         } finally {
             setIsDrawing(false);
         }
     };
-
     useEffect(() => {
         draw();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [bg, text, bird, hat, deviceId, tokenVersion, artStyle]);
-
-    useEffect(() => {
-        const updateScale = () => {
-            const maxHeight = window.innerHeight * 0.8; // fit within 80% of viewport height
-            const scale = Math.min(maxHeight / device.h, 1) * 0.9; // never upscale
-            setPreviewHeight(device.h * scale);
-        };
-        updateScale();
-        window.addEventListener("resize", updateScale);
-        return () => window.removeEventListener("resize", updateScale);
-    }, [device]);
 
     useEffect(() => {
         (async () => {
@@ -318,6 +304,24 @@ console.log("[BIRB ASSETS] ODDITY_BASE:", ODDITY_BASE);
             }
         }, "image/png");
     };
+
+    const isPortrait = device.h > device.w;
+    const previewCanvasStyle: React.CSSProperties = isPortrait
+        ? {
+            // Portrait: fit by height (no vertical scroll), keep aspect
+            height: 'min(80vh, 720px)',
+            width: 'auto',
+            maxWidth: '100%',
+            // display: 'block',
+            // marginInline: 'auto',
+        }
+        : {
+            // Landscape: fit by width, keep aspect
+            width: '100%',
+            height: 'auto',
+            // display: 'block',
+            // marginInline: 'auto',
+        };
 
     // --- UI ---
     return (
@@ -501,16 +505,15 @@ console.log("[BIRB ASSETS] ODDITY_BASE:", ODDITY_BASE);
                     {/* Desktop canvas */}
                     <canvas
                         ref={canvasRef}
-                        className="hidden md:block max-w-full h-auto mx-auto"
-                        style={{
-                            height: previewHeight,
-                            width: (device.w / device.h) * previewHeight,
-                        }}
+                        className="hidden md:block mx-auto"
+                        style={previewCanvasStyle}
                     />
+
                     {/* Mobile <img> for long-press save */}
                     <img
                         id="mobile-preview"
-                        className="block md:hidden max-w-full h-auto mx-auto"
+                        className="block md:hidden mx-auto"
+                        style={previewCanvasStyle}
                         alt="Wallpaper preview"
                     />
                 </div>
@@ -561,17 +564,39 @@ function drawCenteredNoScale(
     // draw 1:1 pixels, centered; crops if needed, never scales
     ctx.drawImage(img, sx, sy, dw, dh, dx, dy, dw, dh);
 }
-function drawBottomOffsetNoScale(ctx: CanvasRenderingContext2D, img: HTMLImageElement, c: HTMLCanvasElement, offset: number) {
+// function drawBottomOffsetNoScale(ctx: CanvasRenderingContext2D, img: HTMLImageElement, c: HTMLCanvasElement, offset: number) {
+//     const { w: iw, h: ih } = getImgSize(img);
+//     const dw = Math.min(iw, c.width);
+//     const dh = Math.min(ih, c.height);
+//     const sx = Math.max(0, Math.floor((iw - dw) / 2));
+//     const sy = Math.max(0, Math.floor((ih - dh) / 2));
+//     const dx = Math.floor((c.width - dw) / 2);
+//     const dy = c.height - dh - offset;
+//     ctx.drawImage(img, sx, sy, dw, dh, dx, dy, dw, dh);
+// }
+
+function drawBottomOffsetNoScale(
+    ctx: CanvasRenderingContext2D,
+    img: HTMLImageElement,
+    c: HTMLCanvasElement,
+    offset: number
+) {
     const { w: iw, h: ih } = getImgSize(img);
+
+    // destination size (no scaling)
     const dw = Math.min(iw, c.width);
     const dh = Math.min(ih, c.height);
+
+    // source crop: center by width, **bottom-align by height**
     const sx = Math.max(0, Math.floor((iw - dw) / 2));
-    const sy = Math.max(0, Math.floor((ih - dh) / 2));
+    const sy = ih > dh ? ih - dh : 0; // <-- bottom-crop instead of center-crop
+
+    // destination position: center horizontally, **bottom-align vertically**
     const dx = Math.floor((c.width - dw) / 2);
     const dy = c.height - dh - offset;
+
     ctx.drawImage(img, sx, sy, dw, dh, dx, dy, dw, dh);
 }
-
 /**
  * Draws an image scaled by `scale`, horizontally centered,
  * and bottom-aligned (offset is optional).
@@ -607,23 +632,38 @@ function getIntegerPixelScale(
     return Math.max(1, Math.min(maxScale, Math.floor(raw))); // <-- clamp
 }
 
-// // Draw with nearest-neighbor and integer positioning to avoid gaps.
-// function drawBottomScaledCrisp(
-//     ctx: CanvasRenderingContext2D,
-//     img: HTMLImageElement,
-//     c: HTMLCanvasElement,
-//     scale: number,
-//     offset = 0
-// ) {
-//     const { w: iw, h: ih } = getImgSize(img);
-//     const dw = Math.round(iw * scale);
-//     const dh = Math.round(ih * scale);
+function getContainedScale(
+    img: HTMLImageElement,
+    c: HTMLCanvasElement,
+    targetWidthRatio = 0.6,
+    targetHeightRatio = 0.9,
+    maxScale = 2,
+    minScale = 0.5
+) {
+    const { w, h } = getImgSize(img);
+    const maxByW = (c.width * targetWidthRatio) / w;
+    const maxByH = (c.height * targetHeightRatio) / h;
+    return Math.max(minScale, Math.min(maxScale, maxByW, maxByH));
+}
 
-//     const dx = Math.round((c.width - dw) / 2);  // center on whole pixels
-//     const dy = Math.round(c.height - dh - offset);
+function drawTextCenteredVertically(
+    ctx: CanvasRenderingContext2D,
+    img: HTMLImageElement,
+    c: HTMLCanvasElement
+) {
+    const iw = img.naturalWidth || img.width;
+    const ih = img.naturalHeight || img.height;
 
-//     const prev = ctx.imageSmoothingEnabled;
-//     ctx.imageSmoothingEnabled = false;          // nearest-neighbor
-//     ctx.drawImage(img, dx, dy, dw, dh);
-//     ctx.imageSmoothingEnabled = prev;
-// }
+    // Scale down only if the text image is larger than the canvas.
+    const scale = Math.min(1, c.width / iw, c.height / ih);
+
+    const dw = Math.round(iw * scale);
+    const dh = Math.round(ih * scale);
+
+    // Center on both axes; vertical centering is the key ask.
+    const dx = Math.round((c.width - dw) / 2);
+    const dy = Math.round((c.height - dh) / 2);
+
+    ctx.drawImage(img, dx, dy, dw, dh);
+}
+

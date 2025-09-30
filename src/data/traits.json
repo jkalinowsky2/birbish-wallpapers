@@ -5,14 +5,23 @@
     { "id": "iphone16ProMax", "w": 1320, "h": 2868, "name": "1329 x 2868 (iPhone 16 Pro Max)" },
     { "id": "bigBiceps", "w": 1440, "h": 3120, "name": "1440 x 3120 (Big Biceps Mode)" },
 
-    { "id": "iPad", "w": 2040, "h": 2732, "name": "2040 x 2732 (Tablet)" }
+    { "id": "iPad", "w": 2040, "h": 2732, "name": "2040 x 2732 (Tablet)" },
+
+    { "id": "pfp", "w": 1000, "h": 1000, "name": "1000 x 1000 (pfp)" },
+    { "id": "widescreen", "w": 1920, "h": 1080, "name": "1920 x 1080 (Widescreen)" },
+    { "id": "hd", "w": 3840, "h": 2160, "name": "3840 x 2160 (HD Widescreen)" }
+
+
+  
+
+
 
   ],
   "backgrounds": [
-    { "id": "bg-black", "label": "Black", "src": "/backgrounds/black.png" },
-    { "id": "bg-red", "label": "Red", "src": "/backgrounds/red.png" },
-    { "id": "bg-blue", "label": "Blue", "src": "/backgrounds/blue.png" },
-    { "id": "bg-plum", "label": "Plum ", "src": "/backgrounds/plum.png" }
+    { "id": "bg-black", "label": "Black", "src": "/backgrounds/black_pattern.png" },
+    { "id": "bg-red", "label": "Red", "src": "/backgrounds/red_pattern.png" },
+    { "id": "bg-blue", "label": "Blue", "src": "/backgrounds/blue_pattern.png" },
+    { "id": "bg-plum", "label": "Plum ", "src": "/backgrounds/plum_pattern.png" }
 
 
   ],
