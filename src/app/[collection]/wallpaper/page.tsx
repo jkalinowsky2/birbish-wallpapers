@@ -1,18 +1,13 @@
+// src/app/[collection]/wallpaper/page.tsx
 import { notFound } from "next/navigation";
 import Composer from "@/components/Composer";
-import {
-  KNOWN_COLLECTIONS,
-  isKnownCollection,
-  loadCollection,
-} from "@/lib/getCollection";
+import { loadCollection, isKnownCollection } from "@/lib/getCollection";
 
-export default async function Page({
-  params,
-}: {
-  params: Promise<{ collection: string }> | { collection: string };
-}) {
-  // In Next 15, params may be a promise, so await handles both cases
-  const { collection } = await params;
+// If your project's Next types expect Promise-like params, type it like this:
+type ParamsPromise = Promise<{ collection: string }>;
+
+export default async function Page({ params }: { params: ParamsPromise }) {
+  const { collection } = await params; // <-- await the params
 
   if (!isKnownCollection(collection)) {
     notFound();
@@ -26,11 +21,9 @@ export default async function Page({
         <h1 className="text-2xl font-semibold mb-4">
           {meta.name} Wallpaper Builder
         </h1>
-
-        <Composer meta={meta} config={config} />
+        <Composer meta={meta} config={config as any} />
       </div>
 
-      {/* Footer */}
       <footer className="border-t mt-12">
         <div className="mx-auto max-w-6xl px-4 py-6 text-xs text-neutral-500">
           © {new Date().getFullYear()} Generational Merch is not affiliated with
@@ -39,11 +32,6 @@ export default async function Page({
       </footer>
     </main>
   );
-}
-
-// Optional: pre-generate known collection paths for static builds
-export function generateStaticParams() {
-  return KNOWN_COLLECTIONS.map((collection) => ({ collection }));
 }
 
 // import { loadCollection, isKnownCollection } from "@/lib/getCollection";
