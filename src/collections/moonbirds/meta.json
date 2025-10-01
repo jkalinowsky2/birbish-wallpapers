@@ -1,0 +1,14 @@
+{
+  "id" : "moonbirds",
+  "name": "Moonbirds",
+  "features": ["tokens", "headwear"],
+  "artStyles": ["illustrated", "pixel", "oddity"],
+  "labels": {
+    "background": "Background",
+    "text": "Text",
+    "character": "Birb",
+    "headwear": "Headwear",
+    "tokenId": "Token ID",
+    "tokenHint": "Or select your Moonbird…"
+  }
+}

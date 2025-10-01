@@ -38,7 +38,8 @@ export default function SiteHeader() {
         </Link>
 
         <nav className="flex items-center gap-2">
-          <NavLink href="/">Wallpaper Builder</NavLink>
+          <NavLink href="/">Moonbirds</NavLink>
+          {/* <NavLink href="/glyders/wallpaper">Glyders</NavLink> */}
           <NavLink href="/banner">X Banner Builder</NavLink>
         </nav>
       </div>

@@ -1,0 +1,13 @@
+{
+  "id": "glyders",
+  "name": "NightGlyders",
+  "features": ["tokens"],
+  "artStyles": ["illustrated", "pixel"],
+  "labels": {
+    "background": "Background",
+    "text": "Glyph",
+    "character": "Glyder",
+    "tokenId": "Glyder ID",
+    "tokenHint": "Or select your Glyder…"
+  }
+}
