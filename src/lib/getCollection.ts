@@ -1,5 +1,5 @@
 // src/lib/getCollection.ts
-import { PIXEL_BASE, ODDITY_BASE, ILLU_PROXY } from "@/lib/assets";
+import { PIXEL_BASE, ODDITY_BASE, ILLU_PROXY, GLYDERS_PIXEL_BASE } from "@/lib/assets";
 import type { CollectionMeta, CollectionConfig } from "@/types/collections";
 
 // Known collections
@@ -16,10 +16,7 @@ import moonbirdsConfigJson from "@/collections/moonbirds/config.json";
 import glydersMetaJson from "@/collections/glyders/meta.json";
 import glydersConfigJson from "@/collections/glyders/config.json";
 
-/**
- * Raw shape as it exists in your JSON files (no assetBases in JSON, some fields optional).
- * We keep this local so we don't fight the stricter runtime types.
- */
+/** Raw JSON shapes (looser than runtime types) */
 type RawBaseLayer = { id: string; label: string; src: string };
 type RawDevice = { id: string; w: number; h: number; name: string };
 type RawBackground = RawBaseLayer & { mode?: "tile" | "image" };
@@ -33,11 +30,10 @@ type RawConfigJson = {
   devices: RawDevice[];
   backgrounds: RawBackground[];
   texts: RawText[];
-  birds?: RawBaseLayer[];    // optional in JSON
-  headwear?: RawBaseLayer[]; // optional in JSON
+  birds?: RawBaseLayer[];
+  headwear?: RawBaseLayer[];
 };
 
-// Map the statically imported JSON into the raw shape (no `any`)
 const META: Record<CollectionId, CollectionMeta> = {
   moonbirds: moonbirdsMetaJson as CollectionMeta,
   glyders: glydersMetaJson as CollectionMeta,
@@ -48,8 +44,8 @@ const RAW_CONFIG: Record<CollectionId, RawConfigJson> = {
   glyders: glydersConfigJson as RawConfigJson,
 };
 
-/** Normalize raw JSON -> CollectionConfig (inject runtime assetBases, default optionals). */
-function toCollectionConfig(raw: RawConfigJson): CollectionConfig {
+/** Normalize raw JSON -> CollectionConfig and inject per-collection asset bases. */
+function toCollectionConfig(id: CollectionId, raw: RawConfigJson): CollectionConfig {
   return {
     devices: raw.devices.map((d) => ({
       id: String(d.id),
@@ -71,30 +67,24 @@ function toCollectionConfig(raw: RawConfigJson): CollectionConfig {
       ...(typeof t.maxHeightRatio === "number" ? { maxHeightRatio: t.maxHeightRatio } : {}),
       ...(typeof t.allowUpscale === "boolean" ? { allowUpscale: t.allowUpscale } : {}),
     })),
-    // If CollectionConfig requires arrays, we guarantee them here:
     birds: raw.birds?.map((b) => ({ id: String(b.id), label: String(b.label), src: String(b.src) })) ?? [],
-    headwear:
-      raw.headwear?.map((h) => ({ id: String(h.id), label: String(h.label), src: String(h.src) })) ?? [],
+    headwear: raw.headwear?.map((h) => ({ id: String(h.id), label: String(h.label), src: String(h.src) })) ?? [],
     assetBases: {
-      pixelBase: PIXEL_BASE,
-      oddityBase: ODDITY_BASE,
-      illustratedProxy: ILLU_PROXY,
+      // Glyders uses its own pixel base on GitHub; Moonbirds uses the existing one
+      pixelBase: id === "glyders" ? GLYDERS_PIXEL_BASE : PIXEL_BASE,
+      // Only Moonbirds has oddities + illustrated
+      oddityBase: id === "moonbirds" ? ODDITY_BASE : undefined,
+      illustratedProxy: id === "moonbirds" ? ILLU_PROXY : undefined,
+      pixelTokenScale: id === "glyders" ? .75 : 1,  //THIS IS WHERE YOU SCALE GLYDERS
     },
   };
 }
 
 // Public loader
-export async function loadCollection(id: CollectionId): Promise<{
-  meta: CollectionMeta;
-  config: CollectionConfig;
-}> {
+export async function loadCollection(id: CollectionId): Promise<{ meta: CollectionMeta; config: CollectionConfig }> {
   const meta = META[id];
   const raw = RAW_CONFIG[id];
-
-  if (!meta || !raw) {
-    throw new Error(`Missing meta/config for collection "${id}"`);
-  }
-
-  const config = toCollectionConfig(raw);
+  if (!meta || !raw) throw new Error(`Missing meta/config for collection "${id}"`);
+  const config = toCollectionConfig(id, raw);
   return { meta, config };
 }

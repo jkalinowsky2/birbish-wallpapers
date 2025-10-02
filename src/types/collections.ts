@@ -19,6 +19,16 @@ export type CollectionMeta = {
     };
 };
 
+export type AssetBases = {
+  pixelBase?: string;
+  oddityBase?: string;
+  illustratedProxy?: string;
+  /** Optional multiplier just for pixel token rendering */
+  pixelTokenScale?: number;
+};
+
+
+
 export type Device = { id: string; w: number; h: number; name: string };
 export type Option = { id: string; label: string; src: string };
 
@@ -28,10 +38,10 @@ export type CollectionConfig = {
     texts: { id: string; label: string; src: string }[];
     birds: { id: string; label: string; src: string }[];
     headwear?: { id: string; label: string; src: string }[]; // optional if not supported
-
-    assetBases: {
-        pixelBase?: string;        // e.g. https://.../pixel_clean
-        oddityBase?: string;       // (Moonbirds only)
-        illustratedProxy?: string; // e.g. /api/imgproxy
-    };
+    assetBases: AssetBases;
+    // assetBases: {
+    //     pixelBase?: string;        // e.g. https://.../pixel_clean
+    //     oddityBase?: string;       // (Moonbirds only)
+    //     illustratedProxy?: string; // e.g. /api/imgproxy
+    // };
 };

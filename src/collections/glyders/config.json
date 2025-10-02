@@ -33,5 +33,10 @@
     { "id": "glyderlogoNG", "label": "Logo & NG", "src": "/texts/glyderlogoNG1.png","maxWidthRatio": 0.6,"allowUpscale": false}
 
 
-  ]
+  ],
+
+    "birds": [
+
+
+    ]
 }
