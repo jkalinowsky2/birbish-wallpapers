@@ -3,21 +3,22 @@ import { notFound } from "next/navigation";
 import { loadCollection, isKnownCollection } from "@/lib/getCollection";
 import Composer from "@/components/Composer";
 
-// Keep this local to the file—clean and explicit.
 type RouteParams = { collection: string };
 
 export default async function Page({
   params,
 }: {
-  params: Promise<RouteParams>; // 👈 Next 15: params is a Promise
+  params: Promise<RouteParams>; // Next 15: params is a Promise
 }) {
-  const { collection } = await params; // 👈 await it
+  const { collection } = await params;
 
-  if (!isKnownCollection(collection)) {
-    notFound();
-  }
+  if (!isKnownCollection(collection)) notFound();
 
   const { meta, config } = await loadCollection(collection);
+
+  // Derive the exact config prop type Composer expects (no explicit any)
+  type ComposerConfigProp = Parameters<typeof Composer>[0]["config"];
+  const composerConfig = config as ComposerConfigProp;
 
   return (
     <main className="min-h-dvh text-neutral-900">
@@ -25,7 +26,7 @@ export default async function Page({
         <h1 className="text-2xl font-semibold mb-4">
           {meta.name} Wallpaper Builder
         </h1>
-        <Composer meta={meta} config={config as any} />
+        <Composer meta={meta} config={composerConfig} />
       </div>
 
       <footer className="border-t mt-12">
