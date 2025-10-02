@@ -27,7 +27,9 @@
     { "id": "bg-black", "label": "Black", "src": "/backgrounds/black_pattern.png", "mode": "tile"  },
     { "id": "bg-red", "label": "Red", "src": "/backgrounds/red_pattern.png" , "mode": "tile"  },
     { "id": "bg-blue", "label": "Blue", "src": "/backgrounds/blue_pattern.png", "mode": "tile"   },
-    { "id": "bg-plum", "label": "Plum ", "src": "/backgrounds/plum_pattern.png", "mode": "tile"   }
+    { "id": "bg-plum", "label": "Plum", "src": "/backgrounds/plum_pattern.png", "mode": "tile"   },
+    { "id": "bg-birbhalla", "label": "Birbhalla", "src": "/backgrounds/birbhalla.png", "mode": "image"   }
+
 
 
   ],
@@ -46,7 +48,8 @@
     { "id": "pink", "label": "Pip", "src": "/birds/pink.png" },
     { "id": "blue", "label": "Zen", "src": "/birds/blue.png" },
     { "id": "toobins", "label": "Toobins", "src": "/birds/toobins.png" },
-    { "id": "ddroobins", "label": "Droobins", "src": "/birds/droobins.png" }
+    { "id": "droobins", "label": "Droobins", "src": "/birds/droobins.png" },
+    { "id": "none", "label": "None", "src": "/birds/none.png" }
 
 
   ],

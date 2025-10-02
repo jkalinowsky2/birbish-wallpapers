@@ -35,6 +35,7 @@ const BG_OPTIONS: { id: string; label: string; src: string }[] = [
     { id: "blue", label: "Blue", src: "/banner-bg/blue.png" },
     { id: "plum", label: "Plum", src: "/banner-bg/plum.png" },
     { id: "absract", label: "Abstract", src: "/banner-bg/abstract.png" },
+    { id: "birbhalla", label: "Birbhalla", src: "/banner-bg/birbhalla.png" },
 
     //{ id: "spencer", label: "Head Birb - Limited Time Only!", src: "/banner-bg/spencer.png" },
 ];
@@ -47,6 +48,7 @@ const CENTER_OPTIONS: { id: string; label: string; src: string }[] = [
     { id: "gbirb", label: "gbirb.", src: "/bannertext/gbirb.png" },
     { id: "logo", label: "logo", src: "/bannertext/logo.png" },
     { id: "toobins", label: "Toobins", src: "/bannertext/toobins.png" },
+
 ];
 
 export default function BannerComposer() {
