@@ -20,6 +20,7 @@
   "backgrounds": [
     { "id": "bg-blue", "label": "Blue", "src": "/backgrounds/glyders-blue.png", "mode": "tile" },
     { "id": "bg-black", "label": "Black", "src": "/backgrounds/glyders-black.png", "mode": "tile"  },
+    { "id": "bg-deepblack", "label": "Deep Black", "src": "/backgrounds/glyders-deepblack.png", "mode": "tile"  },
     { "id": "bg-purple", "label": "Purple", "src": "/backgrounds/glyders-purple.png", "mode": "tile"  },
     { "id": "bg-OS", "label": "Other Side", "src": "/backgrounds/glyders_OS.png" , "mode": "image" }
 
