@@ -282,6 +282,16 @@ export default function Composer({
                 //         : artStyle === "oddity"
                 //             ? oddityImgRef.current ?? moonbirdImgRef.current ?? pixelBirdImgRef.current
                 //             : moonbirdImgRef.current ?? pixelBirdImgRef.current ?? oddityImgRef.current;
+                
+               //debug 
+                console.log("draw token", {
+                    artStyle,
+                    hasIllustrated: !!moonbirdImgRef.current,
+                    hasPixel: !!pixelBirdImgRef.current,
+                    hasOddity: !!oddityImgRef.current,
+                    chosen: !!tokenImg,
+                });
+
 
                 if (tokenImg) {
                     if (artStyle === "pixel") {
