@@ -128,16 +128,25 @@ export default function Composer({
 
     function buildIllustratedUrl(id: string) {
         // Prefer per-collection base first (for Glyders)
-        const base = config.assetBases?.illustratedBase;
-          console.log("buildIllustratedUrl using base =", base, "for id", id);
-        if (base) {
-            // normalize slashes
-            const clean = base.replace(/\/+$/, "");
-            return `${clean}/${Number(id)}.png`;
+        const base = config.assetBases?.illustratedBase ?? "";
+        const cleanBase = base.replace(/\/+$/, ""); // strip trailing slashes
+
+        // Normalize the id -> "2" (guards against "002" or whitespace)
+        const n = String(Number(id)); // if id isn't numeric, this becomes "NaN"
+
+        let url: string;
+        if (cleanBase) {
+            url = `${cleanBase}/${n}.png`;
+        } else {
+            // Fallback to Moonbirds behavior (Proof raw + optional proxy)
+            const raw = `https://collection-assets.proof.xyz/moonbirds/images_no_bg/${n}.png`;
+            url = illustratedProxy
+                ? `${illustratedProxy}?url=${encodeURIComponent(raw)}`
+                : raw;
         }
-        // Otherwise fall back to Moonbirds behavior (Proof raw + optional proxy)
-        const raw = `https://collection-assets.proof.xyz/moonbirds/images_no_bg/${id}.png`;
-        return illustratedProxy ? `${illustratedProxy}?url=${encodeURIComponent(raw)}` : raw;
+
+        console.log("buildIllustratedUrl →", url);
+        return url;
     }
     // function buildIllustratedUrl(id: string) {
     //     const raw = `https://collection-assets.proof.xyz/moonbirds/images_no_bg/${id}.png`;
