@@ -147,11 +147,21 @@ export default function Composer({
         const img = new Image();
         img.crossOrigin = "anonymous";
         img.src = buildIllustratedUrl(id);
+
+        //troubleshooting
+        useEffect(() => {
+            // This shows what your page is *actually* using at runtime
+            console.log("assetBases in Composer:", config.assetBases);
+        }, [config.assetBases]);
+////////
+
         await new Promise<void>((res, rej) => {
             img.onload = () => res();
             img.onerror = rej;
         });
         return img;
+
+
     }
 
     async function loadIllustratedById(id: string): Promise<HTMLImageElement> {
