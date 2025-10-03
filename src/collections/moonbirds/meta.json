@@ -2,7 +2,7 @@
   "id" : "moonbirds",
   "name": "Moonbirds",
   "features": ["tokens", "headwear"],
-  "artStyles": ["illustrated", "pixel", "oddity"],
+  "artStyles": ["illustrated", "pixel"],
   "labels": {
     "background": "Background",
     "text": "Text",

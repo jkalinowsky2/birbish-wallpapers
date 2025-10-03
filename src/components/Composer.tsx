@@ -33,8 +33,9 @@ export default function Composer({
     config: ComposerConfig;
 }) {
     // --- Asset bases from config ---
-    const { pixelBase, oddityBase, illustratedProxy } = config.assetBases ?? {};
-
+    // const { pixelBase, oddityBase, illustratedProxy } = config.assetBases ?? {};
+    // Inside Composer component (you already extract this above)
+    const { pixelBase, oddityBase, illustratedProxy, illustratedBase } = config.assetBases ?? {};
     // --- Meta-driven toggles & labels ---
     const features = new Set(meta?.features ?? []);
     const hasBirds = Boolean(config.birds && config.birds.length > 0);
@@ -126,9 +127,18 @@ export default function Composer({
         });
 
     function buildIllustratedUrl(id: string) {
+        // If a direct illustrated base is supplied (Glyders-on-R2), use it.
+        if (illustratedBase) {
+            return `${illustratedBase}/${Number(id)}.png`;
+        }
+        // Otherwise fall back to Moonbirds behavior (Proof raw + optional proxy)
         const raw = `https://collection-assets.proof.xyz/moonbirds/images_no_bg/${id}.png`;
         return illustratedProxy ? `${illustratedProxy}?url=${encodeURIComponent(raw)}` : raw;
     }
+    // function buildIllustratedUrl(id: string) {
+    //     const raw = `https://collection-assets.proof.xyz/moonbirds/images_no_bg/${id}.png`;
+    //     return illustratedProxy ? `${illustratedProxy}?url=${encodeURIComponent(raw)}` : raw;
+    // }
 
     async function loadMoonbirdById(id: string): Promise<HTMLImageElement> {
         const img = new Image();
@@ -259,9 +269,15 @@ export default function Composer({
                         const mult = config.assetBases?.pixelTokenScale ?? 1;
                         const s = base * mult;
                         drawBottomScaled(ctx, tokenImg, c, s, 0);
-                    } else if (artStyle === "oddity") {
+                    }
+                    else if (artStyle === "illustrated") {
+                        const s = config.assetBases?.illustratedTokenScale ?? 0.4; // default used before
+                        drawBottomScaled(ctx, tokenImg, c, s, 0);
+                    } 
+                    else if (artStyle === "oddity") {
                         drawBottomScaled(ctx, tokenImg, c, 0.8, 0);
-                    } else {
+                    } 
+                    else {
                         drawBottomScaled(ctx, tokenImg, c, 0.4, 0);
                     }
                 }
@@ -491,10 +507,16 @@ export default function Composer({
                                                 oddityImgRef.current = null;
 
                                                 const results = await Promise.allSettled([
-                                                    canIllustrated ? loadMoonbirdById(id) : Promise.reject("illustrated disabled"),
+                                                    canIllustrated ? loadIllustratedById(id) : Promise.reject("illustrated disabled"),
                                                     canPixel ? loadPixelById(id) : Promise.reject("pixel disabled"),
                                                     canOddity ? loadOddityById(id) : Promise.reject("oddity disabled"),
                                                 ]);
+
+                                                // const results = await Promise.allSettled([
+                                                //     canIllustrated ? loadMoonbirdById(id) : Promise.reject("illustrated disabled"),
+                                                //     canPixel ? loadPixelById(id) : Promise.reject("pixel disabled"),
+                                                //     canOddity ? loadOddityById(id) : Promise.reject("oddity disabled"),
+                                                // ]);
 
                                                 if (results[0].status === "fulfilled") moonbirdImgRef.current = results[0].value;
                                                 if (results[1].status === "fulfilled") pixelBirdImgRef.current = results[1].value;

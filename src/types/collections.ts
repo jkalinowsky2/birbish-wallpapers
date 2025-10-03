@@ -20,11 +20,16 @@ export type CollectionMeta = {
 };
 
 export type AssetBases = {
-  pixelBase?: string;
-  oddityBase?: string;
-  illustratedProxy?: string;
-  /** Optional multiplier just for pixel token rendering */
-  pixelTokenScale?: number;
+    pixelBase?: string;
+    oddityBase?: string;
+    illustratedProxy?: string;
+    /** NEW: direct base for illustrated images (no proxy, e.g. R2) */
+    illustratedBase?: string;  // NEW: direct base for illustrated (e.g., Glyders on R2/Worker)
+    
+    //   illustratedProxy?: string;
+    /** Optional multiplier just for pixel token rendering */
+    pixelTokenScale?: number;
+    illustratedTokenScale?: number; // NEW optional
 };
 
 

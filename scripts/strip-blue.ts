@@ -2,8 +2,9 @@ import fs from "fs";
 import path from "path";
 import sharp from "sharp";
 
-const IN_DIR  = process.argv[2] ?? "glyders-raw";
-const OUT_DIR = process.argv[3] ?? "glyders-clean";
+// const IN_DIR  = process.argv[2] ?? "glyders-raw";
+const IN_DIR  = process.argv[2] ?? "glyders-illustrated";
+const OUT_DIR = process.argv[3] ?? "glyders-ill-clean";
 
 // target blue and tolerance
 const BLUE = { r: 3, g: 71, b: 175 }; // #0B51C8  <-- adjust if yours differs

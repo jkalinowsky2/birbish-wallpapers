@@ -28,9 +28,7 @@
     { "id": "bg-red", "label": "Red", "src": "/backgrounds/red_pattern.png" , "mode": "tile"  },
     { "id": "bg-blue", "label": "Blue", "src": "/backgrounds/blue_pattern.png", "mode": "tile"   },
     { "id": "bg-plum", "label": "Plum", "src": "/backgrounds/plum_pattern.png", "mode": "tile"   },
-    { "id": "bg-birbhalla", "label": "Birbhalla", "src": "/backgrounds/birbhalla.png", "mode": "image"   }
-
-
+    
 
   ],
 
