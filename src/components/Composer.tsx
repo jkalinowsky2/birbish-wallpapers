@@ -271,12 +271,17 @@ export default function Composer({
 
             // --- character / token ---
             if (usingToken) {
-                const tokenImg =
-                    artStyle === "pixel"
-                        ? pixelBirdImgRef.current ?? moonbirdImgRef.current ?? oddityImgRef.current
-                        : artStyle === "oddity"
-                            ? oddityImgRef.current ?? moonbirdImgRef.current ?? pixelBirdImgRef.current
-                            : moonbirdImgRef.current ?? pixelBirdImgRef.current ?? oddityImgRef.current;
+
+                let tokenImg: HTMLImageElement | null = null;
+                if (artStyle === "illustrated") tokenImg = moonbirdImgRef.current;
+                else if (artStyle === "pixel") tokenImg = pixelBirdImgRef.current;
+                else if (artStyle === "oddity") tokenImg = oddityImgRef.current;
+                // const tokenImg =
+                //     artStyle === "pixel"
+                //         ? pixelBirdImgRef.current ?? moonbirdImgRef.current ?? oddityImgRef.current
+                //         : artStyle === "oddity"
+                //             ? oddityImgRef.current ?? moonbirdImgRef.current ?? pixelBirdImgRef.current
+                //             : moonbirdImgRef.current ?? pixelBirdImgRef.current ?? oddityImgRef.current;
 
                 if (tokenImg) {
                     if (artStyle === "pixel") {
