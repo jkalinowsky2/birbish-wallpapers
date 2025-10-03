@@ -127,9 +127,12 @@ export default function Composer({
         });
 
     function buildIllustratedUrl(id: string) {
-        // If a direct illustrated base is supplied (Glyders-on-R2), use it.
-        if (illustratedBase) {
-            return `${illustratedBase}/${Number(id)}.png`;
+        // Prefer per-collection base first (for Glyders)
+        const base = config.assetBases?.illustratedBase;
+        if (base) {
+            // normalize slashes
+            const clean = base.replace(/\/+$/, "");
+            return `${clean}/${Number(id)}.png`;
         }
         // Otherwise fall back to Moonbirds behavior (Proof raw + optional proxy)
         const raw = `https://collection-assets.proof.xyz/moonbirds/images_no_bg/${id}.png`;
@@ -273,10 +276,10 @@ export default function Composer({
                     else if (artStyle === "illustrated") {
                         const s = config.assetBases?.illustratedTokenScale ?? 0.4; // default used before
                         drawBottomScaled(ctx, tokenImg, c, s, 0);
-                    } 
+                    }
                     else if (artStyle === "oddity") {
                         drawBottomScaled(ctx, tokenImg, c, 0.8, 0);
-                    } 
+                    }
                     else {
                         drawBottomScaled(ctx, tokenImg, c, 0.4, 0);
                     }
