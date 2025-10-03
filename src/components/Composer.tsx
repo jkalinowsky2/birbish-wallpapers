@@ -129,6 +129,7 @@ export default function Composer({
     function buildIllustratedUrl(id: string) {
         // Prefer per-collection base first (for Glyders)
         const base = config.assetBases?.illustratedBase;
+          console.log("buildIllustratedUrl using base =", base, "for id", id);
         if (base) {
             // normalize slashes
             const clean = base.replace(/\/+$/, "");
@@ -147,14 +148,6 @@ export default function Composer({
         const img = new Image();
         img.crossOrigin = "anonymous";
         img.src = buildIllustratedUrl(id);
-
-        //troubleshooting
-        useEffect(() => {
-            // This shows what your page is *actually* using at runtime
-            console.log("assetBases in Composer:", config.assetBases);
-        }, [config.assetBases]);
-////////
-
         await new Promise<void>((res, rej) => {
             img.onload = () => res();
             img.onerror = rej;
