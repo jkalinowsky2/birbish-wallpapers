@@ -73,6 +73,10 @@ function toCollectionConfig(id: CollectionId, raw: RawConfigJson): CollectionCon
       pixelBase: id === "glyders" ? GLYDERS_PIXEL_BASE : PIXEL_BASE,
       oddityBase: id === "moonbirds" ? ODDITY_BASE : undefined,
       illustratedProxy: id === "moonbirds" ? ILLU_PROXY : undefined,
+      illustratedBase: id === "glyders"
+        ? (process.env.NEXT_PUBLIC_GLYDERS_ILLU_BASE ?? "")
+        : undefined,
+
 
       // NEW: per-style scales
       ...(id === "moonbirds"
@@ -84,7 +88,7 @@ function toCollectionConfig(id: CollectionId, raw: RawConfigJson): CollectionCon
         : {
           // Glyders
           pixelTokenScale: 1.0,        // integer-scaled, then multiplied
-          illustratedTokenScale: 0.42, // Glyders illustrated (already looked good)
+          illustratedTokenScale: 1, // Glyders illustrated (already looked good)
         }),
     }
   };
