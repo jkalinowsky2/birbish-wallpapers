@@ -5,7 +5,7 @@
   "artStyles": ["pixel","illustrated", "oddity"],
   "labels": {
     "background": "Background",
-    "text": "Text",
+    "text": "Glyph",
     "character": "Birb",
     "headwear": "Headwear",
     "tokenId": "Token ID",

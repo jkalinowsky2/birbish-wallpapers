@@ -48,6 +48,9 @@ export default function Composer({
     const canPixel = enabledStyles.has("pixel") && !!pixelBase;
     const canOddity = enabledStyles.has("oddity") && !!oddityBase;
 
+    //NUDGER
+    const [textYOffset, setTextYOffset] = useState<number>(0); // px offset (+ = down)
+
     // Default to first enabled style
     const [artStyle, setArtStyle] = useState<ArtStyle>(
         (canIllustrated && "illustrated") ||
@@ -257,7 +260,8 @@ export default function Composer({
                     c,
                     textLayer.maxWidthRatio ?? 1,
                     textLayer.maxHeightRatio ?? 1,
-                    textLayer.allowUpscale ?? false
+                    textLayer.allowUpscale ?? false,
+                    textYOffset // NEW
                 );
             } else {
                 drawTextCenteredVertically(ctx, textImg, c);
@@ -313,7 +317,7 @@ export default function Composer({
     useEffect(() => {
         draw();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [bg, text, bird, hat, deviceId, tokenVersion, artStyle]);
+    }, [bg, text, bird, hat, deviceId, tokenVersion, artStyle, textYOffset]);
 
     // Lazy-load token images only when needed
     useEffect(() => {
@@ -444,6 +448,39 @@ export default function Composer({
                                 </option>
                             ))}
                         </select>
+                    </Field>
+                    {/* Text vertical nudge (buttons only, ±10px) */}
+                    <Field label="Glyph vertical offset">
+                        <div className="flex items-center gap-2">
+                            <button
+                                type="button"
+                                className="btn"
+                                aria-label="Nudge text up"
+                                onClick={() => setTextYOffset((v) => v - 20)}
+                                title="Move text up 10px"
+                            >
+                                ▲
+                            </button>
+
+                            <button
+                                type="button"
+                                className="btn"
+                                aria-label="Nudge text down"
+                                onClick={() => setTextYOffset((v) => v + 20)}
+                                title="Move text down 10px"
+                            >
+                                ▼
+                            </button>
+
+                            <button
+                                type="button"
+                                className="btn btn-ghost ml-2"
+                                onClick={() => setTextYOffset(0)}
+                                title="Reset position"
+                            >
+                                Reset
+                            </button>
+                        </div>
                     </Field>
 
                     {/* Character selector */}
@@ -710,7 +747,8 @@ function drawCenteredWithMaxWidth(
     c: HTMLCanvasElement,
     maxWidthRatio = 1,
     maxHeightRatio = 1,
-    allowUpscale = false
+    allowUpscale = false,
+    offsetY = 0
 ) {
     const iw = img.naturalWidth || img.width;
     const ih = img.naturalHeight || img.height;
@@ -724,7 +762,8 @@ function drawCenteredWithMaxWidth(
     const dw = Math.round(iw * scale);
     const dh = Math.round(ih * scale);
     const dx = Math.round((c.width - dw) / 2);
-    const dy = Math.round((c.height - dh) / 2);
+    //const dy = Math.round((c.height - dh) / 2);
+    const dy = Math.round((c.height - dh) / 2) + offsetY; // apply nudge
 
     ctx.drawImage(img, dx, dy, dw, dh);
 }
@@ -773,11 +812,11 @@ function fillTiledCentered(
     const tx = mod(txRaw, iw);
     const ty = mod(tyRaw, ih);
 
- // Type guard for modern CanvasPattern objects
-const p = pattern as CanvasPattern & { setTransform?: (m: DOMMatrix) => void };
-if (typeof p.setTransform === "function") {
-  p.setTransform(new DOMMatrix().translate(tx, ty));
-}
+    // Type guard for modern CanvasPattern objects
+    const p = pattern as CanvasPattern & { setTransform?: (m: DOMMatrix) => void };
+    if (typeof p.setTransform === "function") {
+        p.setTransform(new DOMMatrix().translate(tx, ty));
+    }
 
     ctx.save();
     ctx.fillStyle = pattern;
