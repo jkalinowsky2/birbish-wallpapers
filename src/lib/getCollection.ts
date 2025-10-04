@@ -87,7 +87,7 @@ function toCollectionConfig(id: CollectionId, raw: RawConfigJson): CollectionCon
         }
         : {
           // Glyders
-          pixelTokenScale: 1.0,        // integer-scaled, then multiplied
+          pixelTokenScale: 1,        // integer-scaled, then multiplied
           illustratedTokenScale: 1, // Glyders illustrated (already looked good)
         }),
     }

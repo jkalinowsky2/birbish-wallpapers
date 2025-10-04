@@ -241,15 +241,9 @@ export default function Composer({
             // --- background ---
             const bgDef = get(config.backgrounds, bg);
             if (bgDef.mode === "image") {
-                // fill canvas like CSS background-size: cover
                 drawBackgroundCover(ctx, bgImg, c);
             } else {
-                // default/fallback = tile pattern
-                const pattern = ctx.createPattern(bgImg, "repeat");
-                if (pattern) {
-                    ctx.fillStyle = pattern;
-                    ctx.fillRect(0, 0, c.width, c.height);
-                }
+                fillTiledCentered(ctx, bgImg, c);
             }
 
             // --- text ---
@@ -296,49 +290,6 @@ export default function Composer({
                     }
                 }
             }
-            //OLD
-            // if (usingToken) {
-
-            //     let tokenImg: HTMLImageElement | null = null;
-            //     if (artStyle === "illustrated") tokenImg = moonbirdImgRef.current;
-            //     else if (artStyle === "pixel") tokenImg = pixelBirdImgRef.current;
-            //     else if (artStyle === "oddity") tokenImg = oddityImgRef.current;
-            //     // const tokenImg =
-            //     //     artStyle === "pixel"
-            //     //         ? pixelBirdImgRef.current ?? moonbirdImgRef.current ?? oddityImgRef.current
-            //     //         : artStyle === "oddity"
-            //     //             ? oddityImgRef.current ?? moonbirdImgRef.current ?? pixelBirdImgRef.current
-            //     //             : moonbirdImgRef.current ?? pixelBirdImgRef.current ?? oddityImgRef.current;
-
-            //    //debug 
-            //     console.log("draw token", {
-            //         artStyle,
-            //         hasIllustrated: !!moonbirdImgRef.current,
-            //         hasPixel: !!pixelBirdImgRef.current,
-            //         hasOddity: !!oddityImgRef.current,
-            //         chosen: !!tokenImg,
-            //     });
-
-
-            //     if (tokenImg) {
-            //         if (artStyle === "pixel") {
-            //             const base = getIntegerPixelScale(tokenImg, c, 1);
-            //             const mult = config.assetBases?.pixelTokenScale ?? 1;
-            //             const s = base * mult;
-            //             drawBottomScaled(ctx, tokenImg, c, s, 0);
-            //         }
-            //         else if (artStyle === "illustrated") {
-            //             const s = config.assetBases?.illustratedTokenScale ?? 0.4; // default used before
-            //             drawBottomScaled(ctx, tokenImg, c, s, 0);
-            //         }
-            //         else if (artStyle === "oddity") {
-            //             drawBottomScaled(ctx, tokenImg, c, 0.8, 0);
-            //         }
-            //         else {
-            //             drawBottomScaled(ctx, tokenImg, c, 0.4, 0);
-            //         }
-            //     }
-            // } 
 
             else if (charImgOrNull) {
                 drawBottomOffsetNoScale(ctx, charImgOrNull, c, 0);
@@ -571,12 +522,6 @@ export default function Composer({
                                                     canOddity ? loadOddityById(id) : Promise.reject("oddity disabled"),
                                                 ]);
 
-                                                // const results = await Promise.allSettled([
-                                                //     canIllustrated ? loadMoonbirdById(id) : Promise.reject("illustrated disabled"),
-                                                //     canPixel ? loadPixelById(id) : Promise.reject("pixel disabled"),
-                                                //     canOddity ? loadOddityById(id) : Promise.reject("oddity disabled"),
-                                                // ]);
-
                                                 if (results[0].status === "fulfilled") moonbirdImgRef.current = results[0].value;
                                                 if (results[1].status === "fulfilled") pixelBirdImgRef.current = results[1].value;
                                                 if (results[2].status === "fulfilled") oddityImgRef.current = results[2].value;
@@ -609,15 +554,7 @@ export default function Composer({
                             {/* Art styles available for this collection */}
                             <Field label="Art Style">
                                 <div className="grid grid-cols-3 gap-2">
-                                    {canIllustrated && (
-                                        <button
-                                            type="button"
-                                            className={`btn ${artStyle === "illustrated" ? "btn-primary" : "btn-ghost"}`}
-                                            onClick={() => setArtStyle("illustrated")}
-                                        >
-                                            Illustrated
-                                        </button>
-                                    )}
+
                                     {canPixel && (
                                         <button
                                             type="button"
@@ -625,6 +562,15 @@ export default function Composer({
                                             onClick={() => setArtStyle("pixel")}
                                         >
                                             Pixel
+                                        </button>
+                                    )}
+                                    {canIllustrated && (
+                                        <button
+                                            type="button"
+                                            className={`btn ${artStyle === "illustrated" ? "btn-primary" : "btn-ghost"}`}
+                                            onClick={() => setArtStyle("illustrated")}
+                                        >
+                                            Illustrated
                                         </button>
                                     )}
                                     {canOddity && (
@@ -805,4 +751,35 @@ function drawBackgroundCover(ctx: CanvasRenderingContext2D, img: HTMLImageElemen
     const dx = (c.width - dw) / 2;
     const dy = (c.height - dh) / 2;
     ctx.drawImage(img, dx, dy, dw, dh);
+}
+
+function fillTiledCentered(
+    ctx: CanvasRenderingContext2D,
+    img: HTMLImageElement,
+    c: HTMLCanvasElement
+) {
+    const iw = img.naturalWidth || img.width;
+    const ih = img.naturalHeight || img.height;
+
+    const pattern = ctx.createPattern(img, "repeat");
+    if (!pattern || iw === 0 || ih === 0) return;
+
+    // Offset so a tile center sits on the canvas center
+    const txRaw = c.width / 2 - iw / 2;
+    const tyRaw = c.height / 2 - ih / 2;
+
+    // Proper modulo for negatives
+    const mod = (v: number, m: number) => ((v % m) + m) % m;
+    const tx = mod(txRaw, iw);
+    const ty = mod(tyRaw, ih);
+
+    // Shift the pattern’s phase
+    if (typeof (pattern as any).setTransform === "function") {
+        (pattern as any).setTransform(new DOMMatrix().translate(tx, ty));
+    }
+
+    ctx.save();
+    ctx.fillStyle = pattern;
+    ctx.fillRect(0, 0, c.width, c.height);
+    ctx.restore();
 }

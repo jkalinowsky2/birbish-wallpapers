@@ -2,7 +2,7 @@
   "id": "glyders",
   "name": "NightGlyders",
   "features": ["tokens"],
-  "artStyles": ["illustrated", "pixel"],
+  "artStyles": ["pixel", "illustrated"],
   "labels": {
     "background": "Background",
     "text": "Glyph",
