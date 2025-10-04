@@ -773,10 +773,11 @@ function fillTiledCentered(
     const tx = mod(txRaw, iw);
     const ty = mod(tyRaw, ih);
 
-    // Shift the pattern’s phase
-    if (typeof (pattern as any).setTransform === "function") {
-        (pattern as any).setTransform(new DOMMatrix().translate(tx, ty));
-    }
+ // Type guard for modern CanvasPattern objects
+const p = pattern as CanvasPattern & { setTransform?: (m: DOMMatrix) => void };
+if (typeof p.setTransform === "function") {
+  p.setTransform(new DOMMatrix().translate(tx, ty));
+}
 
     ctx.save();
     ctx.fillStyle = pattern;
