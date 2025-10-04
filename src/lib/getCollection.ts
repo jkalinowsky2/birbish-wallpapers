@@ -1,5 +1,5 @@
 // src/lib/getCollection.ts
-import { PIXEL_BASE, ODDITY_BASE, ILLU_PROXY, GLYDERS_PIXEL_BASE, GLYDERS_ILLU_BASE } from "@/lib/assets";import type { CollectionMeta, CollectionConfig } from "@/types/collections";
+import { PIXEL_BASE, ODDITY_BASE, ILLU_PROXY, GLYDERS_PIXEL_BASE, GLYDERS_ILLU_BASE } from "@/lib/assets"; import type { CollectionMeta, CollectionConfig } from "@/types/collections";
 
 // Known collections
 export const KNOWN_COLLECTIONS = ["moonbirds", "glyders"] as const;
@@ -68,16 +68,25 @@ function toCollectionConfig(id: CollectionId, raw: RawConfigJson): CollectionCon
     })),
     birds: raw.birds?.map((b) => ({ id: String(b.id), label: String(b.label), src: String(b.src) })) ?? [],
     headwear: raw.headwear?.map((h) => ({ id: String(h.id), label: String(h.label), src: String(h.src) })) ?? [],
+
     assetBases: {
-      // Glyders uses its own pixel base on GitHub; Moonbirds uses the existing one
       pixelBase: id === "glyders" ? GLYDERS_PIXEL_BASE : PIXEL_BASE,
-      illustratedBase: id === "glyders" ? GLYDERS_ILLU_BASE : undefined,
-      // Only Moonbirds has oddities + illustrated
       oddityBase: id === "moonbirds" ? ODDITY_BASE : undefined,
       illustratedProxy: id === "moonbirds" ? ILLU_PROXY : undefined,
-      pixelTokenScale: id === "glyders" ? .75 : 1,  //THIS IS WHERE YOU SCALE GLYDERS pixel
-      illustratedTokenScale: 0.75, //THIS IS WHERE YOU SCALE GLYDERS illustrated
-    },
+
+      // NEW: per-style scales
+      ...(id === "moonbirds"
+        ? {
+          pixelTokenScale: 1.2,        // Moonbirds pixel (if used)
+          illustratedTokenScale: 0.45, // Moonbirds illustrated (smaller)
+          oddityTokenScale: 0.8,     // Moonbirds oddity
+        }
+        : {
+          // Glyders
+          pixelTokenScale: 1.0,        // integer-scaled, then multiplied
+          illustratedTokenScale: 0.42, // Glyders illustrated (already looked good)
+        }),
+    }
   };
 }
 

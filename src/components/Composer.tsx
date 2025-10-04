@@ -271,47 +271,76 @@ export default function Composer({
 
             // --- character / token ---
             if (usingToken) {
-
-                let tokenImg: HTMLImageElement | null = null;
-                if (artStyle === "illustrated") tokenImg = moonbirdImgRef.current;
-                else if (artStyle === "pixel") tokenImg = pixelBirdImgRef.current;
-                else if (artStyle === "oddity") tokenImg = oddityImgRef.current;
-                // const tokenImg =
-                //     artStyle === "pixel"
-                //         ? pixelBirdImgRef.current ?? moonbirdImgRef.current ?? oddityImgRef.current
-                //         : artStyle === "oddity"
-                //             ? oddityImgRef.current ?? moonbirdImgRef.current ?? pixelBirdImgRef.current
-                //             : moonbirdImgRef.current ?? pixelBirdImgRef.current ?? oddityImgRef.current;
-                
-               //debug 
-                console.log("draw token", {
-                    artStyle,
-                    hasIllustrated: !!moonbirdImgRef.current,
-                    hasPixel: !!pixelBirdImgRef.current,
-                    hasOddity: !!oddityImgRef.current,
-                    chosen: !!tokenImg,
-                });
-
+                const tokenImg =
+                    artStyle === "pixel"
+                        ? pixelBirdImgRef.current ?? moonbirdImgRef.current ?? oddityImgRef.current
+                        : artStyle === "oddity"
+                            ? oddityImgRef.current ?? moonbirdImgRef.current ?? pixelBirdImgRef.current
+                            : moonbirdImgRef.current ?? pixelBirdImgRef.current ?? oddityImgRef.current;
 
                 if (tokenImg) {
+                    const bases = config.assetBases ?? {};
+
                     if (artStyle === "pixel") {
-                        const base = getIntegerPixelScale(tokenImg, c, 1);
-                        const mult = config.assetBases?.pixelTokenScale ?? 1;
-                        const s = base * mult;
+                        // integer scale for crispness, then apply optional multiplier
+                        const baseInt = getIntegerPixelScale(tokenImg, c, 1);
+                        const mul = bases.pixelTokenScale ?? 1;
+                        drawBottomScaled(ctx, tokenImg, c, baseInt * mul, 0);
+                    } else if (artStyle === "oddity") {
+                        const s = bases.oddityTokenScale ?? 0.8;
                         drawBottomScaled(ctx, tokenImg, c, s, 0);
-                    }
-                    else if (artStyle === "illustrated") {
-                        const s = config.assetBases?.illustratedTokenScale ?? 0.4; // default used before
+                    } else {
+                        // illustrated
+                        const s = bases.illustratedTokenScale ?? 0.4;
                         drawBottomScaled(ctx, tokenImg, c, s, 0);
-                    }
-                    else if (artStyle === "oddity") {
-                        drawBottomScaled(ctx, tokenImg, c, 0.8, 0);
-                    }
-                    else {
-                        drawBottomScaled(ctx, tokenImg, c, 0.4, 0);
                     }
                 }
-            } else if (charImgOrNull) {
+            }
+            //OLD
+            // if (usingToken) {
+
+            //     let tokenImg: HTMLImageElement | null = null;
+            //     if (artStyle === "illustrated") tokenImg = moonbirdImgRef.current;
+            //     else if (artStyle === "pixel") tokenImg = pixelBirdImgRef.current;
+            //     else if (artStyle === "oddity") tokenImg = oddityImgRef.current;
+            //     // const tokenImg =
+            //     //     artStyle === "pixel"
+            //     //         ? pixelBirdImgRef.current ?? moonbirdImgRef.current ?? oddityImgRef.current
+            //     //         : artStyle === "oddity"
+            //     //             ? oddityImgRef.current ?? moonbirdImgRef.current ?? pixelBirdImgRef.current
+            //     //             : moonbirdImgRef.current ?? pixelBirdImgRef.current ?? oddityImgRef.current;
+
+            //    //debug 
+            //     console.log("draw token", {
+            //         artStyle,
+            //         hasIllustrated: !!moonbirdImgRef.current,
+            //         hasPixel: !!pixelBirdImgRef.current,
+            //         hasOddity: !!oddityImgRef.current,
+            //         chosen: !!tokenImg,
+            //     });
+
+
+            //     if (tokenImg) {
+            //         if (artStyle === "pixel") {
+            //             const base = getIntegerPixelScale(tokenImg, c, 1);
+            //             const mult = config.assetBases?.pixelTokenScale ?? 1;
+            //             const s = base * mult;
+            //             drawBottomScaled(ctx, tokenImg, c, s, 0);
+            //         }
+            //         else if (artStyle === "illustrated") {
+            //             const s = config.assetBases?.illustratedTokenScale ?? 0.4; // default used before
+            //             drawBottomScaled(ctx, tokenImg, c, s, 0);
+            //         }
+            //         else if (artStyle === "oddity") {
+            //             drawBottomScaled(ctx, tokenImg, c, 0.8, 0);
+            //         }
+            //         else {
+            //             drawBottomScaled(ctx, tokenImg, c, 0.4, 0);
+            //         }
+            //     }
+            // } 
+
+            else if (charImgOrNull) {
                 drawBottomOffsetNoScale(ctx, charImgOrNull, c, 0);
             }
 

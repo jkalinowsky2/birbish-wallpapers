@@ -23,13 +23,13 @@ export type AssetBases = {
     pixelBase?: string;
     oddityBase?: string;
     illustratedProxy?: string;
-    /** NEW: direct base for illustrated images (no proxy, e.g. R2) */
+
     illustratedBase?: string;  // NEW: direct base for illustrated (e.g., Glyders on R2/Worker)
-    
-    //   illustratedProxy?: string;
-    /** Optional multiplier just for pixel token rendering */
-    pixelTokenScale?: number;
-    illustratedTokenScale?: number; // NEW optional
+
+    // NEW: per-art-style token scale overrides (all optional)
+    pixelTokenScale?: number;        // e.g., 1.0
+    illustratedTokenScale?: number;  // e.g., 0.32 for Moonbirds, 0.42 for Glyders
+    oddityTokenScale?: number;       // e.g., 0.8
 };
 
 
