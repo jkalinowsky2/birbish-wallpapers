@@ -264,7 +264,7 @@ export default function Composer({
                     textYOffset // NEW
                 );
             } else {
-                drawTextCenteredVertically(ctx, textImg, c);
+                drawTextCenteredVertically(ctx, textImg, c, textYOffset);
             }
 
             // --- character / token ---
@@ -685,14 +685,14 @@ function getImgSize(img: HTMLImageElement, fallbackW = 1600, fallbackH = 1600) {
     return { w, h };
 }
 
-function drawTextCenteredVertically(ctx: CanvasRenderingContext2D, img: HTMLImageElement, c: HTMLCanvasElement) {
+function drawTextCenteredVertically(ctx: CanvasRenderingContext2D, img: HTMLImageElement, c: HTMLCanvasElement, offsetY: number = 0) {
     const iw = img.naturalWidth || img.width;
     const ih = img.naturalHeight || img.height;
     const scale = Math.min(1, c.width / iw, c.height / ih);
     const dw = Math.round(iw * scale);
     const dh = Math.round(ih * scale);
     const dx = Math.round((c.width - dw) / 2);
-    const dy = Math.round((c.height - dh) / 2);
+      const dy = Math.round((c.height - dh) / 2) + offsetY; // ← apply nudge
     ctx.drawImage(img, dx, dy, dw, dh);
 }
 
