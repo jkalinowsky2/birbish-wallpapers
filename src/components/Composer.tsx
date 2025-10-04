@@ -439,8 +439,52 @@ export default function Composer({
                         </select>
                     </Field>
 
-                    {/* Text */}
                     <Field label={labels.text}>
+                    {/* Glyph selector + Nudge buttons side by side */}
+                    <div className="flex items-center justify-between gap-2">
+                        {/* Glyph dropdown */}
+                        <div className="flex-1">
+                            <select
+                                className="input w-full"
+                                value={text}
+                                onChange={(e) => setText(e.target.value)}
+                                disabled={isDrawing}
+                            >
+                                {config.texts.map((t) => (
+                                    <option key={t.id} value={t.id}>
+                                        {t.label}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Nudge buttons */}
+                        <div className="flex items-center gap-1">
+                            <button
+                                type="button"
+                                className="btn btn-ghost p-1 h-6 min-h-6"
+                                onClick={() => setTextYOffset((y) => y - 10)}
+                                disabled={isDrawing}
+                                title="Nudge up"
+                            >
+                                ↑
+                            </button>
+
+                            <button
+                                type="button"
+                                className="btn btn-ghost p-1 h-6 min-h-6"
+                                onClick={() => setTextYOffset((y) => y + 10)}
+                                disabled={isDrawing}
+                                title="Nudge down"
+                            >
+                                ↓
+                            </button>
+                        </div>
+                    </div>
+                </Field>
+
+                {/* Text */}
+                {/* <Field label={labels.text}>
                         <select className="input" value={text} onChange={(e) => setText(e.target.value)}>
                             {config.texts.map((x) => (
                                 <option key={x.id} value={x.id}>
@@ -448,204 +492,195 @@ export default function Composer({
                                 </option>
                             ))}
                         </select>
-                    </Field>
-                    {/* Text vertical nudge (buttons only, ±10px) */}
-                    <Field label="Glyph vertical offset">
-                        <div className="flex items-center gap-2">
+                    </Field> */}
+                {/* Text vertical nudge (buttons only, ±10px) */}
+                {/* <Field label="Nudge Glyph">
+                        <div className="flex items-center gap-1">
                             <button
                                 type="button"
-                                className="btn"
-                                aria-label="Nudge text up"
-                                onClick={() => setTextYOffset((v) => v - 20)}
-                                title="Move text up 10px"
+                                className="btn btn-ghost p-1 h-6 min-h-6"
+                                onClick={() => setTextYOffset((y) => y - 20)}
+                                disabled={isDrawing}
+                                title="Nudge up"
                             >
-                                ▲
+                                ↑
                             </button>
 
                             <button
                                 type="button"
-                                className="btn"
-                                aria-label="Nudge text down"
-                                onClick={() => setTextYOffset((v) => v + 20)}
-                                title="Move text down 10px"
+                                className="btn btn-ghost p-1 h-6 min-h-6"
+                                onClick={() => setTextYOffset((y) => y + 20)}
+                                disabled={isDrawing}
+                                title="Nudge down"
                             >
-                                ▼
-                            </button>
-
-                            <button
-                                type="button"
-                                className="btn btn-ghost ml-2"
-                                onClick={() => setTextYOffset(0)}
-                                title="Reset position"
-                            >
-                                Reset
+                                ↓
                             </button>
                         </div>
+                    </Field> */}
+
+                {/* Character selector */}
+                {hasBirds && (
+                    <Field label={labels.character}>
+                        <select
+                            className="input"
+                            value={bird}
+                            onChange={async (e) => {
+                                const next = e.target.value;
+                                if (isTokenActive()) await resetToken({ keepHeadwear: true });
+                                setBird(next);
+                            }}
+                        >
+                            {config.birds!.map((x) => (
+                                <option key={x.id} value={x.id}>
+                                    {x.label}
+                                </option>
+                            ))}
+                        </select>
                     </Field>
+                )}
 
-                    {/* Character selector */}
-                    {hasBirds && (
-                        <Field label={labels.character}>
-                            <select
-                                className="input"
-                                value={bird}
-                                onChange={async (e) => {
-                                    const next = e.target.value;
-                                    if (isTokenActive()) await resetToken({ keepHeadwear: true });
-                                    setBird(next);
-                                }}
-                            >
-                                {config.birds!.map((x) => (
-                                    <option key={x.id} value={x.id}>
-                                        {x.label}
-                                    </option>
-                                ))}
-                            </select>
-                        </Field>
-                    )}
+                {/* Headwear */}
+                {hasHeadwear && (
+                    <Field label={labels.headwear} className="mb-4">
+                        <select
+                            className="input"
+                            value={hat}
+                            onChange={async (e) => {
+                                const nextHat = e.target.value;
+                                setHat(nextHat);
+                                if (isTokenActive() && nextHat !== "none") {
+                                    await resetToken({ keepHeadwear: true });
+                                }
+                            }}
+                        >
+                            {config.headwear!.map((x) => (
+                                <option key={x.id} value={x.id}>
+                                    {x.label}
+                                </option>
+                            ))}
+                        </select>
+                    </Field>
+                )}
 
-                    {/* Headwear */}
-                    {hasHeadwear && (
-                        <Field label={labels.headwear} className="mb-4">
-                            <select
-                                className="input"
-                                value={hat}
-                                onChange={async (e) => {
-                                    const nextHat = e.target.value;
-                                    setHat(nextHat);
-                                    if (isTokenActive() && nextHat !== "none") {
-                                        await resetToken({ keepHeadwear: true });
-                                    }
-                                }}
-                            >
-                                {config.headwear!.map((x) => (
-                                    <option key={x.id} value={x.id}>
-                                        {x.label}
-                                    </option>
-                                ))}
-                            </select>
-                        </Field>
-                    )}
+                {/* Tokens */}
+                {hasTokens && (
+                    <>
+                        <p className="text-xs text-neutral-500 mt-6">{labels.tokenHint}</p>
 
-                    {/* Tokens */}
-                    {hasTokens && (
-                        <>
-                            <p className="text-xs text-neutral-500 mt-6">{labels.tokenHint}</p>
+                        <Field label={labels.tokenId}>
+                            <div className="flex gap-2">
+                                <input
+                                    type="number"
+                                    placeholder="e.g. 8209"
+                                    value={tokenId}
+                                    onChange={(e) => setTokenId(e.target.value)}
+                                    className="input w-40"
+                                    min={1}
+                                />
+                                <button
+                                    onClick={async () => {
+                                        try {
+                                            const id = tokenId.trim();
+                                            if (!id) return;
 
-                            <Field label={labels.tokenId}>
-                                <div className="flex gap-2">
-                                    <input
-                                        type="number"
-                                        placeholder="e.g. 8209"
-                                        value={tokenId}
-                                        onChange={(e) => setTokenId(e.target.value)}
-                                        className="input w-40"
-                                        min={1}
-                                    />
+                                            // clear previous
+                                            moonbirdImgRef.current = null;
+                                            pixelBirdImgRef.current = null;
+                                            oddityImgRef.current = null;
+
+                                            const results = await Promise.allSettled([
+                                                canIllustrated ? loadIllustratedById(id) : Promise.reject("illustrated disabled"),
+                                                canPixel ? loadPixelById(id) : Promise.reject("pixel disabled"),
+                                                canOddity ? loadOddityById(id) : Promise.reject("oddity disabled"),
+                                            ]);
+
+                                            if (results[0].status === "fulfilled") moonbirdImgRef.current = results[0].value;
+                                            if (results[1].status === "fulfilled") pixelBirdImgRef.current = results[1].value;
+                                            if (results[2].status === "fulfilled") oddityImgRef.current = results[2].value;
+
+                                            if (hasHeadwear) setHat("none");
+                                            setTokenVersion((v) => v + 1);
+                                            await draw();
+                                        } catch {
+                                            alert("Could not load that token image. Double-check the ID.");
+                                        }
+                                    }}
+                                    disabled={!tokenId}
+                                >
+                                    Load
+                                </button>
+                                {tokenId && (
                                     <button
+                                        className="btn btn-ghost"
                                         onClick={async () => {
-                                            try {
-                                                const id = tokenId.trim();
-                                                if (!id) return;
-
-                                                // clear previous
-                                                moonbirdImgRef.current = null;
-                                                pixelBirdImgRef.current = null;
-                                                oddityImgRef.current = null;
-
-                                                const results = await Promise.allSettled([
-                                                    canIllustrated ? loadIllustratedById(id) : Promise.reject("illustrated disabled"),
-                                                    canPixel ? loadPixelById(id) : Promise.reject("pixel disabled"),
-                                                    canOddity ? loadOddityById(id) : Promise.reject("oddity disabled"),
-                                                ]);
-
-                                                if (results[0].status === "fulfilled") moonbirdImgRef.current = results[0].value;
-                                                if (results[1].status === "fulfilled") pixelBirdImgRef.current = results[1].value;
-                                                if (results[2].status === "fulfilled") oddityImgRef.current = results[2].value;
-
-                                                if (hasHeadwear) setHat("none");
-                                                setTokenVersion((v) => v + 1);
-                                                await draw();
-                                            } catch {
-                                                alert("Could not load that token image. Double-check the ID.");
-                                            }
+                                            await resetToken({ keepHeadwear: false });
                                         }}
-                                        disabled={!tokenId}
+                                        type="button"
                                     >
-                                        Load
+                                        Reset
                                     </button>
-                                    {tokenId && (
-                                        <button
-                                            className="btn btn-ghost"
-                                            onClick={async () => {
-                                                await resetToken({ keepHeadwear: false });
-                                            }}
-                                            type="button"
-                                        >
-                                            Reset
-                                        </button>
-                                    )}
-                                </div>
-                            </Field>
+                                )}
+                            </div>
+                        </Field>
 
-                            {/* Art styles available for this collection */}
-                            <Field label="Art Style">
-                                <div className="grid grid-cols-3 gap-2">
+                        {/* Art styles available for this collection */}
+                        <Field label="Art Style">
+                            <div className="grid grid-cols-3 gap-2">
 
-                                    {canPixel && (
-                                        <button
-                                            type="button"
-                                            className={`btn ${artStyle === "pixel" ? "btn-primary" : "btn-ghost"}`}
-                                            onClick={() => setArtStyle("pixel")}
-                                        >
-                                            Pixel
-                                        </button>
-                                    )}
-                                    {canIllustrated && (
-                                        <button
-                                            type="button"
-                                            className={`btn ${artStyle === "illustrated" ? "btn-primary" : "btn-ghost"}`}
-                                            onClick={() => setArtStyle("illustrated")}
-                                        >
-                                            Illustrated
-                                        </button>
-                                    )}
-                                    {canOddity && (
-                                        <button
-                                            type="button"
-                                            className={`btn ${artStyle === "oddity" ? "btn-primary" : "btn-ghost"}`}
-                                            onClick={() => setArtStyle("oddity")}
-                                        >
-                                            Oddity
-                                        </button>
-                                    )}
-                                </div>
-                            </Field>
-                        </>
+                                {canPixel && (
+                                    <button
+                                        type="button"
+                                        className={`btn ${artStyle === "pixel" ? "btn-primary" : "btn-ghost"}`}
+                                        onClick={() => setArtStyle("pixel")}
+                                    >
+                                        Pixel
+                                    </button>
+                                )}
+                                {canIllustrated && (
+                                    <button
+                                        type="button"
+                                        className={`btn ${artStyle === "illustrated" ? "btn-primary" : "btn-ghost"}`}
+                                        onClick={() => setArtStyle("illustrated")}
+                                    >
+                                        Illustrated
+                                    </button>
+                                )}
+                                {canOddity && (
+                                    <button
+                                        type="button"
+                                        className={`btn ${artStyle === "oddity" ? "btn-primary" : "btn-ghost"}`}
+                                        onClick={() => setArtStyle("oddity")}
+                                    >
+                                        Oddity
+                                    </button>
+                                )}
+                            </div>
+                        </Field>
+                    </>
+                )}
+
+                <div className="border-t border-neutral-200 my-8" />
+
+                <div className="grid grid-cols-2 gap-2 mt-8">
+                    <button className="btn" onClick={() => download("png")}>
+                        Download PNG
+                    </button>
+                    <button className="btn" onClick={() => download("jpeg")}>
+                        Download JPEG
+                    </button>
+                    {canNativeShare && (
+                        <button className="btn col-span-2" onClick={shareImage} title="Share to Photos/Files">
+                            Share / Save
+                        </button>
                     )}
-
-                    <div className="border-t border-neutral-200 my-8" />
-
-                    <div className="grid grid-cols-2 gap-2 mt-8">
-                        <button className="btn" onClick={() => download("png")}>
-                            Download PNG
-                        </button>
-                        <button className="btn" onClick={() => download("jpeg")}>
-                            Download JPEG
-                        </button>
-                        {canNativeShare && (
-                            <button className="btn col-span-2" onClick={shareImage} title="Share to Photos/Files">
-                                Share / Save
-                            </button>
-                        )}
-                    </div>
-
-                    {isDrawing && <p className="text-xs text-neutral-500">Rendering…</p>}
                 </div>
-            </aside>
 
-            {/* Preview card */}
-            <section className="h-full min-w-0 rounded-2xl border bg-white shadow-sm p-4 lg:p-5">
+                {isDrawing && <p className="text-xs text-neutral-500">Rendering…</p>}
+        </div>
+            </aside >
+
+        {/* Preview card */ }
+        < section className = "h-full min-w-0 rounded-2xl border bg-white shadow-sm p-4 lg:p-5" >
                 <h2 className="text-sm font-semibold mb-3">Preview</h2>
 
                 <div className="rounded-xl bg-white p-3 max-h-[80vh] overflow-auto">
@@ -655,8 +690,8 @@ export default function Composer({
                     {/* Mobile <img> for long-press save */}
                     <img id="mobile-preview" className="block md:hidden mx-auto" style={previewCanvasStyle} alt="Wallpaper preview" />
                 </div>
-            </section>
-        </div>
+            </section >
+        </div >
     );
 }
 
@@ -692,7 +727,7 @@ function drawTextCenteredVertically(ctx: CanvasRenderingContext2D, img: HTMLImag
     const dw = Math.round(iw * scale);
     const dh = Math.round(ih * scale);
     const dx = Math.round((c.width - dw) / 2);
-      const dy = Math.round((c.height - dh) / 2) + offsetY; // ← apply nudge
+    const dy = Math.round((c.height - dh) / 2) + offsetY; // ← apply nudge
     ctx.drawImage(img, dx, dy, dw, dh);
 }
 
