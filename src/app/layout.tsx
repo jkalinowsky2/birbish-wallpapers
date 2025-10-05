@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import SiteHeader from "@/components/SiteHeader";
 
 export const metadata: Metadata = {
-  title: "Birbish Builders",
+  title: "Generational Merch",
   description: "Wallpapers & X banners for your collection",
 };
 
