@@ -5,6 +5,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
+
 type Item = { label: string; href: string };
 
 const WALLPAPER_ITEMS: Item[] = [
@@ -48,6 +49,12 @@ export default function Header() {
         <nav className="hidden md:flex items-center gap-2">
           <Dropdown label="Wallpapers" items={WALLPAPER_ITEMS} pathname={pathname} />
           <Dropdown label="Banners" items={BANNER_ITEMS} pathname={pathname} />
+          <Link
+            href="/tip-jar"
+            className="px-3 py-2 rounded-lg text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100"
+          >
+            Tip Jar
+          </Link>
         </nav>
 
         {/* MOBILE TOGGLE */}
