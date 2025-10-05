@@ -119,6 +119,17 @@ export default function Header() {
                 ))}
               </ul>
             )}
+
+            <hr className="my-2 border-neutral-200" />
+
+            <Link
+              href="/tip-jar"
+              className={linkClasses("/tip-jar")}
+              onClick={() => setMobileOpen(false)}
+            >
+              Tip Jar
+            </Link>
+
           </div>
         </div>
       )}
