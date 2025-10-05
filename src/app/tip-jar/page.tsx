@@ -32,7 +32,7 @@ export default function TipJarPage() {
             <p className="text-neutral-600 mb-6">
                 My wallpaper and banner builders will always be free to use. <br />
                 <br />
-                If you'd like the support the costs to create the content, maintain and develop the tools, and host the files, tips are appreciated. 
+                If you&apos;d like the support the costs to create the content, maintain and develop the tools, and host the files, tips are appreciated. 
                 <br/>
                 <br/>
                 Below are my wallet addresses. <br/>
