@@ -463,7 +463,7 @@ export default function Composer({
                             <button
                                 type="button"
                                 className="btn btn-ghost p-1 h-6 min-h-6"
-                                onClick={() => setTextYOffset((y) => y - 10)}
+                                onClick={() => setTextYOffset((y) => y - 25)}
                                 disabled={isDrawing}
                                 title="Nudge up"
                             >
@@ -473,7 +473,7 @@ export default function Composer({
                             <button
                                 type="button"
                                 className="btn btn-ghost p-1 h-6 min-h-6"
-                                onClick={() => setTextYOffset((y) => y + 10)}
+                                onClick={() => setTextYOffset((y) => y + 25)}
                                 disabled={isDrawing}
                                 title="Nudge down"
                             >
@@ -482,41 +482,6 @@ export default function Composer({
                         </div>
                     </div>
                 </Field>
-
-                {/* Text */}
-                {/* <Field label={labels.text}>
-                        <select className="input" value={text} onChange={(e) => setText(e.target.value)}>
-                            {config.texts.map((x) => (
-                                <option key={x.id} value={x.id}>
-                                    {x.label}
-                                </option>
-                            ))}
-                        </select>
-                    </Field> */}
-                {/* Text vertical nudge (buttons only, ±10px) */}
-                {/* <Field label="Nudge Glyph">
-                        <div className="flex items-center gap-1">
-                            <button
-                                type="button"
-                                className="btn btn-ghost p-1 h-6 min-h-6"
-                                onClick={() => setTextYOffset((y) => y - 20)}
-                                disabled={isDrawing}
-                                title="Nudge up"
-                            >
-                                ↑
-                            </button>
-
-                            <button
-                                type="button"
-                                className="btn btn-ghost p-1 h-6 min-h-6"
-                                onClick={() => setTextYOffset((y) => y + 20)}
-                                disabled={isDrawing}
-                                title="Nudge down"
-                            >
-                                ↓
-                            </button>
-                        </div>
-                    </Field> */}
 
                 {/* Character selector */}
                 {hasBirds && (

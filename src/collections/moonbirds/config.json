@@ -14,8 +14,7 @@
     { "id": "iPad", "w": 2040, "h": 2732, "name": "2040 x 2732 (Tablet)" },
 
     { "id": "pfp", "w": 1000, "h": 1000, "name": "1000 x 1000 (pfp)" },
-    { "id": "widescreen", "w": 1920, "h": 1080, "name": "1920 x 1080 (Widescreen)" },
-    { "id": "hd", "w": 3840, "h": 2160, "name": "3840 x 2160 (HD Widescreen)" }
+    { "id": "widescreen", "w": 3840, "h": 2160, "name": "3840 x 2160 (HD Widescreen)" }
 
 
   
