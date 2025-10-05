@@ -12,7 +12,8 @@ const WALLPAPER_ITEMS: Item[] = [
   { label: "Glyders", href: "/glyders/wallpaper" },
 ];
 
-const BANNER_ITEMS: Item[] = [
+// src/components/SiteHeader.tsx (or wherever)
+const BANNER_ITEMS = [
   { label: "Moonbirds", href: "/moonbirds/banner" },
   { label: "Glyders", href: "/glyders/banner" },
 ];
@@ -150,8 +151,8 @@ function Dropdown({
                 <Link
                   href={it.href}
                   className={`block px-3 py-2 text-sm ${active
-                      ? "bg-neutral-900 text-white"
-                      : "text-neutral-700 hover:bg-neutral-100"
+                    ? "bg-neutral-900 text-white"
+                    : "text-neutral-700 hover:bg-neutral-100"
                     }`}
                 >
                   {it.label}
