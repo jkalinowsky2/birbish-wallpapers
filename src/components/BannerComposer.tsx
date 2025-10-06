@@ -1,7 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { PIXEL_BASE, ODDITY_BASE, ILLU_PROXY } from "@/lib/assets";
+//import { PIXEL_BASE, ODDITY_BASE, ILLU_PROXY } from "@/lib/assets";
+import {
+    MOONBIRDS_PIXEL_BASE,
+    MOONBIRDS_ILLU_BASE,
+    MOONBIRDS_ODDITY_BASE,
+} from "@/lib/assets";
 
 type ArtStyle = "none" | "illustrated" | "pixel" | "oddity";
 
@@ -35,7 +40,7 @@ const BG_OPTIONS: { id: string; label: string; src: string }[] = [
     { id: "blue", label: "Blue", src: "/banner-bg/blue.png" },
     { id: "plum", label: "Plum", src: "/banner-bg/plum.png" },
     { id: "absract", label: "Abstract", src: "/banner-bg/abstract.png" },
-    { id: "birbhalla", label: "Birbhalla", src: "/banner-bg/birbhalla.png" },
+    { id: "birbhalla", label: "Birbhalla", src: "/banner-bgt/birbhalla.png" },
 
     //{ id: "spencer", label: "Head Birb - Limited Time Only!", src: "/banner-bg/spencer.png" },
 ];
@@ -64,20 +69,30 @@ export default function BannerComposer() {
     const imgCache = imgCacheRef.current;
 
     // --- helpers ---
-    function urlForSlot(style: ArtStyle, id: string | undefined) {
-        if (style === "none") return null;
-        if (!id || id.trim() === "") return null;
+    function urlForSlot(style: ArtStyle, id?: string) {
         const n = Number(id);
-        if (!Number.isFinite(n)) return null;
+        if (!Number.isFinite(n) || !id?.trim()) return null;
 
-        if (style === "pixel") return `${PIXEL_BASE}/${n}.png`;
-        if (style === "oddity") return `${ODDITY_BASE}/${n}.png`;
+        if (style === "pixel") return `${MOONBIRDS_PIXEL_BASE}/${n}.png`;
+        if (style === "oddity") return `${MOONBIRDS_ODDITY_BASE}/${n}.png`;
+        if (style === "illustrated") return `${MOONBIRDS_ILLU_BASE}/${n}.png`;
 
-        // illustrated via proxy to Proof PNGs
-        return `${ILLU_PROXY}?url=${encodeURIComponent(
-            `https://collection-assets.proof.xyz/moonbirds/images_no_bg/${n}.png`
-        )}`;
+        return null;
     }
+    // function urlForSlot(style: ArtStyle, id: string | undefined) {
+    //     if (style === "none") return null;
+    //     if (!id || id.trim() === "") return null;
+    //     const n = Number(id);
+    //     if (!Number.isFinite(n)) return null;
+
+    //     if (style === "pixel") return `${PIXEL_BASE}/${n}.png`;
+    //     if (style === "oddity") return `${ODDITY_BASE}/${n}.png`;
+
+    //     // illustrated via proxy to Proof PNGs
+    //     return `${ILLU_PROXY}?url=${encodeURIComponent(
+    //         `https://collection-assets.proof.xyz/moonbirds/images_no_bg/${n}.png`
+    //     )}`;
+    // }
 
     async function loadImage(src: string): Promise<HTMLImageElement> {
         const cached = imgCache.get(src);

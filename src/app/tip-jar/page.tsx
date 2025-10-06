@@ -66,23 +66,6 @@ export default function TipJarPage() {
                     </div>
                 ))}
             </div>
-            {/* <div className="rounded-2xl border bg-white shadow-sm divide-y">
-                {WALLETS.map((w) => (
-                    <div key={w.label} className="flex items-center gap-3 p-4">
-                        <div className="min-w-40 font-medium">{w.label}</div>
-                        <code className="text-[13px] break-all text-neutral-800 bg-neutral-50 px-2 py-1 rounded grow">
-                            {w.address}
-                        </code>
-                        <button
-                            className="btn btn-ghost whitespace-nowrap"
-                            onClick={() => copy(w.address)}
-                            title="Copy to clipboard"
-                        >
-                            {copied === w.address ? "Copied!" : "Copy"}
-                        </button>
-                    </div>
-                ))}
-            </div> */}
 
             <p className="text-xs text-neutral-500 mt-4">
                 As always, double-check the address matches before sending. Generational Merch is not responsible for lost or transfered funds.

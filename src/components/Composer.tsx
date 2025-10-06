@@ -35,7 +35,16 @@ export default function Composer({
     // --- Asset bases from config ---
     // const { pixelBase, oddityBase, illustratedProxy } = config.assetBases ?? {};
     // Inside Composer component (you already extract this above)
-    const { pixelBase, oddityBase, illustratedProxy, illustratedBase } = config.assetBases ?? {};
+    // const { pixelBase, oddityBase, illustratedProxy, illustratedBase } = config.assetBases ?? {};
+    const {
+        pixelBase,
+        oddityBase,
+        illustratedBase,
+        illustratedProxy,
+        pixelTokenScale,
+        illustratedTokenScale,
+        oddityTokenScale,
+    } = config.assetBases ?? {};
     // --- Meta-driven toggles & labels ---
     const features = new Set(meta?.features ?? []);
     const hasBirds = Boolean(config.birds && config.birds.length > 0);
@@ -130,27 +139,36 @@ export default function Composer({
         });
 
     function buildIllustratedUrl(id: string) {
-        // Prefer per-collection base first (for Glyders)
-        const base = config.assetBases?.illustratedBase ?? "";
-        const cleanBase = base.replace(/\/+$/, ""); // strip trailing slashes
+        const base = illustratedBase ?? "";
+        const cleanBase = base.replace(/\/+$/, "");
+        const n = String(Number(id));
+        if (cleanBase) return `${cleanBase}/${n}.png`;
 
-        // Normalize the id -> "2" (guards against "002" or whitespace)
-        const n = String(Number(id)); // if id isn't numeric, this becomes "NaN"
-
-        let url: string;
-        if (cleanBase) {
-            url = `${cleanBase}/${n}.png`;
-        } else {
-            // Fallback to Moonbirds behavior (Proof raw + optional proxy)
-            const raw = `https://collection-assets.proof.xyz/moonbirds/images_no_bg/${n}.png`;
-            url = illustratedProxy
-                ? `${illustratedProxy}?url=${encodeURIComponent(raw)}`
-                : raw;
-        }
-
-        console.log("buildIllustratedUrl →", url);
-        return url;
+        const raw = `https://collection-assets.proof.xyz/moonbirds/images_no_bg/${n}.png`;
+        return illustratedProxy ? `${illustratedProxy}?url=${encodeURIComponent(raw)}` : raw;
     }
+    // function buildIllustratedUrl(id: string) {
+    //     // Prefer per-collection base first (for Glyders)
+    //     const base = config.assetBases?.illustratedBase ?? "";
+    //     const cleanBase = base.replace(/\/+$/, ""); // strip trailing slashes
+
+    //     // Normalize the id -> "2" (guards against "002" or whitespace)
+    //     const n = String(Number(id)); // if id isn't numeric, this becomes "NaN"
+
+    //     let url: string;
+    //     if (cleanBase) {
+    //         url = `${cleanBase}/${n}.png`;
+    //     } else {
+    //         // Fallback to Moonbirds behavior (Proof raw + optional proxy)
+    //         const raw = `https://collection-assets.proof.xyz/moonbirds/images_no_bg/${n}.png`;
+    //         url = illustratedProxy
+    //             ? `${illustratedProxy}?url=${encodeURIComponent(raw)}`
+    //             : raw;
+    //     }
+
+    //     console.log("buildIllustratedUrl →", url);
+    //     return url;
+    // }
     // function buildIllustratedUrl(id: string) {
     //     const raw = `https://collection-assets.proof.xyz/moonbirds/images_no_bg/${id}.png`;
     //     return illustratedProxy ? `${illustratedProxy}?url=${encodeURIComponent(raw)}` : raw;
@@ -440,212 +458,212 @@ export default function Composer({
                     </Field>
 
                     <Field label={labels.text}>
-                    {/* Glyph selector + Nudge buttons side by side */}
-                    <div className="flex items-center justify-between gap-2">
-                        {/* Glyph dropdown */}
-                        <div className="flex-1">
+                        {/* Glyph selector + Nudge buttons side by side */}
+                        <div className="flex items-center justify-between gap-2">
+                            {/* Glyph dropdown */}
+                            <div className="flex-1">
+                                <select
+                                    className="input w-full"
+                                    value={text}
+                                    onChange={(e) => setText(e.target.value)}
+                                    disabled={isDrawing}
+                                >
+                                    {config.texts.map((t) => (
+                                        <option key={t.id} value={t.id}>
+                                            {t.label}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {/* Nudge buttons */}
+                            <div className="flex items-center gap-1">
+                                <button
+                                    type="button"
+                                    className="btn btn-ghost p-1 h-6 min-h-6"
+                                    onClick={() => setTextYOffset((y) => y - 25)}
+                                    disabled={isDrawing}
+                                    title="Nudge up"
+                                >
+                                    ↑
+                                </button>
+
+                                <button
+                                    type="button"
+                                    className="btn btn-ghost p-1 h-6 min-h-6"
+                                    onClick={() => setTextYOffset((y) => y + 25)}
+                                    disabled={isDrawing}
+                                    title="Nudge down"
+                                >
+                                    ↓
+                                </button>
+                            </div>
+                        </div>
+                    </Field>
+
+                    {/* Character selector */}
+                    {hasBirds && (
+                        <Field label={labels.character}>
                             <select
-                                className="input w-full"
-                                value={text}
-                                onChange={(e) => setText(e.target.value)}
-                                disabled={isDrawing}
+                                className="input"
+                                value={bird}
+                                onChange={async (e) => {
+                                    const next = e.target.value;
+                                    if (isTokenActive()) await resetToken({ keepHeadwear: true });
+                                    setBird(next);
+                                }}
                             >
-                                {config.texts.map((t) => (
-                                    <option key={t.id} value={t.id}>
-                                        {t.label}
+                                {config.birds!.map((x) => (
+                                    <option key={x.id} value={x.id}>
+                                        {x.label}
                                     </option>
                                 ))}
                             </select>
-                        </div>
-
-                        {/* Nudge buttons */}
-                        <div className="flex items-center gap-1">
-                            <button
-                                type="button"
-                                className="btn btn-ghost p-1 h-6 min-h-6"
-                                onClick={() => setTextYOffset((y) => y - 25)}
-                                disabled={isDrawing}
-                                title="Nudge up"
-                            >
-                                ↑
-                            </button>
-
-                            <button
-                                type="button"
-                                className="btn btn-ghost p-1 h-6 min-h-6"
-                                onClick={() => setTextYOffset((y) => y + 25)}
-                                disabled={isDrawing}
-                                title="Nudge down"
-                            >
-                                ↓
-                            </button>
-                        </div>
-                    </div>
-                </Field>
-
-                {/* Character selector */}
-                {hasBirds && (
-                    <Field label={labels.character}>
-                        <select
-                            className="input"
-                            value={bird}
-                            onChange={async (e) => {
-                                const next = e.target.value;
-                                if (isTokenActive()) await resetToken({ keepHeadwear: true });
-                                setBird(next);
-                            }}
-                        >
-                            {config.birds!.map((x) => (
-                                <option key={x.id} value={x.id}>
-                                    {x.label}
-                                </option>
-                            ))}
-                        </select>
-                    </Field>
-                )}
-
-                {/* Headwear */}
-                {hasHeadwear && (
-                    <Field label={labels.headwear} className="mb-4">
-                        <select
-                            className="input"
-                            value={hat}
-                            onChange={async (e) => {
-                                const nextHat = e.target.value;
-                                setHat(nextHat);
-                                if (isTokenActive() && nextHat !== "none") {
-                                    await resetToken({ keepHeadwear: true });
-                                }
-                            }}
-                        >
-                            {config.headwear!.map((x) => (
-                                <option key={x.id} value={x.id}>
-                                    {x.label}
-                                </option>
-                            ))}
-                        </select>
-                    </Field>
-                )}
-
-                {/* Tokens */}
-                {hasTokens && (
-                    <>
-                        <p className="text-xs text-neutral-500 mt-6">{labels.tokenHint}</p>
-
-                        <Field label={labels.tokenId}>
-                            <div className="flex gap-2">
-                                <input
-                                    type="number"
-                                    placeholder="e.g. 8209"
-                                    value={tokenId}
-                                    onChange={(e) => setTokenId(e.target.value)}
-                                    className="input w-40"
-                                    min={1}
-                                />
-                                <button
-                                    onClick={async () => {
-                                        try {
-                                            const id = tokenId.trim();
-                                            if (!id) return;
-
-                                            // clear previous
-                                            moonbirdImgRef.current = null;
-                                            pixelBirdImgRef.current = null;
-                                            oddityImgRef.current = null;
-
-                                            const results = await Promise.allSettled([
-                                                canIllustrated ? loadIllustratedById(id) : Promise.reject("illustrated disabled"),
-                                                canPixel ? loadPixelById(id) : Promise.reject("pixel disabled"),
-                                                canOddity ? loadOddityById(id) : Promise.reject("oddity disabled"),
-                                            ]);
-
-                                            if (results[0].status === "fulfilled") moonbirdImgRef.current = results[0].value;
-                                            if (results[1].status === "fulfilled") pixelBirdImgRef.current = results[1].value;
-                                            if (results[2].status === "fulfilled") oddityImgRef.current = results[2].value;
-
-                                            if (hasHeadwear) setHat("none");
-                                            setTokenVersion((v) => v + 1);
-                                            await draw();
-                                        } catch {
-                                            alert("Could not load that token image. Double-check the ID.");
-                                        }
-                                    }}
-                                    disabled={!tokenId}
-                                >
-                                    Load
-                                </button>
-                                {tokenId && (
-                                    <button
-                                        className="btn btn-ghost"
-                                        onClick={async () => {
-                                            await resetToken({ keepHeadwear: false });
-                                        }}
-                                        type="button"
-                                    >
-                                        Reset
-                                    </button>
-                                )}
-                            </div>
                         </Field>
-
-                        {/* Art styles available for this collection */}
-                        <Field label="Art Style">
-                            <div className="grid grid-cols-3 gap-2">
-
-                                {canPixel && (
-                                    <button
-                                        type="button"
-                                        className={`btn ${artStyle === "pixel" ? "btn-primary" : "btn-ghost"}`}
-                                        onClick={() => setArtStyle("pixel")}
-                                    >
-                                        Pixel
-                                    </button>
-                                )}
-                                {canIllustrated && (
-                                    <button
-                                        type="button"
-                                        className={`btn ${artStyle === "illustrated" ? "btn-primary" : "btn-ghost"}`}
-                                        onClick={() => setArtStyle("illustrated")}
-                                    >
-                                        Illustrated
-                                    </button>
-                                )}
-                                {canOddity && (
-                                    <button
-                                        type="button"
-                                        className={`btn ${artStyle === "oddity" ? "btn-primary" : "btn-ghost"}`}
-                                        onClick={() => setArtStyle("oddity")}
-                                    >
-                                        Oddity
-                                    </button>
-                                )}
-                            </div>
-                        </Field>
-                    </>
-                )}
-
-                <div className="border-t border-neutral-200 my-8" />
-
-                <div className="grid grid-cols-2 gap-2 mt-8">
-                    <button className="btn" onClick={() => download("png")}>
-                        Download PNG
-                    </button>
-                    <button className="btn" onClick={() => download("jpeg")}>
-                        Download JPEG
-                    </button>
-                    {canNativeShare && (
-                        <button className="btn col-span-2" onClick={shareImage} title="Share to Photos/Files">
-                            Share / Save
-                        </button>
                     )}
-                </div>
 
-                {isDrawing && <p className="text-xs text-neutral-500">Rendering…</p>}
-        </div>
+                    {/* Headwear */}
+                    {hasHeadwear && (
+                        <Field label={labels.headwear} className="mb-4">
+                            <select
+                                className="input"
+                                value={hat}
+                                onChange={async (e) => {
+                                    const nextHat = e.target.value;
+                                    setHat(nextHat);
+                                    if (isTokenActive() && nextHat !== "none") {
+                                        await resetToken({ keepHeadwear: true });
+                                    }
+                                }}
+                            >
+                                {config.headwear!.map((x) => (
+                                    <option key={x.id} value={x.id}>
+                                        {x.label}
+                                    </option>
+                                ))}
+                            </select>
+                        </Field>
+                    )}
+
+                    {/* Tokens */}
+                    {hasTokens && (
+                        <>
+                            <p className="text-xs text-neutral-500 mt-6">{labels.tokenHint}</p>
+
+                            <Field label={labels.tokenId}>
+                                <div className="flex gap-2">
+                                    <input
+                                        type="number"
+                                        placeholder="e.g. 8209"
+                                        value={tokenId}
+                                        onChange={(e) => setTokenId(e.target.value)}
+                                        className="input w-40"
+                                        min={1}
+                                    />
+                                    <button
+                                        onClick={async () => {
+                                            try {
+                                                const id = tokenId.trim();
+                                                if (!id) return;
+
+                                                // clear previous
+                                                moonbirdImgRef.current = null;
+                                                pixelBirdImgRef.current = null;
+                                                oddityImgRef.current = null;
+
+                                                const results = await Promise.allSettled([
+                                                    canIllustrated ? loadIllustratedById(id) : Promise.reject("illustrated disabled"),
+                                                    canPixel ? loadPixelById(id) : Promise.reject("pixel disabled"),
+                                                    canOddity ? loadOddityById(id) : Promise.reject("oddity disabled"),
+                                                ]);
+
+                                                if (results[0].status === "fulfilled") moonbirdImgRef.current = results[0].value;
+                                                if (results[1].status === "fulfilled") pixelBirdImgRef.current = results[1].value;
+                                                if (results[2].status === "fulfilled") oddityImgRef.current = results[2].value;
+
+                                                if (hasHeadwear) setHat("none");
+                                                setTokenVersion((v) => v + 1);
+                                                await draw();
+                                            } catch {
+                                                alert("Could not load that token image. Double-check the ID.");
+                                            }
+                                        }}
+                                        disabled={!tokenId}
+                                    >
+                                        Load
+                                    </button>
+                                    {tokenId && (
+                                        <button
+                                            className="btn btn-ghost"
+                                            onClick={async () => {
+                                                await resetToken({ keepHeadwear: false });
+                                            }}
+                                            type="button"
+                                        >
+                                            Reset
+                                        </button>
+                                    )}
+                                </div>
+                            </Field>
+
+                            {/* Art styles available for this collection */}
+                            <Field label="Art Style">
+                                <div className="grid grid-cols-3 gap-2">
+
+                                    {canPixel && (
+                                        <button
+                                            type="button"
+                                            className={`btn ${artStyle === "pixel" ? "btn-primary" : "btn-ghost"}`}
+                                            onClick={() => setArtStyle("pixel")}
+                                        >
+                                            Pixel
+                                        </button>
+                                    )}
+                                    {canIllustrated && (
+                                        <button
+                                            type="button"
+                                            className={`btn ${artStyle === "illustrated" ? "btn-primary" : "btn-ghost"}`}
+                                            onClick={() => setArtStyle("illustrated")}
+                                        >
+                                            Illustrated
+                                        </button>
+                                    )}
+                                    {canOddity && (
+                                        <button
+                                            type="button"
+                                            className={`btn ${artStyle === "oddity" ? "btn-primary" : "btn-ghost"}`}
+                                            onClick={() => setArtStyle("oddity")}
+                                        >
+                                            Oddity
+                                        </button>
+                                    )}
+                                </div>
+                            </Field>
+                        </>
+                    )}
+
+                    <div className="border-t border-neutral-200 my-8" />
+
+                    <div className="grid grid-cols-2 gap-2 mt-8">
+                        <button className="btn" onClick={() => download("png")}>
+                            Download PNG
+                        </button>
+                        <button className="btn" onClick={() => download("jpeg")}>
+                            Download JPEG
+                        </button>
+                        {canNativeShare && (
+                            <button className="btn col-span-2" onClick={shareImage} title="Share to Photos/Files">
+                                Share / Save
+                            </button>
+                        )}
+                    </div>
+
+                    {isDrawing && <p className="text-xs text-neutral-500">Rendering…</p>}
+                </div>
             </aside >
 
-        {/* Preview card */ }
-        < section className = "h-full min-w-0 rounded-2xl border bg-white shadow-sm p-4 lg:p-5" >
+            {/* Preview card */}
+            < section className="h-full min-w-0 rounded-2xl border bg-white shadow-sm p-4 lg:p-5" >
                 <h2 className="text-sm font-semibold mb-3">Preview</h2>
 
                 <div className="rounded-xl bg-white p-3 max-h-[80vh] overflow-auto">
