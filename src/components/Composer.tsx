@@ -144,32 +144,6 @@ export default function Composer({
         const raw = `https://collection-assets.proof.xyz/moonbirds/images_no_bg/${n}.png`;
         return illustratedProxy ? `${illustratedProxy}?url=${encodeURIComponent(raw)}` : raw;
     }
-    // function buildIllustratedUrl(id: string) {
-    //     // Prefer per-collection base first (for Glyders)
-    //     const base = config.assetBases?.illustratedBase ?? "";
-    //     const cleanBase = base.replace(/\/+$/, ""); // strip trailing slashes
-
-    //     // Normalize the id -> "2" (guards against "002" or whitespace)
-    //     const n = String(Number(id)); // if id isn't numeric, this becomes "NaN"
-
-    //     let url: string;
-    //     if (cleanBase) {
-    //         url = `${cleanBase}/${n}.png`;
-    //     } else {
-    //         // Fallback to Moonbirds behavior (Proof raw + optional proxy)
-    //         const raw = `https://collection-assets.proof.xyz/moonbirds/images_no_bg/${n}.png`;
-    //         url = illustratedProxy
-    //             ? `${illustratedProxy}?url=${encodeURIComponent(raw)}`
-    //             : raw;
-    //     }
-
-    //     console.log("buildIllustratedUrl →", url);
-    //     return url;
-    // }
-    // function buildIllustratedUrl(id: string) {
-    //     const raw = `https://collection-assets.proof.xyz/moonbirds/images_no_bg/${id}.png`;
-    //     return illustratedProxy ? `${illustratedProxy}?url=${encodeURIComponent(raw)}` : raw;
-    // }
 
     async function loadMoonbirdById(id: string): Promise<HTMLImageElement> {
         const img = new Image();
@@ -263,6 +237,35 @@ export default function Composer({
             } else {
                 fillTiledCentered(ctx, bgImg, c);
             }
+
+            //vignette
+            // ---- Optional vignette effect ----
+            // ---- Optional vignette effect (elliptical) ----
+            ctx.save();
+
+            // Move origin to center
+            ctx.translate(device.w / 2, device.h / 2);
+
+            // Scale vertically — smaller value squashes it into an ellipse
+            ctx.scale(1, 0.7);  // ← adjust 0.7 for more or less vertical flattening
+
+            // Create the gradient as if centered at (0,0)
+            const vignette = ctx.createRadialGradient(
+                0, 0, 0,             // inner circle
+                0, 0, device.w / 1.2 // outer circle radius
+            );
+
+            // Define fade from clear center to dark edges
+            vignette.addColorStop(0.25, "rgba(0,0,0,0)");
+            vignette.addColorStop(1.0, "rgba(0,0,0,.25)");
+
+            // Apply gradient fill
+            ctx.fillStyle = vignette;
+
+            // Because we scaled the context, draw a full rect around origin
+            ctx.fillRect(-device.w / 2, -device.h / 2 / 0.7, device.w, device.h / 0.7);
+
+            ctx.restore();
 
             // --- text ---
             const textLayer = get(config.texts, text);
