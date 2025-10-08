@@ -30,7 +30,9 @@
     { "id": "none", "label": "None", "src": "/texts/none.png" },
     { "id": "nightglyders", "label": "NightGlyders", "src": "/texts/nightglyders1.png","maxWidthRatio": 0.6,"allowUpscale": false },
     { "id": "glyderlogo", "label": "Logo", "src": "/texts/glyderlogo1.png","maxWidthRatio": 0.6,"allowUpscale": false},
-    { "id": "glyderlogoNG", "label": "Logo & NG", "src": "/texts/glyderlogoNG1.png","maxWidthRatio": 0.6,"allowUpscale": false}
+    { "id": "glyderlogoNG", "label": "Logo & NG", "src": "/texts/glyderlogoNG1.png","maxWidthRatio": 0.6,"allowUpscale": false},
+    { "id": "glydish-wh", "label": "Glydish", "src": "/bannertext/glydish-wh.png","maxWidthRatio": 0.6,"allowUpscale": false },
+    { "id": "glydish-glow", "label": "Glydish - Glow", "src": "/bannertext/glydish-glow.png","maxWidthRatio": 0.6,"allowUpscale": false }
 
 
   ],

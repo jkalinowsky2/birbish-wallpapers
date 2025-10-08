@@ -16,7 +16,9 @@
     { "id": "glyderlogoNG-wh", "label": "Logo + NG", "src": "/bannertext/glyderlogoNG-wh.png" },
     { "id": "nightlyders-glow", "label": "NightGlyders - Glow", "src": "/bannertext/nightglyders-glow.png" },
     { "id": "glyderlogo-glow", "label": "Logo - Glow", "src": "/bannertext/glyderlogo-glow.png" },
-    { "id": "glyderlogoNG-glow", "label": "Logo + NG - Glow", "src": "/bannertext/glyderlogoNG-glow.png" }
+    { "id": "glyderlogoNG-glow", "label": "Logo + NG - Glow", "src": "/bannertext/glyderlogoNG-glow.png" },
+    { "id": "glydish-wh", "label": "Glydish", "src": "/bannertext/glydish-wh.png" },
+    { "id": "glydish-glow", "label": "Glydish - Glow", "src": "/bannertext/glydish-glow.png" }
 
   ],
   "defaults": {
