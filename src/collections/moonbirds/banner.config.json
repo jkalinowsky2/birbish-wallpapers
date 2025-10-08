@@ -13,7 +13,8 @@
     { "id": "birbish", "label": "birbish", "src": "/bannertext/birbish.png" },
     { "id": "control", "label": "birbs in Control", "src": "/bannertext/control.png" },
     { "id": "gbirb",   "label": "gbirb.",  "src": "/bannertext/gbirb.png" },
-    { "id": "logo",    "label": "logo",    "src": "/bannertext/logo.png" },
+    { "id": "logo",    "label": "birb logo",    "src": "/bannertext/logo.png" },   
+    { "id": "logo2",    "label": "birb logo 2",    "src": "/bannertext/birblogo2.png" },
     { "id": "toobins", "label": "Toobins", "src": "/bannertext/toobins.png" }
   ],
   "defaults": {
