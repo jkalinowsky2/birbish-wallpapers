@@ -14,7 +14,7 @@
     { "id": "glyderlogoNG", "label": "Logo + NG", "src": "/bannertext/glyderlogoNG.png" }
   ],
   "defaults": {
-    "bgId": "black",
+    "bgId": "blue",
     "centerId": "none",
     "centerScale": 1,
     "centerYOffset": 0,
