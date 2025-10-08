@@ -30,6 +30,11 @@ export type AssetBases = {
     pixelTokenScale?: number;        // e.g., 1.0
     illustratedTokenScale?: number;  // e.g., 0.32 for Moonbirds, 0.42 for Glyders
     oddityTokenScale?: number;       // e.g., 0.8
+
+    /** Banner scales (NEW) */
+    pixelBannerScale?: number;
+    illustratedBannerScale?: number;
+    oddityBannerScale?: number;
 };
 
 

@@ -32,10 +32,7 @@ export default function Composer({
     meta: CollectionMeta;
     config: ComposerConfig;
 }) {
-    // --- Asset bases from config ---
-    // const { pixelBase, oddityBase, illustratedProxy } = config.assetBases ?? {};
-    // Inside Composer component (you already extract this above)
-    // const { pixelBase, oddityBase, illustratedProxy, illustratedBase } = config.assetBases ?? {};
+
     const {
         pixelBase,
         oddityBase,

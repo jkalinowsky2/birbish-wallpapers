@@ -1,0 +1,32 @@
+{
+  "allowedStyles": ["illustrated", "pixel", "oddity"],
+
+  "backgrounds": [
+    { "id": "red",   "label": "Red",   "src": "/banner-bg/red_pattern.png" , "mode": "tile" },
+    { "id": "black", "label": "Black", "src": "/banner-bg/black_pattern.png" , "mode": "tile" },
+    { "id": "blue",  "label": "Blue",  "src": "/banner-bg/blue_pattern.png" , "mode": "tile" },
+    { "id": "plum",  "label": "Plum",  "src": "/banner-bg/plum_pattern.png", "mode": "tile"  },
+    { "id": "abstract", "label": "Abstract", "src": "/banner-bg/abstract.png" , "mode": "image"  }
+  ],
+  "centerOverlays": [
+    { "id": "none",    "label": "None",    "src": "" },
+    { "id": "birbish", "label": "birbish", "src": "/bannertext/birbish.png" },
+    { "id": "control", "label": "birbs in Control", "src": "/bannertext/control.png" },
+    { "id": "gbirb",   "label": "gbirb.",  "src": "/bannertext/gbirb.png" },
+    { "id": "logo",    "label": "logo",    "src": "/bannertext/logo.png" },
+    { "id": "toobins", "label": "Toobins", "src": "/bannertext/toobins.png" }
+  ],
+  "defaults": {
+    "bgId": "red",
+    "centerId": "birbish",
+    "centerScale": 1,
+    "centerYOffset": 0,
+    "tileScale": 1,
+    "slots": [
+      { "id": "", "style": "illustrated", "x": 60,  "y": 100, "w": 260, "h": 300, "scale": 1.0 },
+      { "id": "", "style": "pixel",       "x": 420, "y": 100, "w": 260, "h": 300, "scale": 1.0 },
+      { "id": "", "style": "oddity",      "x": 780, "y": 100, "w": 260, "h": 300, "scale": 1.0 },
+      { "id": "", "style": "illustrated", "x": 1140,"y": 100, "w": 260, "h": 300, "scale": 1.0 }
+    ]
+  }
+}

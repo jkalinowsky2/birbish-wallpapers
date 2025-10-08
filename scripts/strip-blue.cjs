@@ -8,8 +8,8 @@ const OUT_DIR = process.argv[3] ?? "downloads/glyders-clean";
 
 // target blue and tolerance
 const BLUE = { r: 3, g: 71, b: 175 }; // #0347AF — adjust if needed
-const TOL  = 24;                      // 0–255; raise if some blue remains
-const FEATHER = 1;                    // 0–2px soft edge anti-halo
+const TOL  = 26;                      // 0–255; raise if some blue remains
+const FEATHER = 2;                    // 0–2px soft edge anti-halo
 
 fs.mkdirSync(OUT_DIR, { recursive: true });
 

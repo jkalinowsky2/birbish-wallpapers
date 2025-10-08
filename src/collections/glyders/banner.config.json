@@ -1,0 +1,30 @@
+{
+  "allowedStyles": ["illustrated", "pixel"],
+
+  "backgrounds": [
+    { "id": "purple",   "label": "Purple",   "src": "/banner-bg/glyders-purple.png", "mode": "tile"  },
+    { "id": "blue", "label": "Blue", "src": "/banner-bg/glyders-blue.png", "mode": "tile"  },
+    { "id": "black", "label": "Black", "src": "/banner-bg/glyders-deepblack.png" , "mode": "tile" }
+
+  ],
+  "centerOverlays": [
+    { "id": "none", "label": "None", "src": "" },
+    { "id": "nightlyders", "label": "NightGlyders", "src": "/bannertext/nightglyders1.png" },
+    { "id": "glyderlogo", "label": "Logo", "src": "/bannertext/glyderlogo.png" },
+    { "id": "glyderlogoNG", "label": "Logo + NG", "src": "/bannertext/glyderlogoNG.png" }
+  ],
+  "defaults": {
+    "bgId": "black",
+    "centerId": "none",
+    "centerScale": 1,
+    "centerYOffset": 0,
+    "tileScale": 1,
+    "slots": [
+      { "id": "", "style": "illustrated", "x": 60,  "y": 100, "w": 260, "h": 300, "scale": 1 },
+      { "id": "", "style": "pixel",       "x": 420, "y": 100, "w": 260, "h": 300, "scale": 1 },
+      { "id": "", "style": "pixel",      "x": 780, "y": 100, "w": 260, "h": 300, "scale": 1 },
+      { "id": "", "style": "illustrated", "x": 1140,"y": 100, "w": 260, "h": 300, "scale": 1 }
+    ]
+  }
+}
+

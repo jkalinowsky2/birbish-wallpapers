@@ -11,12 +11,14 @@ type Item = { label: string; href: string };
 const WALLPAPER_ITEMS: Item[] = [
   { label: "Moonbirds", href: "/moonbirds/wallpaper" },
   { label: "Glyders", href: "/glyders/wallpaper" },
+  // { label: "Gobs", href: "/gobs/wallpaper" },
 ];
 
 // src/components/SiteHeader.tsx (or wherever)
 const BANNER_ITEMS = [
   { label: "Moonbirds", href: "/moonbirds/banner" },
   { label: "Glyders", href: "/glyders/banner" },
+  // { label: "Gobs", href: "/gobs/banner" },
 ];
 
 export default function Header() {

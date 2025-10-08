@@ -1,0 +1,14 @@
+{
+  "id" : "gobs",
+  "name": "Gobs",
+  "features": ["tokens"],
+  "artStyles": ["pixel"],
+  "labels": {
+    "background": "Background",
+    "text": "Glyph",
+    "character": "Birb",
+    "headwear": "Headwear",
+    "tokenId": "Token ID",
+    "tokenHint": "Or select your Moonbird…"
+  }
+}

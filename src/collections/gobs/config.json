@@ -1,0 +1,73 @@
+{
+  "assetBases": {
+    "pixelBase": "https://cdn.jsdelivr.net/gh/jkalinowsky2/birb-assets@latest/pixel_clean",
+    "oddityBase": "https://cdn.jsdelivr.net/gh/jkalinowsky2/birb-assets@latest/oddities_clean",
+    "illustratedProxy": "/api/imgproxy"  
+  },
+
+  "devices": [
+    { "id": "iphone16", "w": 1179, "h": 2556, "name": "1179 x 2556 (iPhone 16)" },
+    { "id": "iphone16Plus", "w": 1290, "h": 2796, "name": "1290 x 2796 (iPhone 16 Plus)" },
+    { "id": "iphone16ProMax", "w": 1320, "h": 2868, "name": "1329 x 2868 (iPhone 16 Pro Max)" },
+    { "id": "bigBiceps", "w": 1440, "h": 3120, "name": "1440 x 3120 (Big Biceps Mode)" },
+
+    { "id": "iPad", "w": 2040, "h": 2732, "name": "2040 x 2732 (Tablet)" },
+
+    { "id": "pfp", "w": 1000, "h": 1000, "name": "1000 x 1000 (pfp)" },
+    { "id": "widescreen", "w": 3840, "h": 2160, "name": "3840 x 2160 (HD Widescreen)" }
+
+
+  
+
+
+
+  ],
+  "backgrounds": [
+    { "id": "bg-black", "label": "Black", "src": "/backgrounds/black_pattern.png", "mode": "tile"  },
+    { "id": "bg-red", "label": "Red", "src": "/backgrounds/red_pattern.png" , "mode": "tile"  },
+    { "id": "bg-blue", "label": "Blue", "src": "/backgrounds/blue_pattern.png", "mode": "tile"   },
+    { "id": "bg-plum", "label": "Plum", "src": "/backgrounds/plum_pattern.png", "mode": "tile"   }
+    
+
+  ],
+
+  "texts": [
+    { "id": "none", "label": "None", "src": "/texts/none.png" },
+    { "id": "birbish", "label": "birbish.", "src": "/texts/birbish.png" },
+    { "id": "control", "label": "birbs in control", "src": "/texts/control.png" },
+    { "id": "gbirb", "label": "gbirb.", "src": "/texts/gbirb.png" },
+    { "id": "birblogo", "label": "birb logo", "src": "/texts/birblogo.png" }
+
+
+  ],
+  "birds": [
+    { "id": "red", "label": "Birb", "src": "/birds/red.png" },
+    { "id": "pink", "label": "Pip", "src": "/birds/pink.png" },
+    { "id": "blue", "label": "Zen", "src": "/birds/blue.png" },
+    { "id": "toobins", "label": "Toobins", "src": "/birds/toobins.png" },
+    { "id": "droobins", "label": "Droobins", "src": "/birds/droobins.png" },
+    { "id": "none", "label": "None", "src": "/birds/none.png" }
+
+
+  ],
+  "headwear": [
+    { "id": "none", "label": "None", "src": "/headwear/none.png" },
+    { "id": "tinyCrown", "label": "Tiny Crown", "src": "/headwear/tinyCrown.png" },
+    { "id": "halo", "label": "Halo", "src": "/headwear/halo.png" },
+    { "id": "skull", "label": "Skull", "src": "/headwear/skull.png" },
+    { "id": "flame", "label": "Flame", "src": "/headwear/flame.png" },
+    { "id": "beanie", "label": "Beanie", "src": "/headwear/beanie.png" },
+    { "id": "captain", "label": "Captain's Cap", "src": "/headwear/captain.png" },
+    { "id": "pirate", "label": "Pirate's Hat", "src": "/headwear/pirate.png" },
+    { "id": "cowboy", "label": "Cowboy Hat", "src": "/headwear/cowboy.png" },
+    { "id": "witch", "label": "Witch's Hat", "src": "/headwear/witch.png" },
+    { "id": "flower", "label": "Flower", "src": "/headwear/flower.png" },
+    { "id": "crescent", "label": "Crescent", "src": "/headwear/crescent.png" },
+    { "id": "mooncap", "label": "Moon Cap", "src": "/headwear/mooncap.png" },
+    { "id": "rain", "label": "Rain Cloud", "src": "/headwear/rain.png" },
+    { "id": "tomato", "label": "Tomato Bird", "src": "/headwear/tomato.png" }
+
+
+
+  ]
+}
