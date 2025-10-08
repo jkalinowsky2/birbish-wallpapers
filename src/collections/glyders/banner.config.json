@@ -4,7 +4,8 @@
   "backgrounds": [
     { "id": "purple",   "label": "Purple",   "src": "/banner-bg/glyders-purple.png", "mode": "tile"  },
     { "id": "blue", "label": "Blue", "src": "/banner-bg/glyders-blue.png", "mode": "tile"  },
-    { "id": "black", "label": "Black", "src": "/banner-bg/glyders-deepblack.png" , "mode": "tile" }
+    { "id": "black", "label": "Black", "src": "/banner-bg/glyders-deepblack.png" , "mode": "tile" },
+    { "id": "clouds", "label": "Clouds", "src": "/banner-bg/clouds.png" , "mode": "image" }
 
   ],
   "centerOverlays": [
