@@ -5,14 +5,19 @@
     { "id": "purple",   "label": "Purple",   "src": "/banner-bg/glyders-purple.png", "mode": "tile"  },
     { "id": "blue", "label": "Blue", "src": "/banner-bg/glyders-blue.png", "mode": "tile"  },
     { "id": "black", "label": "Black", "src": "/banner-bg/glyders-deepblack.png" , "mode": "tile" },
+    { "id": "blackgray", "label": "Black/Gray", "src": "/banner-bg/glyders-blackgray.png" , "mode": "tile" },
     { "id": "clouds", "label": "Clouds", "src": "/banner-bg/clouds.png" , "mode": "image" }
 
   ],
   "centerOverlays": [
     { "id": "none", "label": "None", "src": "" },
-    { "id": "nightlyders", "label": "NightGlyders", "src": "/bannertext/nightglyders1.png" },
-    { "id": "glyderlogo", "label": "Logo", "src": "/bannertext/glyderlogo.png" },
-    { "id": "glyderlogoNG", "label": "Logo + NG", "src": "/bannertext/glyderlogoNG.png" }
+    { "id": "nightlyders-wh", "label": "NightGlyders", "src": "/bannertext/nightglyders-wh.png" },
+    { "id": "glyderlogo-wh", "label": "Logo", "src": "/bannertext/glyderlogo-wh.png" },
+    { "id": "glyderlogoNG-wh", "label": "Logo + NG", "src": "/bannertext/glyderlogoNG-wh.png" },
+    { "id": "nightlyders-glow", "label": "NightGlyders - Glow", "src": "/bannertext/nightglyders-glow.png" },
+    { "id": "glyderlogo-glow", "label": "Logo - Glow", "src": "/bannertext/glyderlogo-glow.png" },
+    { "id": "glyderlogoNG-glow", "label": "Logo + NG - Glow", "src": "/bannertext/glyderlogoNG-glow.png" }
+
   ],
   "defaults": {
     "bgId": "blue",
