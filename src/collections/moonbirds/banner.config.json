@@ -2,25 +2,25 @@
   "allowedStyles": ["illustrated", "pixel", "oddity"],
 
   "backgrounds": [
-    { "id": "red",   "label": "Red",   "src": "/banner-bg/red_pattern.png" , "mode": "tile" },
-    { "id": "black", "label": "Black", "src": "/banner-bg/black_pattern.png" , "mode": "tile" },
-    { "id": "blue",  "label": "Blue",  "src": "/banner-bg/blue_pattern.png" , "mode": "tile" },
-    { "id": "plum",  "label": "Plum",  "src": "/banner-bg/plum_pattern.png", "mode": "tile"  },
-    { "id": "abstract", "label": "Abstract", "src": "/banner-bg/abstract.png" , "mode": "image"  }
+    { "id": "red",   "label": "Red",   "src": "/backgrounds/red_pattern.png" , "mode": "tile" },
+    { "id": "black", "label": "Black", "src": "/backgrounds/black_pattern.png" , "mode": "tile" },
+    { "id": "blue",  "label": "Blue",  "src": "/backgrounds/blue_pattern.png" , "mode": "tile" },
+    { "id": "plum",  "label": "Plum",  "src": "/backgrounds/plum_pattern.png", "mode": "tile"  },
+    { "id": "abstract", "label": "Abstract", "src": "/backgrounds/banners/abstract.png" , "mode": "image"  }
   ],
   "centerOverlays": [
     { "id": "none",    "label": "None",    "src": "" },
-    { "id": "birbish", "label": "birbish", "src": "/bannertext/birbish.png" },
-    { "id": "control", "label": "birbs in Control", "src": "/bannertext/control.png" },
-    { "id": "gbirb",   "label": "gbirb.",  "src": "/bannertext/gbirb.png" },
-    { "id": "logo",    "label": "birb logo",    "src": "/bannertext/logo.png" },   
-    { "id": "logo2",    "label": "birb logo 2",    "src": "/bannertext/birblogo2.png" },
-    { "id": "toobins", "label": "Toobins", "src": "/bannertext/toobins.png" }
+    { "id": "birbish", "label": "birbish", "src": "/overlays/birbish.png" },
+    { "id": "control", "label": "birbs in Control", "src": "/overlays/control-hz.png" },
+    { "id": "gbirb",   "label": "gbirb.",  "src": "/overlays/gbirb.png" },
+    { "id": "logo",    "label": "birb logo",    "src": "/overlays/logo.png" },   
+    { "id": "logo2",    "label": "birb logo 2",    "src": "/overlays/birblogo2.png" },
+    { "id": "toobins", "label": "Toobins", "src": "/overlays/toobins.png" }
   ],
   "defaults": {
     "bgId": "red",
     "centerId": "birbish",
-    "centerScale": 1,
+    "centerScale": 0.2,
     "centerYOffset": 0,
     "tileScale": 1,
     "slots": [

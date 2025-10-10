@@ -21,18 +21,19 @@
     { "id": "bg-blue", "label": "Blue", "src": "/backgrounds/glyders-blue.png", "mode": "tile" },
     { "id": "bg-black", "label": "Black", "src": "/backgrounds/glyders-black.png", "mode": "tile"  },
     { "id": "bg-deepblack", "label": "Deep Black", "src": "/backgrounds/glyders-deepblack.png", "mode": "tile"  },
+    { "id": "blackgray", "label": "Black/Gray", "src": "/backgrounds/glyders-blackgray.png" , "mode": "tile" },
     { "id": "bg-purple", "label": "Purple", "src": "/backgrounds/glyders-purple.png", "mode": "tile"  },
     { "id": "bg-OS", "label": "Other Side", "src": "/backgrounds/glyders_OS.png" , "mode": "image" }
 
   ],
 
   "texts": [
-    { "id": "none", "label": "None", "src": "/texts/none.png" },
-    { "id": "nightglyders", "label": "NightGlyders", "src": "/texts/nightglyders1.png","maxWidthRatio": 0.6,"allowUpscale": false },
-    { "id": "glyderlogo", "label": "Logo", "src": "/texts/glyderlogo1.png","maxWidthRatio": 0.6,"allowUpscale": false},
-    { "id": "glyderlogoNG", "label": "Logo & NG", "src": "/texts/glyderlogoNG1.png","maxWidthRatio": 0.6,"allowUpscale": false},
-    { "id": "glydish-wh", "label": "Glydish", "src": "/bannertext/glydish-wh.png","maxWidthRatio": 0.6,"allowUpscale": false },
-    { "id": "glydish-glow", "label": "Glydish - Glow", "src": "/bannertext/glydish-glow.png","maxWidthRatio": 0.6,"allowUpscale": false }
+    { "id": "none", "label": "None", "src": "/overlays/none.png" },
+    { "id": "nightglyders", "label": "NightGlyders", "src": "/overlays/nightglyders1.png","maxWidthRatio": 0.6,"allowUpscale": false },
+    { "id": "glyderlogo", "label": "Logo", "src": "/overlays/glyderlogo1.png","maxWidthRatio": 0.6,"allowUpscale": false},
+    { "id": "glyderlogoNG", "label": "Logo & NG", "src": "/overlays/glyderlogoNG1.png","maxWidthRatio": 0.6,"allowUpscale": false},
+    { "id": "glydish-wh", "label": "Glydish", "src": "/overlays/glydish-wh.png","maxWidthRatio": 0.6,"allowUpscale": false },
+    { "id": "glydish-glow", "label": "Glydish - Glow", "src": "/overlays/glydish-glow.png","maxWidthRatio": 0.6,"allowUpscale": false }
 
 
   ],

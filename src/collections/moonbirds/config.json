@@ -16,11 +16,6 @@
     { "id": "pfp", "w": 1000, "h": 1000, "name": "1000 x 1000 (pfp)" },
     { "id": "widescreen", "w": 3840, "h": 2160, "name": "3840 x 2160 (HD Widescreen)" }
 
-
-  
-
-
-
   ],
   "backgrounds": [
     { "id": "bg-black", "label": "Black", "src": "/backgrounds/black_pattern.png", "mode": "tile"  },
@@ -28,17 +23,16 @@
     { "id": "bg-blue", "label": "Blue", "src": "/backgrounds/blue_pattern.png", "mode": "tile"   },
     { "id": "bg-plum", "label": "Plum", "src": "/backgrounds/plum_pattern.png", "mode": "tile"   }
     
-
   ],
 
   "texts": [
-    { "id": "none", "label": "None", "src": "/texts/none.png" },
-    { "id": "birbish", "label": "birbish.", "src": "/texts/birbish.png" },
-    { "id": "control", "label": "birbs in control", "src": "/texts/control.png" },
-    { "id": "gbirb", "label": "gbirb.", "src": "/texts/gbirb.png" },
-    { "id": "birblogo", "label": "birb logo", "src": "/texts/birblogo.png" },
-    { "id": "birblogo2", "label": "birb logo 2", "src": "/texts/birblogo2.png" },
-    { "id": "birblogo3", "label": "birb logo 3", "src": "/texts/birblogo3.png" }
+    { "id": "none", "label": "None", "src": "/overlays/none.png" },
+    { "id": "birbish", "label": "birbish.", "src": "/overlays/birbish.png" },
+    { "id": "control", "label": "birbs in control", "src": "/overlays/control.png" },
+    { "id": "gbirb", "label": "gbirb.", "src": "/overlays/gbirb.png" },
+    { "id": "birblogo", "label": "birb logo", "src": "/overlays/birblogo.png" },
+    { "id": "birblogo2", "label": "birb logo 2", "src": "/overlays/birblogo2.png" },
+    { "id": "birblogo3", "label": "birb logo 3", "src": "/overlays/birblogo3.png" }
 
 
 

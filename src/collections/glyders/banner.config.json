@@ -2,11 +2,11 @@
   "allowedStyles": ["illustrated", "pixel"],
 
   "backgrounds": [
-    { "id": "purple",   "label": "Purple",   "src": "/banner-bg/glyders-purple.png", "mode": "tile"  },
-    { "id": "blue", "label": "Blue", "src": "/banner-bg/glyders-blue.png", "mode": "tile"  },
-    { "id": "black", "label": "Black", "src": "/banner-bg/glyders-deepblack.png" , "mode": "tile" },
-    { "id": "blackgray", "label": "Black/Gray", "src": "/banner-bg/glyders-blackgray.png" , "mode": "tile" },
-    { "id": "clouds", "label": "Clouds", "src": "/banner-bg/clouds.png" , "mode": "image" }
+    { "id": "purple",   "label": "Purple",   "src": "/backgrounds/glyders-purple.png", "mode": "tile"  },
+    { "id": "blue", "label": "Blue", "src": "/backgrounds/glyders-blue.png", "mode": "tile"  },
+    { "id": "black", "label": "Black", "src": "/backgrounds/glyders-deepblack.png" , "mode": "tile" },
+    { "id": "blackgray", "label": "Black/Gray", "src": "/backgrounds/glyders-blackgray.png" , "mode": "tile" },
+    { "id": "clouds", "label": "Clouds", "src": "/backgrounds/banners/clouds.png" , "mode": "image" }
 
   ],
   "centerOverlays": [
