@@ -1,6 +1,6 @@
 // src/types/banner.ts
 export type BannerBackground = { id: string; label: string; src: string; mode?: "tile" | "image"; };
-export type BannerCenterOverlay = { id: string; label: string; src: string };
+export type BannerCenterOverlay = { id: string; label: string; src: string;   scale?: number; };
 
 export type BannerSlotDefault = {
     id: string;           // default token id (can be "")

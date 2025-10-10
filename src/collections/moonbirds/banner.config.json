@@ -15,7 +15,7 @@
     { "id": "gbirb",   "label": "gbirb.",  "src": "/overlays/gbirb.png" },
     { "id": "logo",    "label": "birb logo",    "src": "/overlays/logo.png" },   
     { "id": "logo2",    "label": "birb logo 2",    "src": "/overlays/birblogo2.png" },
-    { "id": "toobins", "label": "Toobins", "src": "/overlays/toobins.png" }
+    { "id": "toobins", "label": "Toobins", "src": "/overlays/toobins.png" , "scale": 5 }
   ],
   "defaults": {
     "bgId": "red",

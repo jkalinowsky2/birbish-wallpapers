@@ -203,7 +203,9 @@ export default function BannerComposer({
             const sContain = Math.min(MAX_W / iw, MAX_H / ih);
 
             // Apply user scale
-            const s = sContain * centerScale;
+            // const s = sContain * centerScale;
+            const overlayMul = opt.scale ?? 1;          // ← new
+            const s = sContain * centerScale * overlayMul;
 
             const dw = Math.round(iw * s);
             const dh = Math.round(ih * s);
@@ -637,7 +639,7 @@ export default function BannerComposer({
           ))}
         </div>
 
-    
+
         {/* Actions */}
         <div className="w-full flex justify-left mt-8">
           <div className="grid grid-cols-2 gap-2 w-full sm:w-3/4 lg:w-1/2">
