@@ -6,7 +6,8 @@
     { "id": "black", "label": "Black", "src": "/backgrounds/black_pattern.png" , "mode": "tile" },
     { "id": "blue",  "label": "Blue",  "src": "/backgrounds/blue_pattern.png" , "mode": "tile" },
     { "id": "plum",  "label": "Plum",  "src": "/backgrounds/plum_pattern.png", "mode": "tile"  },
-    { "id": "abstract", "label": "Abstract", "src": "/backgrounds/banners/abstract.png" , "mode": "image"  }
+    { "id": "abstract", "label": "Abstract", "src": "/backgrounds/banners/abstract.png" , "mode": "image"  },
+    { "id": "spencer", "label": "Spencer", "src": "/backgrounds/banners/spencer2.png" , "mode": "image"  }
   ],
   "centerOverlays": [
     { "id": "none",    "label": "None",    "src": "" },
