@@ -11,7 +11,7 @@
   "centerOverlays": [
     { "id": "none",    "label": "None",    "src": "" },
     { "id": "birbish", "label": "birbish", "src": "/overlays/birbish.png" },
-    { "id": "control", "label": "birbs in Control", "src": "/overlays/control-hz.png" },
+    { "id": "control", "label": "birbs in Control", "src": "/overlays/control-hz.png", "scale": 2 },
     { "id": "gbirb",   "label": "gbirb.",  "src": "/overlays/gbirb.png" },
     { "id": "logo",    "label": "birb logo",    "src": "/overlays/logo.png" },   
     { "id": "logo2",    "label": "birb logo 2",    "src": "/overlays/birblogo2.png" },
