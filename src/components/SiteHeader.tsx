@@ -11,6 +11,7 @@ type Item = { label: string; href: string };
 const WALLPAPER_ITEMS: Item[] = [
   { label: "Moonbirds", href: "/moonbirds/wallpaper" },
   { label: "Glyders", href: "/glyders/wallpaper" },
+  { label: "Trenchers", href: "/trenchers/wallpaper" },
   // { label: "Gobs", href: "/gobs/wallpaper" },
 ];
 
@@ -18,6 +19,7 @@ const WALLPAPER_ITEMS: Item[] = [
 const BANNER_ITEMS = [
   { label: "Moonbirds", href: "/moonbirds/banner" },
   { label: "Glyders", href: "/glyders/banner" },
+  { label: "Trenchers", href: "/trenchers/banner" },
   // { label: "Gobs", href: "/gobs/banner" },
 ];
 

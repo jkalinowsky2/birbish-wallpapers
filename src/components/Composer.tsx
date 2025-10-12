@@ -54,8 +54,10 @@ export default function Composer({
     const canPixel = enabledStyles.has("pixel") && !!pixelBase;
     const canOddity = enabledStyles.has("oddity") && !!oddityBase;
 
+
     //NUDGER
     const [textYOffset, setTextYOffset] = useState<number>(0); // px offset (+ = down)
+    const [textScale, setTextScale] = useState<number>(1);
 
     // Default to first enabled style
     const [artStyle, setArtStyle] = useState<ArtStyle>(
@@ -95,6 +97,7 @@ export default function Composer({
     const [bg, setBg] = useState<string>(config.backgrounds[0].id);
     const [text, setText] = useState<string>(config.texts[0].id);
 
+
     const DEFAULT_CHAR_ID =
         hasBirds
             ? config.birds!.find((b) => b.id === "red")?.id ?? config.birds![0].id
@@ -112,6 +115,7 @@ export default function Composer({
 
     // --- Refs ---
     const canvasRef = useRef<HTMLCanvasElement>(null);
+
 
     // --- Helpers ---
     type WithId = { id: string };
@@ -238,35 +242,33 @@ export default function Composer({
                 fillTiledCentered(ctx, bgImg, c);
             }
 
-            //vignette
-            // ---- Optional vignette effect ----
-            // ---- Optional vignette effect (elliptical) ----
-            ctx.save();
+            // --- vignette (collection-controlled) ---
+            const wantsVignette = config.effects?.vignette ?? true; // set false in trenchers config to disable
+            if (wantsVignette) {
+                ctx.save();
 
-            // Move origin to center
-            ctx.translate(device.w / 2, device.h / 2);
+                // Move origin to center
+                ctx.translate(device.w / 2, device.h / 2);
 
-            // Scale vertically — smaller value squashes it into an ellipse
-            ctx.scale(1, 0.7);  // ← adjust 0.7 for more or less vertical flattening
+                // Elliptical look
+                ctx.scale(1, 0.7);
 
-            // Create the gradient as if centered at (0,0)
-            const vignette = ctx.createRadialGradient(
-                0, 0, 0,             // inner circle
-                0, 0, device.w / 1.2 // outer circle radius
-            );
+                // Radial gradient
+                const vignette = ctx.createRadialGradient(
+                    0, 0, 0,                // inner circle
+                    0, 0, device.w / 1.2    // outer circle radius
+                );
+                vignette.addColorStop(0.25, "rgba(0,0,0,0)");
+                vignette.addColorStop(1.0, "rgba(0,0,0,.25)");
 
-            // Define fade from clear center to dark edges
-            vignette.addColorStop(0.25, "rgba(0,0,0,0)");
-            vignette.addColorStop(1.0, "rgba(0,0,0,.25)");
+                ctx.fillStyle = vignette;
+                ctx.fillRect(-device.w / 2, -device.h / 2 / 0.7, device.w, device.h / 0.7);
 
-            // Apply gradient fill
-            ctx.fillStyle = vignette;
+                ctx.restore();
+            }
 
-            // Because we scaled the context, draw a full rect around origin
-            ctx.fillRect(-device.w / 2, -device.h / 2 / 0.7, device.w, device.h / 0.7);
 
-            ctx.restore();
-
+            // --- text ---
             // --- text ---
             const textLayer = get(config.texts, text);
             const hasCap = textLayer.maxWidthRatio || textLayer.maxHeightRatio;
@@ -276,13 +278,14 @@ export default function Composer({
                     ctx,
                     textImg,
                     c,
-                    textLayer.maxWidthRatio ?? 1,
-                    textLayer.maxHeightRatio ?? 1,
+                    (textLayer.maxWidthRatio ?? 1) * textScale, // ← multiply
+                    (textLayer.maxHeightRatio ?? 1) * textScale, // ← multiply
                     textLayer.allowUpscale ?? false,
-                    textYOffset // NEW
+                    textYOffset
                 );
             } else {
-                drawTextCenteredVertically(ctx, textImg, c, textYOffset);
+                // allowUpscale = true so user scale can go > 1 if they want
+                drawTextCenteredVertically(ctx, textImg, c, textYOffset, textScale, true);
             }
 
             // --- character / token ---
@@ -335,7 +338,7 @@ export default function Composer({
     useEffect(() => {
         draw();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [bg, text, bird, hat, deviceId, tokenVersion, artStyle, textYOffset]);
+    }, [bg, text, bird, hat, deviceId, tokenVersion, artStyle, textYOffset, textScale]);
 
     // Lazy-load token images only when needed
     useEffect(() => {
@@ -476,8 +479,23 @@ export default function Composer({
                                 </select>
                             </div>
 
+                            {/* NEW: Scale */}
+                            <div className="flex items-center gap-1">
+                                <span className="text-xs text-neutral-600">Scale</span>
+                                <input
+                                    className="input w-20"
+                                    type="number"
+                                    step={0.05}
+                                    min={0.1}
+                                    max={5}
+                                    value={textScale}
+                                    onChange={(e) => setTextScale(Math.max(0.1, Math.min(5, Number(e.target.value) || 1)))}
+                                    title="Glyph scale"
+                                />
+                            </div>
                             {/* Nudge buttons */}
                             <div className="flex items-center gap-1">
+                                <span className="text-xs text-neutral-600">Nudge</span>
                                 <button
                                     type="button"
                                     className="btn btn-ghost p-1 h-6 min-h-6"
@@ -498,6 +516,8 @@ export default function Composer({
                                     ↓
                                 </button>
                             </div>
+
+
                         </div>
                     </Field>
 
@@ -703,14 +723,26 @@ function getImgSize(img: HTMLImageElement, fallbackW = 1600, fallbackH = 1600) {
     return { w, h };
 }
 
-function drawTextCenteredVertically(ctx: CanvasRenderingContext2D, img: HTMLImageElement, c: HTMLCanvasElement, offsetY: number = 0) {
+function drawTextCenteredVertically(
+    ctx: CanvasRenderingContext2D,
+    img: HTMLImageElement,
+    c: HTMLCanvasElement,
+    offsetY: number = 0,
+    scaleMul: number = 1,          // NEW
+    allowUpscale: boolean = false  // NEW
+) {
     const iw = img.naturalWidth || img.width;
     const ih = img.naturalHeight || img.height;
-    const scale = Math.min(1, c.width / iw, c.height / ih);
+
+    const base = Math.min(1, c.width / iw, c.height / ih);
+    let scale = base * (scaleMul || 1);
+    if (!allowUpscale) scale = Math.min(1, scale);
+
     const dw = Math.round(iw * scale);
     const dh = Math.round(ih * scale);
     const dx = Math.round((c.width - dw) / 2);
-    const dy = Math.round((c.height - dh) / 2) + offsetY; // ← apply nudge
+    const dy = Math.round((c.height - dh) / 2) + offsetY;
+
     ctx.drawImage(img, dx, dy, dw, dh);
 }
 

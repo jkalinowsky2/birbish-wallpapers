@@ -2,6 +2,10 @@
 export type BannerBackground = { id: string; label: string; src: string; mode?: "tile" | "image"; };
 export type BannerCenterOverlay = { id: string; label: string; src: string;   scale?: number; };
 
+// in types
+export type EffectsConfig = { vignette?: boolean };
+export type CollectionConfig = { /* … */ effects?: EffectsConfig };
+
 export type BannerSlotDefault = {
     id: string;           // default token id (can be "")
     style: "none" | "illustrated" | "pixel" | "oddity";
@@ -20,11 +24,14 @@ export type BannerDefaults = {
     mode?: "tile" | "image"; // default "tile" or "image"
 };
 
+export type BannerEffects = { vignette?: boolean }; // ← optional
+
 export type BannerConfig = {
     allowedStyles?: ("illustrated" | "pixel")[];
     defaults?: BannerDefaults;     
     backgrounds: BannerBackground[];
     centerOverlays: BannerCenterOverlay[];
+    effects?: BannerEffects; 
     assetBases?: {
         pixelBannerScale?: number;
         illustratedBannerScale?: number;

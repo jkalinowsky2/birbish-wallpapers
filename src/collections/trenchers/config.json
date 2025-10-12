@@ -1,0 +1,41 @@
+{
+  "assetBases": {
+    "pixelBase": "https://ipfs.io/ipfs/<cid>",
+    "illustratedProxy": "/api/imgproxy"
+  },
+  
+  "effects": { "vignette": false },
+
+
+  "devices": [
+    { "id": "sm-phone", "w": 1179, "h": 2556, "name": "1179 x 2556 (Small Phone)" },
+    { "id": "md-phone", "w": 1290, "h": 2796, "name": "1290 x 2796 (Medium Phone)" },
+    { "id": "lg-phone", "w": 1320, "h": 2868, "name": "1329 x 2868 (Large Phone)" },
+    { "id": "bigBiceps", "w": 1440, "h": 3120, "name": "1440 x 3120 (Big Biceps Mode)" },
+
+    { "id": "iPad", "w": 2040, "h": 2732, "name": "2040 x 2732 (Tablet)" },
+
+    { "id": "pfp", "w": 1000, "h": 1000, "name": "1000 x 1000 (pfp)" },
+    { "id": "widescreen", "w": 1920, "h": 1080, "name": "1920 x 1080 (Widescreen)" },
+    { "id": "hd", "w": 3840, "h": 2160, "name": "3840 x 2160 (HD Widescreen)" }
+
+
+  ],
+  "backgrounds": [
+    { "id": "bg-blue", "label": "Blue", "src": "/backgrounds/trenchers-blue.png", "mode": "tile" },
+    { "id": "bg-yellow", "label": "Yellow", "src": "/backgrounds/trenchers-yellow.png", "mode": "tile"  }
+
+  ],
+
+  "texts": [
+    { "id": "none", "label": "None", "src": "/overlays/none.png" },
+    { "id": "trencher", "label": "Trenchers", "src": "/overlays/trenchers.png","maxWidthRatio": 0.6,"allowUpscale": true  },
+    { "id": "logo", "label": "Logo", "src": "/overlays/logo.png","maxWidthRatio": 0.6,"allowUpscale": true  },
+    { "id": "trencherlogo", "label": "Trenchers + Logo", "src": "/overlays/trencherslogo.png","maxWidthRatio": 0.6,"allowUpscale": true  }
+
+
+  ],
+
+    "birds": [
+    ]
+}

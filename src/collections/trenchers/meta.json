@@ -1,0 +1,13 @@
+{
+  "id": "trenchers",
+  "name": "Trenchers",
+  "features": ["tokens"],
+  "artStyles": ["pixel"],
+  "labels": {
+    "background": "Background",
+    "text": "Glyph",
+    "character": "Trencher",
+    "tokenId": "Trencher ID",
+    "tokenHint": "Select your Trencher…"
+  }
+}

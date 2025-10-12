@@ -22,5 +22,8 @@ export const GLYDERS_PIXEL_BASE =
 export const GLYDERS_ILLU_BASE =
     process.env.NEXT_PUBLIC_GLYDERS_ILLU_BASE || "";
 
+export const TRENCHERS_PIXEL_BASE =
+    process.env.NEXT_PUBLIC_GLYDERS_PIXEL_BASE || "";
+
 // If you still have an old ILLU_PROXY lying around, keep it for fallback only:
 export const ILLU_PROXY = process.env.NEXT_PUBLIC_ILLU_PROXY || "";

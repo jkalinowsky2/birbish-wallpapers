@@ -5,12 +5,14 @@ import type { CollectionId } from "@/lib/getCollection";
 // Per-collection banner configs (JSON files you created)
 import moonbirdsBanner from "@/collections/moonbirds/banner.config.json";
 import glydersBanner from "@/collections/glyders/banner.config.json";
+import trenchersBanner from "@/collections/trenchers/banner.config.json";
 // Add more when ready
 // import glydersBanner from "@/collections/glyders/banner.json";
 
 const BANNERS: Partial<Record<CollectionId, BannerConfig>> = {
   moonbirds: moonbirdsBanner as BannerConfig,
   glyders: glydersBanner as BannerConfig,
+  trenchers: trenchersBanner as BannerConfig,
 };
 
 export async function loadBanner(id: CollectionId): Promise<BannerConfig> {

@@ -3,10 +3,11 @@ import fs from "node:fs/promises";
 import path from "node:path";
 
 // ---- Config ----
-const BASE = "https://collection-assets.proof.xyz/moonbirds/images_no_bg";
-const OUT_DIR = path.resolve("downloads/moonbirds"); // change if you like
+// const BASE = "https://collection-assets.proof.xyz/moonbirds/images_no_bg";
+const BASE = "https://www.trenchersonape.com/Trenchers_nfts";
+const OUT_DIR = path.resolve("downloads/trenchers"); // change if you like
 const START_ID = 0;         // Moonbirds are usually 1..10000. If you truly need 0..9999, change these.
-const END_ID   = 9999;     // inclusive
+const END_ID   = 2222;     // inclusive
 const CONCURRENCY = 8;      // be nice to the server
 const RETRIES = 3;
 const RETRY_BACKOFF_MS = 750;

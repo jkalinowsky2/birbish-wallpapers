@@ -156,33 +156,20 @@ export default function BannerComposer({
     }
 
 
-    // ---- Optional vignette effect ----
     // ---- Optional vignette effect (elliptical) ----
+    const wantsVignette = banner.effects?.vignette ?? true;
+    if (wantsVignette) {
+      ctx.save();
+      ctx.translate(BANNER_W / 2, BANNER_H / 2);
+      ctx.scale(1, 0.7);
+      const vignette = ctx.createRadialGradient(0, 0, 0, 0, 0, BANNER_W / 1.2);
+      vignette.addColorStop(0.1, "rgba(0,0,0,0)");
+      vignette.addColorStop(1.0, "rgba(0,0,0,.35)");
+      ctx.fillStyle = vignette;
+      ctx.fillRect(-BANNER_W / 2, -BANNER_H / 2 / 0.7, BANNER_W, BANNER_H / 0.7);
+      ctx.restore();
+    }
     ctx.save();
-
-    // Move origin to center
-    ctx.translate(BANNER_W / 2, BANNER_H / 2);
-
-    // Scale vertically — smaller value squashes it into an ellipse
-    ctx.scale(1, 0.7);  // ← adjust 0.7 for more or less vertical flattening
-
-    // Create the gradient as if centered at (0,0)
-    const vignette = ctx.createRadialGradient(
-      0, 0, 0,             // inner circle
-      0, 0, BANNER_W / 1.2 // outer circle radius
-    );
-
-    // Define fade from clear center to dark edges
-    vignette.addColorStop(0.1, "rgba(0,0,0,0)");
-    vignette.addColorStop(1.0, "rgba(0,0,0,.35)");
-
-    // Apply gradient fill
-    ctx.fillStyle = vignette;
-
-    // Because we scaled the context, draw a full rect around origin
-    ctx.fillRect(-BANNER_W / 2, -BANNER_H / 2 / 0.7, BANNER_W, BANNER_H / 0.7);
-
-    ctx.restore();
 
 
 

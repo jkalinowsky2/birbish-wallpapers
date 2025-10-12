@@ -1,5 +1,6 @@
 {
   "allowedStyles": ["illustrated", "pixel"],
+   "effects": { "vignette": true },
 
   "backgrounds": [
     { "id": "purple",   "label": "Purple",   "src": "/backgrounds/glyders-purple.png", "mode": "tile"  },

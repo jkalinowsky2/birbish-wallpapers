@@ -3,12 +3,13 @@ const fs = require("fs");
 const path = require("path");
 const sharp = require("sharp");
 
-const IN_DIR  = process.argv[2] ?? "downloads/glyders-illustrated";
-const OUT_DIR = process.argv[3] ?? "downloads/glyders-clean";
+const IN_DIR  = process.argv[2] ?? "downloads/trenchers-clean";
+const OUT_DIR = process.argv[3] ?? "downloads/trenchers-clean2";
 
 // target blue and tolerance
-const BLUE = { r: 3, g: 71, b: 175 }; // #0347AF — adjust if needed
-const TOL  = 26;                      // 0–255; raise if some blue remains
+const BLUE = { r: 6, g: 79, b: 198 }; // #0347AF — adjust if needed
+//const BLUE = { r: 255, g: 214, b: 44 }; // #0347AF — adjust if needed
+const TOL  = 35;                      // 0–255; raise if some blue remains
 const FEATHER = 2;                    // 0–2px soft edge anti-halo
 
 fs.mkdirSync(OUT_DIR, { recursive: true });
@@ -41,8 +42,16 @@ async function processOne(file) {
   console.log("✓", file);
 }
 
+// (async () => {
+//   const files = fs.readdirSync(IN_DIR).filter(f => f.toLowerCase().endsWith(".png"));
+//   for (const f of files) await processOne(f);
+//   console.log(`Done → ${OUT_DIR}`);
+// })();
+
 (async () => {
-  const files = fs.readdirSync(IN_DIR).filter(f => f.toLowerCase().endsWith(".png"));
-  for (const f of files) await processOne(f);
-  console.log(`Done → ${OUT_DIR}`);
+  // const files = fs.readdirSync(IN_DIR).filter(f => f.toLowerCase().endsWith(".png"));
+  // for (const f of files) await processOne(f);
+  // console.log(`Done → ${OUT_DIR}`);
+
+  await processOne("1066.png"); // 👈 just run one file
 })();

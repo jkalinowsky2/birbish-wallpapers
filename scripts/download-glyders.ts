@@ -4,12 +4,13 @@ import path from "path";
 import fetch from "node-fetch";
 
 //const BASE_URL = "https://ipfs.io/ipfs/bafybeih7cmapl2jiop7slb5l762dzpqnfbggokovhc65zegql5hkr5xthe";  //pixel URL
-const BASE_URL = "https://ipfs.io/ipfs/bafybeiarws7dnd4vzeczia6tlmmhinamfwjfdjzsnotkbmq27gbqg3q7lu";  //illustrated URL
-const OUT_DIR = path.resolve("downloads/glyders-illustrated");
+// const BASE_URL = "https://ipfs.io/ipfs/bafybeiarws7dnd4vzeczia6tlmmhinamfwjfdjzsnotkbmq27gbqg3q7lu";  //illustrated URL
+const BASE_URL = "https://www.trenchersonape.com/Trenchers_nfts";  //illustrated URL
+const OUT_DIR = path.resolve("downloads/trenchers");
 
 // Adjust these for your token range
 const START_ID = 1;
-const END_ID = 3333; // <-- change to however many tokens you want to fetch
+const END_ID = 10; // <-- change to however many tokens you want to fetch
 
 async function main() {
   if (!fs.existsSync(OUT_DIR)) {

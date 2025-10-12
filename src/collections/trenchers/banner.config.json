@@ -1,0 +1,36 @@
+{
+  "allowedStyles": ["pixel"],
+    
+  "effects": { "vignette": false },
+
+  "backgrounds": [
+    { "id": "blue", "label": "Blue", "src": "/backgrounds/trenchers-blue.png", "mode": "tile"  },  
+    { "id": "yellow",   "label": "Yellow",   "src": "/backgrounds/trenchers-yellow.png", "mode": "tile"  }
+
+
+  ],
+  "centerOverlays": [
+    { "id": "none", "label": "None", "src": "" },    
+    { "id": "trencher", "label": "Trenchers", "src": "/overlays/trenchers.png" },
+    { "id": "logo", "label": "Logo", "src": "/overlays/logo.png" },
+    { "id": "trencherlogo", "label": "Trenchers + Logo", "src": "/overlays/trencherslogo.png" }
+
+
+  ],
+  "defaults": {
+    "bgId": "blue",
+    "centerId": "none",
+    "centerScale": 0.5,
+    "centerYOffset": 0,
+    "tileScale": 1,
+    "style": "pixel",
+    "slots": [
+      { "id": "", "style": "pixel", "x": 60,  "y": 100, "w": 260, "h": 300, "scale": 1 },
+      { "id": "", "style": "pixel",       "x": 420, "y": 100, "w": 260, "h": 300, "scale": 1 },
+      { "id": "", "style": "pixel",      "x": 780, "y": 100, "w": 260, "h": 300, "scale": 1 },
+      { "id": "", "style": "pixel", "x": 1140,"y": 100, "w": 260, "h": 300, "scale": 1 }
+    ]
+  }
+  
+}
+

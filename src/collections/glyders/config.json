@@ -3,6 +3,9 @@
     "pixelBase": "https://ipfs.io/ipfs/<cid>",
     "illustratedProxy": "/api/imgproxy"
   },
+
+    "effects": { "vignette": true },
+    
   "devices": [
     { "id": "iphone16", "w": 1179, "h": 2556, "name": "1179 x 2556 (iPhone 16)" },
     { "id": "iphone16Plus", "w": 1290, "h": 2796, "name": "1290 x 2796 (iPhone 16 Plus)" },
