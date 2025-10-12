@@ -44,12 +44,12 @@ export default function HomePage() {
               {/* Welcome to <strong>genmerch.xyz</strong> — a simple, fast way to build
             custom wallpapers and banners using on-chain collections. Pick a background,
             add glyphs or overlays, drop in your token ID, and download in one click. */}
-              Welcome to Generational Merch, your (future) source for high-quality customer merch for your NFTs. We&aposre working on building out the tools and products to show off your
+              Welcome to Generational Merch, your (future) source for high-quality customer merch for your NFTs. We&apos;re working on building out the tools and products to show off your
               favorite NFTs with physical products. Custom prints, skateboard decks, and more coming soon.
               <br />
               <br />
 
-              For now, we&aposve built out some fun tools to create custom backgrounds for your phone, tablet, computer, or to rock as a pfp. Check out the
+              For now, we&apos;ve built out some fun tools to create custom backgrounds for your phone, tablet, computer, or to rock as a pfp. Check out the
               wallpaper builder to try these out, or head over the banner builders to create the perfect banner for your X profile and rep your community.
 
               <br />
@@ -60,13 +60,13 @@ export default function HomePage() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-600 hover:underline"
-              >Generational Merch</a>{" "}for updates as we add more collections and physicals! If you&aposre a founder and want to add your
+              >Generational Merch</a>{" "}for updates as we add more collections and physicals! If you&apos;re a founder and want to add your
               collection to the builders, hit me up {" "}<a
                 href="https://x.com/_jknft_"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-600 hover:underline"
-              >@_jknft_</a>{" "} on X and we\'ll talk.
+              >@_jknft_</a>{" "} on X and we&apos;ll talk.
 
               <br />
               <br />
