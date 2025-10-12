@@ -23,7 +23,6 @@
     "centerScale": 0.5,
     "centerYOffset": 0,
     "tileScale": 1,
-    "style": "pixel",
     "slots": [
       { "id": "", "style": "pixel", "x": 60,  "y": 100, "w": 260, "h": 300, "scale": 1 },
       { "id": "", "style": "pixel",       "x": 420, "y": 100, "w": 260, "h": 300, "scale": 1 },

@@ -1,7 +1,6 @@
 {
   "assetBases": {
-    "pixelBase": "https://ipfs.io/ipfs/<cid>",
-    "illustratedProxy": "/api/imgproxy"
+
   },
   
   "effects": { "vignette": false },
