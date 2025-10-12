@@ -18,7 +18,7 @@
 
   ],
   "defaults": {
-    "bgId": "blue",
+    "bgId": "yellow",
     "centerId": "none",
     "centerScale": 0.5,
     "centerYOffset": 0,

@@ -66,7 +66,7 @@ export default function HomePage() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-600 hover:underline"
-              >@_jknft_</a>{" "} on X and we&aposll talk.
+              >@_jknft_</a>{" "} on X and we\'ll talk.
 
               <br />
               <br />
