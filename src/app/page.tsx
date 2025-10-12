@@ -60,7 +60,7 @@ export default function HomePage() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-600 hover:underline"
-              >Generational Merch</a>{" "}for updates as we add more collections and physicals! If you'&aposre a founder and want to add your
+              >Generational Merch</a>{" "}for updates as we add more collections and physicals! If you&aposre a founder and want to add your
               collection to the builders, hit me up {" "}<a
                 href="https://x.com/_jknft_"
                 target="_blank"
