@@ -15,7 +15,7 @@
     { "id": "none", "label": "None", "src": "" },    
     { "id": "trencher", "label": "Trenchers", "src": "/overlays/trenchers.png" },
     { "id": "logo", "label": "Logo", "src": "/overlays/logo.png" },
-    { "id": "trencherlogo", "label": "Trenchers + Logo", "src": "/overlays/trencherslogo.png" }
+    { "id": "trencherlogo", "label": "Trenchers + Logo", "src": "/overlays/trencherslogo.png"}
 
 
   ],
