@@ -5,7 +5,9 @@
 
   "backgrounds": [
     { "id": "blue", "label": "Blue", "src": "/backgrounds/trenchers-blue.png", "mode": "tile"  },  
-    { "id": "yellow",   "label": "Yellow",   "src": "/backgrounds/trenchers-yellow.png", "mode": "tile"  }
+    { "id": "yellow",   "label": "Yellow",   "src": "/backgrounds/trenchers-yellow.png", "mode": "tile"  },
+     { "id": "blue-pix", "label": "Blue Pixel", "src": "/backgrounds/banners/trenchers-blue.png", "mode": "image"  },  
+    { "id": "yellow-pix",   "label": "Yellow Pixel",   "src": "/backgrounds/banners/trenchers-yellow.png", "mode": "image"  }
 
 
   ],
