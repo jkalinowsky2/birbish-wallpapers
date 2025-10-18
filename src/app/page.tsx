@@ -21,10 +21,12 @@ export default function HomePage() {
       {/* Hero */}
       <section className="bg-[#f7f7f7]">
         <div className="mx-auto max-w-6xl px-4 pt-10 md:pt-12">
-          <h1 className="text-3xl md:text-5xl font-bold tracking-tight mb-6">
+          <h1 className="text-center text-3xl md:text-5xl font-bold tracking-tight mb-4">
             Generational Merch
           </h1>
-
+          <h2 className="text-center text-xl md:text-xl tracking-tight mb-10">
+              High-quality custom merch for your NFTs.
+          </h2>
           {/* Full-width top hero image */}
           <div className="relative w-full rounded-lg overflow-hidden border shadow-sm mb-4">
             <div className="relative w-full aspect-[16/6] md:aspect-[16/5] lg:h-[380px]">
@@ -87,7 +89,7 @@ export default function HomePage() {
               </a>{" "}
               on X and we&apos;ll talk.
               <br /><br />
-              Cheers — JK
+              Cheers <br /> — JK
             </p>
           </div>
         </div>
