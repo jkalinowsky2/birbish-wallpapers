@@ -31,6 +31,14 @@
     @apply border-transparent bg-transparent hover:bg-neutral-100;
     /* @apply border-transparent bg-transparent hover:bg-[#7c1315]; */
   }
+
+  :root {
+  --font-merriweather: 'Merriweather', serif;
+}
+
+.font-merriweather {
+  font-family: var(--font-merriweather);
+}
 } 
 
 
