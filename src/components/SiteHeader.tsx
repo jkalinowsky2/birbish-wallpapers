@@ -51,15 +51,16 @@ export default function Header() {
 
         {/* DESKTOP NAV */}
         <nav className="hidden md:flex items-center gap-2">
+
+          <Dropdown label="Wallpapers" items={WALLPAPER_ITEMS} pathname={pathname} />
+          <Dropdown label="Banners" items={BANNER_ITEMS} pathname={pathname} />
+
           <Link
             href="/gallery"
             className="px-3 py-2 rounded-lg text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100"
           >
             Gallery
-          </Link>
-          <Dropdown label="Wallpapers" items={WALLPAPER_ITEMS} pathname={pathname} />
-          <Dropdown label="Banners" items={BANNER_ITEMS} pathname={pathname} />
-          <Link
+          </Link><Link
             href="/tip-jar"
             className="px-3 py-2 rounded-lg text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100"
           >
@@ -131,6 +132,13 @@ export default function Header() {
             )}
 
             <hr className="my-2 border-neutral-200" />
+            <Link
+              href="/gallery"
+              className={linkClasses("/gallery")}
+              onClick={() => setMobileOpen(false)}
+            >
+              Gallery
+            </Link>
 
             <Link
               href="/tip-jar"
