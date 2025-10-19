@@ -22,11 +22,11 @@ export default async function Page({
         <h1 className="text-2xl font-semibold mb-4">{meta.name} Wallpaper Builder</h1>
         <Composer meta={meta} config={config} />
       </div>
-      <footer className="border-t mt-12">
+      {/* <footer className="border-t mt-12">
         <div className="mx-auto max-w-6xl px-4 py-6 text-xs text-neutral-500">
           © {new Date().getFullYear()} Generational Merch is not affiliated with Moonbirds or Orange Cap Games.
         </div>
-      </footer>
+      </footer> */}
     </main>
   );
 }

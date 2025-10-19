@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import SiteHeader from "@/components/SiteHeader";
+import SiteFooter from "@/components/SiteFooter";
 
 import { Merriweather } from "next/font/google";
 
@@ -23,11 +24,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         className={`${merriweather.variable} font-merriweather min-h-screen bg-[#f7f7f7] text-neutral-900`}
       >
         <SiteHeader />
-        <main className="mx-auto max-w-6xl px-4 md:px-6 py-6">
-          {children}
-        </main>
+        <main className="mx-auto max-w-6xl px-4 md:px-6 py-6">{children}</main>
+        <SiteFooter />
       </body>
     </html>
   );
 }
-
