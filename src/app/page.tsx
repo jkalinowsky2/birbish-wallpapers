@@ -43,7 +43,7 @@ export default function HomePage() {
 
           {/* Grid of 4 square images */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            {["/hero/birbish1.jpg", "/hero/birbish2.jpg", "/hero/birbish3.jpg", "/hero/birbish4.jpg"].map(
+            {["/hero/birbish5.jpg", "/hero/birbish2.jpg", "/hero/birbish3.jpg", "/hero/birbish4.jpg"].map(
               (src, i) => (
                 <div key={i} className="relative aspect-square rounded-md overflow-hidden border shadow-sm">
                   <Image
