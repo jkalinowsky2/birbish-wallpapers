@@ -1,0 +1,21 @@
+{
+  "v": 1,
+  "defaultModel": "deck-v1",
+  "collections": {
+    "moonbirds": {
+      "uvProfile": {
+        "top":    { "rotationFixDeg": 0, "flipX": false, "flipY": true },
+        "bottom": { "rotationFixDeg": 0, "flipX": false, "flipY": false }
+      },
+      "grips": [
+        { "id": "mb-red-pattern",  "label": "Red",  "src": "/deckAssets/grips/mb_red_pattern.png" },
+        { "id": "mb-blue-pattern", "label": "Blue", "src": "/deckAssets/grips/mb_blue_pattern.png" }
+      ],
+      "defaults": {
+        "style": "illustrated",
+        "top":    { "fit": "cover", "rotationDeg": 0, "scale": 1, "offset": { "x": 0, "y": 0 } },
+        "bottom": { "fit": "cover", "rotationDeg": 0, "scale": 1, "offset": { "x": 0, "y": 0 } }
+      }
+    }
+  }
+}
