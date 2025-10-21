@@ -139,6 +139,30 @@ export default function Header() {
               </ul>
             )}
 
+                        {/* Wallpapers section */}
+            <button
+              className="w-full flex items-center justify-between px-2 py-2 text-sm font-medium"
+              onClick={() => setMobileOpenSection((s) => (s === "wall" ? null : "wall"))}
+            >
+              <span>Decks</span>
+              <span className="text-neutral-500">{mobileOpenSection === "wall" ? "–" : "+"}</span>
+            </button>
+            {mobileOpenSection === "wall" && (
+              <ul className="mb-2">
+                {DECK_ITEMS.map((it) => (
+                  <li key={it.href}>
+                    <Link
+                      href={it.href}
+                      className={linkClasses(it.href)}
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      {it.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+
             <hr className="my-2 border-neutral-200" />
             <Link
               href="/gallery"
