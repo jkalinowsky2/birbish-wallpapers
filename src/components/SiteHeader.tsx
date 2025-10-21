@@ -33,7 +33,7 @@ const DECK_ITEMS: Item[] = [
 export default function Header() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [mobileOpenSection, setMobileOpenSection] = useState<"wall" | "ban" | null>(null);
+  const [mobileOpenSection, setMobileOpenSection] = useState<"wall" | "ban" | "deck" | null>(null);
 
   const linkClasses = (href: string) =>
     `block px-3 py-2 rounded-md text-sm ${pathname?.startsWith(href)
@@ -142,12 +142,12 @@ export default function Header() {
                         {/* Wallpapers section */}
             <button
               className="w-full flex items-center justify-between px-2 py-2 text-sm font-medium"
-              onClick={() => setMobileOpenSection((s) => (s === "wall" ? null : "wall"))}
+              onClick={() => setMobileOpenSection((s) => (s === "deck" ? null : "deck"))}
             >
               <span>Decks</span>
-              <span className="text-neutral-500">{mobileOpenSection === "wall" ? "–" : "+"}</span>
+              <span className="text-neutral-500">{mobileOpenSection === "deck" ? "–" : "+"}</span>
             </button>
-            {mobileOpenSection === "wall" && (
+            {mobileOpenSection === "deck" && (
               <ul className="mb-2">
                 {DECK_ITEMS.map((it) => (
                   <li key={it.href}>
