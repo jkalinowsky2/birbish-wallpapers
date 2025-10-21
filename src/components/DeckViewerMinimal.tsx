@@ -2,7 +2,7 @@
 'use client'
 
 import { Canvas, useLoader } from '@react-three/fiber'
-import { Environment, OrbitControls, useGLTF, ContactShadows } from '@react-three/drei'
+import {OrbitControls, useGLTF, ContactShadows } from '@react-three/drei'
 import * as THREE from 'three'
 import { Suspense, useEffect, useMemo } from 'react'
 
@@ -61,21 +61,26 @@ function DeckMeshes({ topUrl, bottomUrl }: { topUrl: string; bottomUrl: string }
 
     // Also force-apply matte settings to any child mesh/materials in the GLB
     useEffect(() => {
-        scene.traverse((o) => {
-            const mesh = o as THREE.Mesh
-            if (!mesh.isMesh || !mesh.material) return
-            const apply = (m: THREE.Material) => {
-                const mat = m as any
-                if ('envMapIntensity' in mat) {
-                    mat.envMapIntensity = 0
-                    mat.roughness = Math.max(mat.roughness ?? 1, 0.95)
-                    mat.metalness = 0
-                    mat.needsUpdate = true
-                }
-            }
-            if (Array.isArray(mesh.material)) mesh.material.forEach(apply)
-            else apply(mesh.material)
-        })
+scene.traverse((o) => {
+  const mesh = o as THREE.Mesh
+  if (!mesh.isMesh || !mesh.material) return
+
+  const apply = (m: THREE.Material) => {
+    if (
+      m instanceof THREE.MeshStandardMaterial ||
+      m instanceof THREE.MeshPhysicalMaterial
+    ) {
+      m.envMapIntensity = 0
+      // keep surfaces matte
+      m.roughness = Math.max(m.roughness ?? 1, 0.95)
+      m.metalness = 0
+      m.needsUpdate = true
+    }
+  }
+
+  if (Array.isArray(mesh.material)) mesh.material.forEach(apply)
+  else apply(mesh.material)
+})
     }, [scene])
 
     // Keep scene transforms clean
