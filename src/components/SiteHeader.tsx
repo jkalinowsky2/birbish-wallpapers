@@ -61,7 +61,7 @@ export default function Header() {
 
           <Dropdown label="Wallpapers" items={WALLPAPER_ITEMS} pathname={pathname} />
           <Dropdown label="Banners" items={BANNER_ITEMS} pathname={pathname} />
-          <Dropdown label="Decks" items={DECK_ITEMS} pathname={pathname} />
+          {/* <Dropdown label="Decks" items={DECK_ITEMS} pathname={pathname} /> */}
 
           <Link
             href="/gallery"
@@ -139,8 +139,11 @@ export default function Header() {
               </ul>
             )}
 
-                        {/* Wallpapers section */}
-            <button
+
+
+
+                        {/* Decks section */}
+            {/* <button
               className="w-full flex items-center justify-between px-2 py-2 text-sm font-medium"
               onClick={() => setMobileOpenSection((s) => (s === "deck" ? null : "deck"))}
             >
@@ -161,7 +164,10 @@ export default function Header() {
                   </li>
                 ))}
               </ul>
-            )}
+            )} */}
+
+
+
 
             <hr className="my-2 border-neutral-200" />
             <Link

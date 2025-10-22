@@ -1,149 +1,169 @@
-// src/components/DeckViewerMinimal.tsx
 'use client'
 
-import { Canvas, useLoader } from '@react-three/fiber'
-import {OrbitControls, useGLTF, ContactShadows } from '@react-three/drei'
+import { Canvas, useLoader, useThree } from '@react-three/fiber'
+import { OrbitControls, useGLTF, ContactShadows } from '@react-three/drei'
+import { Suspense, useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
-import { Suspense, useEffect, useMemo } from 'react'
 
-
+/* ---------- Deck Meshes ---------- */
 function DeckMeshes({ topUrl, bottomUrl }: { topUrl: string; bottomUrl: string }) {
-    const { scene } = useGLTF('/models/deck.glb')
+  const gltf = useGLTF('/models/deck.glb')
+  const scene = useMemo(() => gltf.scene.clone(), [gltf.scene])
 
-    // --- Load textures
-    const topTex = useLoader(THREE.TextureLoader, topUrl)
-    const bottomTex = useLoader(THREE.TextureLoader, bottomUrl)
+  // Load textures
+  const topTex = useLoader(THREE.TextureLoader, topUrl)
+  const bottomTex = useLoader(THREE.TextureLoader, bottomUrl)
 
-    // Textures applied to a glTF mesh should not flip Y
-    for (const t of [topTex, bottomTex]) {
-        t.flipY = true
-        t.colorSpace = THREE.SRGBColorSpace
-        t.anisotropy = 8
-        t.generateMipmaps = true
-        t.minFilter = THREE.LinearMipmapLinearFilter
-        t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping
-        t.offset.set(0, 0)
-        t.repeat.set(1, 1)
-        t.rotation = 0
-        t.center.set(0.5, 0.5)
-    }
-
-    // --- Materials: truly matte, no env reflections
-    const topMat = useMemo(
-        () =>
-            new THREE.MeshStandardMaterial({
-                map: topTex,
-                roughness: 1,
-                metalness: 0,
-                envMapIntensity: 0,
-            }),
-        [topTex]
-    )
-
-    const bottomMat = useMemo(
-        () =>
-            new THREE.MeshStandardMaterial({
-                map: bottomTex,
-                roughness: 0.95,
-                metalness: 0,
-                envMapIntensity: 0,
-            }),
-        [bottomTex]
-    )
-
-    // Assign to the named meshes if present
-    useEffect(() => {
-        const top = scene.getObjectByName('DeckTop') as THREE.Mesh | null
-        const bottom = scene.getObjectByName('DeckBottom') as THREE.Mesh | null
-        if (top) top.material = topMat
-        if (bottom) bottom.material = bottomMat
-    }, [scene, topMat, bottomMat])
-
-    // Also force-apply matte settings to any child mesh/materials in the GLB
-    useEffect(() => {
-scene.traverse((o) => {
-  const mesh = o as THREE.Mesh
-  if (!mesh.isMesh || !mesh.material) return
-
-  const apply = (m: THREE.Material) => {
-    if (
-      m instanceof THREE.MeshStandardMaterial ||
-      m instanceof THREE.MeshPhysicalMaterial
-    ) {
-      m.envMapIntensity = 0
-      // keep surfaces matte
-      m.roughness = Math.max(m.roughness ?? 1, 0.95)
-      m.metalness = 0
-      m.needsUpdate = true
-    }
+  const prep = (t: THREE.Texture) => {
+    t.colorSpace = THREE.SRGBColorSpace
+    t.flipY = true
+    t.anisotropy = 8
+    t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping
+    t.needsUpdate = true
   }
 
-  if (Array.isArray(mesh.material)) mesh.material.forEach(apply)
-  else apply(mesh.material)
-})
-    }, [scene])
+  useEffect(() => {
+    prep(topTex)
+    prep(bottomTex)
+  }, [topTex, bottomTex])
 
-    // Keep scene transforms clean
-    scene.rotation.set(0, 0, 0)
-    scene.position.set(0, 0, 0)
-    scene.scale.set(1, 1, 1)
+  const topMat = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        map: topTex,
+        roughness: 1,
+        metalness: 0,
+      }),
+    [topTex]
+  )
 
-    return <primitive object={scene} />
+  const bottomMat = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        map: bottomTex,
+        roughness: 1,
+        metalness: 0,
+      }),
+    [bottomTex]
+  )
+
+  // Assign materials
+  useEffect(() => {
+    const top = scene.getObjectByName('DeckTop') as THREE.Mesh | null
+    const bottom = scene.getObjectByName('DeckBottom') as THREE.Mesh | null
+    if (top) top.material = topMat
+    if (bottom) bottom.material = bottomMat
+  }, [scene, topMat, bottomMat])
+
+  return (
+    <group position={[0, 0.0, 0]}>
+      <primitive object={scene} />
+    </group>
+  )
+}
+useGLTF.preload('/models/deck.glb')
+
+/* ---------- Camera Controller ---------- */
+function CameraController({ controlsRef }: { controlsRef: React.MutableRefObject<any> }) {
+  const { camera } = useThree()
+
+  const snap = (
+    pos: [number, number, number],
+    target: [number, number, number] = [0, 0, 0],
+    up?: [number, number, number]
+  ) => {
+    if (up) camera.up.set(...up)
+    camera.position.set(...pos)
+    controlsRef.current?.target?.set(...target)
+    controlsRef.current?.update?.()
+  }
+
+  ;(window as any).deckSnap = snap
+  return null
 }
 
+/* ---------- Main Viewer ---------- */
 export default function DeckViewerMinimal({
-    topUrl = '/deckAssets/grips/mb_red_pattern.png',
-    bottomUrl = '/deckAssets/moonbirds/samplebottom.png',
+  topUrl = '/deckAssets/grips/mb_red_pattern.png',
+  bottomUrl = '/deckAssets/moonbirds/samplebottom.png',
 }: {
-    topUrl?: string
-    bottomUrl?: string
+  topUrl?: string
+  bottomUrl?: string
 }) {
-    return (
-        <Canvas
-            camera={{ position: [1.1, 0.9, 0.75], fov: 20 }}
-            gl={{ toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.0 }}
-        >
-            <color attach="background" args={['#f7f7f7']} />
+  const controlsRef = useRef<any>(null)
 
-            {/* Simple lights; HDRI kept but materials ignore its reflections */}
-            <ambientLight intensity={0.35} />
-            <hemisphereLight intensity={0.4} />
-            {/* key light (top) */}
-            <directionalLight
-                position={[3, 5, 6]}
-                intensity={2.5}
-                color="#ffffff"
-            />
-            {/* fill light (bottom) */}
-            <directionalLight
-                position={[-3, -5, -6]}   // roughly opposite side
-                intensity={3.5}           // half as bright
-                color="#ffffff"
-            />
+  // Wrapper to call the snap function stored on window
+  const snap = (
+    pos: [number, number, number],
+    target?: [number, number, number],
+    up?: [number, number, number]
+  ) => (window as any).deckSnap?.(pos, target ?? [0, 0, 0], up)
 
+  // Preset views
+  const toHeroView = () => snap([1.4, 0.8, 1.2], [0, 0.15, 0], [0, 1, 0]) // angled
+  const toTopView = () => snap([0, 2.0, 0.001], [0, 0, 0], [-1, 0, 0]) // portrait top
+  const toBottomView = () => snap([0, -2.0, 0.001], [0, 0, 0], [-1, 0, 0]) // portrait bottom
 
-            <Suspense fallback={null}>
-                <DeckMeshes topUrl={topUrl} bottomUrl={bottomUrl} />
-                {/* Remove the Environment for now */}
-                {/* <Environment preset="studio" /> */}
+  return (
+    <div style={{ position: 'relative', width: '100%', height: 'min(90vh, 1000px)' }}>
+      <Canvas camera={{ position: [1.4, 0.8, 1.2], fov: 25 }} style={{ width: '100%', height: '100%' }}>
+        <color attach="background" args={['#f7f7f7']} />
 
-                <ContactShadows
-                    position={[0, -0.05, 0]}  // slightly below the deck
-                    opacity={0.75}             // shadow darkness (0.3–0.6 looks natural)
-                    scale={5}                // size of the ground area
-                    blur={1.5}                // softness
-                    far={2}                   // how far it extends from the object
-                />
+        {/* Lighting */}
+        <ambientLight intensity={0.35} />
+        <directionalLight position={[3, 5, 6]} intensity={2.5} />
+        <directionalLight position={[-3, -5, -6]} intensity={3.2} />
 
-            </Suspense>
+        <Suspense fallback={null}>
+          <DeckMeshes topUrl={topUrl} bottomUrl={bottomUrl} />
+          <ContactShadows position={[0, -0.05, 0]} opacity={0.5} scale={4} blur={1.2} far={2} />
+        </Suspense>
 
-            <OrbitControls
-                enablePan={false}
-                minDistance={1.0}
-                maxDistance={2.5}
-                enableDamping
-                dampingFactor={.08}
-            />
-        </Canvas>
-    )
+        <OrbitControls
+          ref={controlsRef}
+          enablePan={true}
+          enableDamping
+          dampingFactor={0.08}
+          minDistance={0.5}
+          maxDistance={3.0}
+          target={[0, 0.15, 0]}
+        />
+
+        <CameraController controlsRef={controlsRef} />
+      </Canvas>
+
+      {/* Preset view buttons */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 12,
+          right: 12,
+          display: 'flex',
+          gap: 8,
+          zIndex: 10,
+        }}
+      >
+        <button className="btn btn-ghost btn-sm" onClick={toHeroView}>
+          Hero
+        </button>
+        <button className="btn btn-ghost btn-sm" onClick={toTopView}>
+          Top
+        </button>
+        <button className="btn btn-ghost btn-sm" onClick={toBottomView}>
+          Bottom
+        </button>
+      </div>
+    </div>
+  )
+}
+
+/* ---------- Optional Type Declaration ---------- */
+declare global {
+  interface Window {
+    deckSnap?: (
+      pos: [number, number, number],
+      target?: [number, number, number],
+      up?: [number, number, number]
+    ) => void
+  }
 }

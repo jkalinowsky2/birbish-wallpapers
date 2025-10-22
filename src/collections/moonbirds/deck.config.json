@@ -8,9 +8,22 @@
         "bottom": { "rotationFixDeg": 0, "flipX": false, "flipY": false }
       },
       "grips": [
-        { "id": "mb-red-pattern",  "label": "Red",  "src": "/deckAssets/grips/mb_red_pattern.png" },
-        { "id": "mb-blue-pattern", "label": "Blue", "src": "/deckAssets/grips/mb_blue_pattern.png" }
+        { "id": "mb-red-birb",  "label": "birb - red",  "image": "/deckAssets/grips/mb_birb_red.png" },
+        { "id": "mb-blk-birb",  "label": "birb - black",  "image": "/deckAssets/grips/mb_birb_blk.png" },
+        { "id": "mb-red-birbish", "label": "birbish - red", "image": "/deckAssets/grips/mb_birbish_red.png" },
+        { "id": "mb-blkbirbish", "label": "birbish - black", "image": "/deckAssets/grips/mb_birbish_blk.png" },
+        { "id": "mb-red-pattern",  "label": "Red Pattern",  "image": "/deckAssets/grips/mb_red_pattern.png" },
+        { "id": "mb-black-pattern", "label": "Black Pattern", "image": "/deckAssets/grips/mb_black_pattern.png" },
+        { "id": "none", "label": "None", "image": "/deckAssets/grips/none.png" }
       ],
+
+     "bottoms": [
+        { "id": "sample", "label": "Sample Bottom", "image": "/deckAssets/moonbirds/samplebottom.png"},
+        { "id": "sample2", "label": "Sample Bottom 2", "image": "/deckAssets/moonbirds/samplebottom6949.png"},
+        { "id": "mb-red-pattern",  "label": "Red",  "image": "/deckAssets/moonbirds/mb_red_gradient.png" }
+
+      ],
+
       "defaults": {
         "style": "illustrated",
         "top":    { "fit": "cover", "rotationDeg": 0, "scale": 1, "offset": { "x": 0, "y": 0 } },
