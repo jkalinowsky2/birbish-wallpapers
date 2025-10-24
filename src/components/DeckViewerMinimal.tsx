@@ -134,7 +134,7 @@ export default function DeckViewerMinimal({
           enableDamping
           dampingFactor={0.08}
           minDistance={0.5}
-          maxDistance={2.0}
+          maxDistance={3.50}
           target={[0, 0.15, 0]}
         />
 
