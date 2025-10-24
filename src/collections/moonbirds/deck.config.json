@@ -18,10 +18,15 @@
       ],
 
      "bottoms": [
-        { "id": "sample", "label": "Sample Bottom", "image": "/deckAssets/moonbirds/samplebottom.png"},
-        { "id": "sample2", "label": "Sample Bottom 2", "image": "/deckAssets/moonbirds/samplebottom6949.png"},
-        { "id": "mb-red-pattern",  "label": "Red",  "image": "/deckAssets/moonbirds/mb_red_gradient.png" }
+        { "id": "mb-red-grad-pattern",  "label": "Red Gradient",  "image": "/deckAssets/moonbirds/mb_red_gradient2.png" },
+        { "id": "mb-starlight",  "label": "Starlight",  "image": "/deckAssets/moonbirds/mb_starlight.png" },
+        { "id": "mb-wood",  "label": "Natural",  "image": "/deckAssets/moonbirds/woodgrain.png" }
 
+
+      ],
+
+      "jkDesigns": [
+        { "id": "toobins", "name": "Twisted Toobins", "image": "/deckAssets/moonbirds/toobins.png" }
       ],
 
       "defaults": {

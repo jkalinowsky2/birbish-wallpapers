@@ -6,7 +6,6 @@ import deckConfig from '@/collections/moonbirds/deck.config.json'
 export default function Page() {
   const raw = deckConfig.collections['moonbirds']
 
-  // Adapt JSON -> DeckComposerConfig
   const cfg: DeckComposerConfig = {
     collectionKey: 'moonbirds',
     grips: raw.grips.map((g: { id: string; label?: string; name?: string; image: string }) => ({
@@ -19,6 +18,13 @@ export default function Page() {
       name: b.label ?? b.name ?? b.id,
       image: b.image,
     })),
+    jkDesigns: (raw.jkDesigns ?? []).map(
+      (d: { id: string; label?: string; name?: string; image: string }) => ({
+        id: d.id,
+        name: d.label ?? d.name ?? d.id,
+        image: d.image,
+      })
+    ),
   }
 
   return <DeckComposer config={cfg} />
