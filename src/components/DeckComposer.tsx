@@ -263,7 +263,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                     )}
 
                     {/* Grip (top) */}
-                    <Field labelText="Grip (Top)">
+                    <Field labelText="Grip Tape">
                         <select
                             className="input"
                             value={gripId}
