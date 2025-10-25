@@ -1,26 +1,30 @@
+// src/components/DeckComposer.tsx
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import DeckViewerMinimal from './DeckViewerMinimal'
+import { ChevronDown } from 'lucide-react'
 
 /* ---------- Types ---------- */
 export type GripOption = { id: string; name: string; image: string }
 export type BottomOption = { id: string; name: string; image: string }
 
-/** Fixed designs that should be used as-is (no token overlay) */
+/** Fixed designs used as-is (no token overlay) */
 export type JKDesign = { id: string; name: string; image: string }
+export type GlyphOption = { id: string; name: string; image: string }
 
 export type DeckComposerConfig = {
     collectionKey: string
     grips: GripOption[]
     bottoms: BottomOption[]              // backgrounds for Custom mode
+    glyphs?: GlyphOption[]               // optional glyph overlay choices (PNG with transparency)
     jkDesigns?: JKDesign[]               // fixed bottoms (no edits)
 }
 
 type LayoutMode = 'verticalTail' | 'horizontalLeft'
 type BuildMode = 'custom' | 'jk'
 
-/* ---------- Small UI helper ---------- */
+/* ---------- Small UI helpers ---------- */
 function Field({
     labelText,
     children,
@@ -38,6 +42,112 @@ function Field({
     )
 }
 
+function OptionTile({
+  image,
+  label,
+  selected,
+  onClick,
+}: {
+  image: string
+  label: string
+  selected?: boolean
+  onClick: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={[
+        "flex flex-col items-center justify-start",
+        "rounded-xl bg-white border border-neutral-200 p-2",
+        "transition hover:border-neutral-300",
+        "overflow-hidden",
+        selected ? "shadow-[inset_0_0_0_2px_#111]" : "shadow-none",
+      ].join(" ")}
+    >
+      {/* slightly smaller thumb box so it’s inset visually */}
+      <div className="w-14 h-14 rounded-md overflow-hidden bg-neutral-100">
+        <img
+          src={image}
+          alt={label}
+          className="block w-full h-full object-cover"
+          loading="lazy"
+        />
+      </div>
+
+      {/* consistent label spacing */}
+      <div className="mt-2 text-xs text-center leading-tight line-clamp-2 h-[2.25rem]">
+        {label}
+      </div>
+    </button>
+  )
+}
+
+function OptionsGrid({ children }: { children: React.ReactNode }) {
+    return (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            {children}
+        </div>
+    )
+}
+
+/** Minimal accordion (Apple-like “pill” behavior) */
+export function AccordionSection({
+    title,
+    children,
+    defaultOpen = false,
+}: {
+    title: string
+    children: React.ReactNode
+    defaultOpen?: boolean
+}) {
+    const [open, setOpen] = useState(defaultOpen)
+
+    return (
+        <div className="w-full">
+            {/* Header: darker gray, full pill */}
+            <button
+                type="button"
+                aria-expanded={open}
+                onClick={() => setOpen(o => !o)}
+                className={`
+          w-full flex items-center justify-between
+          rounded-full px-5 py-3 mb-2
+          text-sm font-medium
+          bg-neutral-300 text-neutral-800
+          hover:bg-neutral-400
+          transition-colors duration-200
+          focus:outline-none focus:ring-2 focus:ring-neutral-400/60
+        `}
+            >
+                <span>{title}</span>
+                <ChevronDown
+                    className={`h-4 w-4 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+                />
+            </button>
+
+            {/* Content: lighter panel with soft shadow, rounded-2xl */}
+            <div
+                className={`
+          overflow-hidden transition-[max-height,opacity,transform]
+          duration-300 ease-in-out
+          ${open ? 'max-h-[1200px] opacity-100 translate-y-0' : 'max-h-0 opacity-0 -translate-y-1'}
+        `}
+            >
+                <div
+                    className={`
+            bg-neutral-100 rounded-2xl
+            px-4 py-4
+            shadow-inner
+          `}
+                >
+                    {children}
+                </div>
+            </div>
+        </div>
+    )
+}
+
 /* ---------- Env-only bases (no proxy/fallbacks) ---------- */
 const ILLU_BASE = (process.env.NEXT_PUBLIC_MOONBIRDS_ILLU_BASE || '').replace(/\/+$/, '')
 const PIXEL_BASE = (process.env.NEXT_PUBLIC_MOONBIRDS_PIXEL_BASE || '').replace(/\/+$/, '')
@@ -47,7 +157,6 @@ function buildIllustratedUrl(id: string) {
     if (!Number.isFinite(n) || n < 1 || !ILLU_BASE) return ''
     return `${ILLU_BASE}/${n}.png`
 }
-
 function buildPixelUrl(id: string) {
     const n = Number(id)
     if (!Number.isFinite(n) || n < 1 || !PIXEL_BASE) return ''
@@ -67,32 +176,41 @@ function loadImage(src: string): Promise<HTMLImageElement> {
 
 /* ---------- Main component ---------- */
 export default function DeckComposer({ config }: { config: DeckComposerConfig }) {
-    const { grips, bottoms, jkDesigns = [] } = config
+    const { grips, bottoms, jkDesigns = [], glyphs = [] } = config
     const hasJK = jkDesigns.length > 0
 
     const initialGrip = useMemo(() => grips[0]!, [grips])
     const initialBottomBG = useMemo(() => bottoms[0]!, [bottoms])
+    const initialJKId = jkDesigns[0]?.id ?? ''
 
+    // Mode: Custom (bg + optional glyph + optional token) vs JK (fixed art)
+    const [mode, setMode] = useState<BuildMode>(hasJK ? 'jk' : 'custom')
+
+    // Top / Bottom selections
     const [gripId, setGripId] = useState<string>(initialGrip.id)
-
-    // Mode: Custom (background + optional token) vs JK (fixed art)
-    const [mode, setMode] = useState<BuildMode>('jk')
-
-    // Custom-mode state
     const [bottomBgId, setBottomBgId] = useState<string>(initialBottomBG.id)
-    const [tokenId, setTokenId] = useState<string>('') // moonbird ID
+
+    // Glyph choice (with “none” as default)
+    const glyphsWithNone = useMemo<GlyphOption[]>(
+        () => [{ id: 'none', name: 'None', image: '/deckAssets/moonbirds/none.png' }, ...glyphs],
+        [glyphs]
+    )
+    const [glyphId, setGlyphId] = useState<string>('none')
+    const [glyphTint, setGlyphTint] = useState('#ff1a1a')
+
+    // Token controls (custom mode)
+    const [tokenId, setTokenId] = useState<string>('')   // moonbird ID
     const [style, setStyle] = useState<'illustrated' | 'pixel'>('illustrated')
     const [layout, setLayout] = useState<LayoutMode>('horizontalLeft')
 
     // Custom controls
     const [tokenScale, setTokenScale] = useState<number>(3.25) // multiplies base size
-    const [offsetX, setOffsetX] = useState<number>(-40)        // px relative to center
-    const [offsetY, setOffsetY] = useState<number>(60)         // px down is positive
+    const [offsetX, setOffsetX] = useState<number>(-40)        // px relative to center (canvas space)
+    const [offsetY, setOffsetY] = useState<number>(60)         // px relative to center (canvas space)
     const nudgeValue = 100
 
     // JK-mode state
-    const initialJK = jkDesigns[0]?.id ?? ''
-    const [jkId, setJkId] = useState<string>(initialJK)
+    const [jkId, setJkId] = useState<string>(initialJKId)
 
     // Output for viewer
     const [bottomPreviewUrl, setBottomPreviewUrl] = useState<string>(initialBottomBG.image)
@@ -101,41 +219,29 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
     const selectedGrip = grips.find((g) => g.id === gripId) ?? initialGrip
     const selectedBottomBG = bottoms.find((b) => b.id === bottomBgId) ?? initialBottomBG
     const selectedJK = jkDesigns.find((j) => j.id === jkId) ?? jkDesigns[0]
+    const selectedGlyph = glyphsWithNone.find(g => g.id === glyphId) ?? glyphsWithNone[0]
 
-    // Offscreen canvas for bottom composite (custom mode)
+    // Offscreen canvas
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     if (!canvasRef.current && typeof document !== 'undefined') {
         canvasRef.current = document.createElement('canvas')
     }
 
+    /* ---------- COMPOSITOR ---------- */
     useEffect(() => {
         let cancelled = false
 
         async function buildBottom() {
-            // JK mode: use fixed art directly and bail
+            // JK mode: use fixed art directly
             if (mode === 'jk' && selectedJK?.image) {
                 if (!cancelled) setBottomPreviewUrl(selectedJK.image)
                 return
             }
 
-            // CUSTOM mode logic (your existing builder)
+            // CUSTOM mode
             try {
                 const bgImg = await loadImage(selectedBottomBG.image)
 
-                const wantPixel = style === 'pixel'
-                const tokenSrc = tokenId
-                    ? (wantPixel ? buildPixelUrl(tokenId) : buildIllustratedUrl(tokenId))
-                    : ''
-
-                // If no token (or no base configured), just pass through the background
-                if (!tokenSrc) {
-                    if (!cancelled) setBottomPreviewUrl(selectedBottomBG.image)
-                    return
-                }
-
-                const tokenImg = await loadImage(tokenSrc)
-
-                // --- Canvas set up ---
                 const c = canvasRef.current!
                 const ctx = c.getContext('2d')
                 if (!ctx) return
@@ -146,62 +252,97 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                 c.height = H
 
                 ctx.clearRect(0, 0, W, H)
+
+                // 1) Background
                 ctx.drawImage(bgImg, 0, 0, W, H)
 
-                const srcW = tokenImg.naturalWidth || tokenImg.width
-                const srcH = tokenImg.naturalHeight || tokenImg.height
+                // 2) Optional Glyph (between background and token)
+                if (selectedGlyph.id !== 'none' && selectedGlyph.image) {
+                    try {
+                        const glyphImg = await loadImage(selectedGlyph.image)
+                        const gSrcW = glyphImg.naturalWidth || glyphImg.width
+                        const gSrcH = glyphImg.naturalHeight || glyphImg.height
 
-                const wantHorizontal = layout === 'horizontalLeft'
-                const baseWidthRatio =
-                    style === 'pixel'
-                        ? (wantHorizontal ? 0.50 : 0.55)
-                        : (wantHorizontal ? 0.38 : 0.42)
+                        // Fit to deck (cover) while preserving AR
+                        const scale = Math.max(W / gSrcW, H / gSrcH)
+                        const gW = Math.round(gSrcW * scale)
+                        const gH = Math.round(gSrcH * scale)
+                        const gX = Math.round((W - gW) / 2)
+                        const gY = Math.round((H - gH) / 2)
 
-                const scaleMul = Math.max(0.05, Math.min(10, tokenScale))
-                const tW = W * baseWidthRatio * scaleMul
-                const tH = srcH * (tW / srcW)
-
-                // ---- MANUAL START POSITION for HORIZONTAL layout (in canvas pixels) ----
-                // Change these two numbers to put the token exactly where you want it.
-                // They are interpreted in the output canvas coordinate space.
-                const HSTART = {
-                    cx: 675,  // X pixel where the *center* of the rotated token should start
-                    cy: 700,  // Y pixel where the *center* of the rotated token should start
-                };
-                // ------------------------------------------------------------------------
-
-                if (wantHorizontal) {
-                    // Final token size (already computed): tW, tH
-                    // We’ll draw rotated 90° clockwise around its center at (cx, cy)
-                    const cx = Math.round(HSTART.cx + offsetX);
-                    const cy = Math.round(HSTART.cy + offsetY);
-
-                    const prev = ctx.imageSmoothingEnabled;
-                    ctx.imageSmoothingEnabled = !(style === 'pixel');
-
-                    ctx.save();
-                    ctx.translate(cx, cy);
-                    ctx.rotate(Math.PI / 2);            // 90° clockwise
-                    ctx.drawImage(tokenImg, -tW / 2, -tH / 2, tW, tH);
-                    ctx.restore();
-
-                    ctx.imageSmoothingEnabled = prev;
-
-                    const url = c.toDataURL('image/png');
-                    if (!cancelled) setBottomPreviewUrl(url);
-                    return; // IMPORTANT: stop here so the vertical-tail branch doesn't also draw
-                }
-                else {
-                    // Original tail placement
-                    const baseDx = Math.round((W - tW) / 2)
-                    const baseDy = Math.round(H - tH - H * 0.06)
-                    const dx = baseDx + Math.round(offsetX)
-                    const dy = baseDy + Math.round(offsetY)
-
-                    ctx.imageSmoothingEnabled = !(style === 'pixel')
-                    ctx.drawImage(tokenImg, dx, dy, tW, tH)
+                        // Tint on an offscreen canvas so blending is isolated
+                        const tmp = document.createElement('canvas')
+                        tmp.width = Math.max(1, gW)
+                        tmp.height = Math.max(1, gH)
+                        const tctx = tmp.getContext('2d')
+                        if (tctx) {
+                            tctx.imageSmoothingEnabled = true
+                            tctx.drawImage(glyphImg, 0, 0, gW, gH)
+                            tctx.globalCompositeOperation = 'source-in'
+                            tctx.fillStyle = glyphTint
+                            tctx.fillRect(0, 0, gW, gH)
+                            tctx.globalCompositeOperation = 'source-over'
+                            ctx.drawImage(tmp, gX, gY)
+                        }
+                    } catch (err) {
+                        console.warn('Glyph draw error:', err)
+                    }
                 }
 
+                // 3) Optional Token
+                const wantPixel = style === 'pixel'
+                const tokenSrc = tokenId
+                    ? (wantPixel ? buildPixelUrl(tokenId) : buildIllustratedUrl(tokenId))
+                    : ''
+
+                if (tokenSrc) {
+                    try {
+                        const tokenImg = await loadImage(tokenSrc)
+                        const srcW = tokenImg.naturalWidth || tokenImg.width
+                        const srcH = tokenImg.naturalHeight || tokenImg.height
+
+                        const wantHorizontal = layout === 'horizontalLeft'
+                        const baseWidthRatio =
+                            style === 'pixel'
+                                ? (wantHorizontal ? 0.50 : 0.55)
+                                : (wantHorizontal ? 0.38 : 0.42)
+
+                        const scaleMul = Math.max(0.05, Math.min(10, tokenScale))
+                        const tW = W * baseWidthRatio * scaleMul
+                        const tH = srcH * (tW / srcW)
+
+                        // Manual start for horizontal layout (canvas pixels)
+                        const HSTART = { cx: 675, cy: 700 }
+
+                        if (wantHorizontal) {
+                            const cx = Math.round(HSTART.cx + offsetX)
+                            const cy = Math.round(HSTART.cy + offsetY)
+
+                            const prev = ctx.imageSmoothingEnabled
+                            ctx.imageSmoothingEnabled = !wantPixel
+                            ctx.save()
+                            ctx.translate(cx, cy)
+                            ctx.rotate(Math.PI / 2) // 90° clockwise
+                            ctx.drawImage(tokenImg, -tW / 2, -tH / 2, tW, tH)
+                            ctx.restore()
+                            ctx.imageSmoothingEnabled = prev
+                        } else {
+                            const baseDx = Math.round((W - tW) / 2)
+                            const baseDy = Math.round(H - tH - H * 0.06)
+                            const dx = baseDx + Math.round(offsetX)
+                            const dy = baseDy + Math.round(offsetY)
+
+                            const prev = ctx.imageSmoothingEnabled
+                            ctx.imageSmoothingEnabled = !wantPixel
+                            ctx.drawImage(tokenImg, dx, dy, tW, tH)
+                            ctx.imageSmoothingEnabled = prev
+                        }
+                    } catch {
+                        /* ignore token errors; bg + glyph still render */
+                    }
+                }
+
+                // finalize
                 const url = c.toDataURL('image/png')
                 if (!cancelled) setBottomPreviewUrl(url)
             } catch {
@@ -210,13 +351,14 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
         }
 
         buildBottom()
-        return () => {
-            cancelled = true
-        }
+        return () => { cancelled = true }
     }, [
         mode,
-        selectedJK?.image,
-        selectedBottomBG.image,
+        selectedJK?.image,          // JK image or…
+        selectedBottomBG.image,     // …custom background
+        glyphId,
+        glyphTint,                  // 🔄 updates preview when color changes
+        glyphsWithNone,             // memoized, safe in deps
         tokenId,
         style,
         tokenScale,
@@ -234,220 +376,257 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
 
     return (
         <div className="grid gap-6 sm:grid-cols-[380px_minmax(0,1fr)] items-stretch">
+
             {/* Settings (left) */}
-            <aside className="h-full lg:sticky lg:top-6 h-fit rounded-2xl border bg-white shadow-sm p-4 lg:p-5">
-                <h2 className="text-sm font-semibold mb-3">Settings</h2>
+            <aside className="h-full lg:sticky lg:top-6 h-fit p-2 lg:p-4">
+                {/* <h2 className="text-sm font-semibold mb-3">Settings</h2> */}
 
-                <div className="space-y-4">
-                    {/* Mode */}
+                <div className="space-y-3">
+                    {/* Mode (JK vs Custom) — always visible */}
                     {hasJK && (
-                        <Field labelText="Choose design mode...">
-                            <div className="flex gap-2">
-                                <button
-                                    type="button"
-                                    className={`btn ${mode === 'jk' ? 'btn-primary' : 'btn-ghost'}`}
-                                    onClick={() => setMode('jk')}
-                                >
-                                    JK Designs
-                                </button>
-                                <button
-                                    type="button"
-                                    className={`btn ${mode === 'custom' ? 'btn-primary' : 'btn-ghost'}`}
-                                    onClick={() => setMode('custom')}
-                                >
-                                    Custom
-                                </button>
-
-                            </div>
-                        </Field>
-                    )}
-
-                    {/* Grip (top) */}
-                    <Field labelText="Grip Tape">
-                        <select
-                            className="input"
-                            value={gripId}
-                            onChange={(e) => setGripId(e.target.value)}
-                        >
-                            {grips.map((g) => (
-                                <option key={g.id} value={g.id}>
-                                    {g.name}
-                                </option>
-                            ))}
-                        </select>
-                    </Field>
-
-                    {/* Custom-mode: Background */}
-                    {mode === 'custom' && (
-                        <Field labelText="Bottom Background">
-                            <select
-                                className="input"
-                                value={bottomBgId}
-                                onChange={(e) => setBottomBgId(e.target.value)}
+                        <div className="inline-flex rounded-full bg-neutral-200 p-1">
+                            <button
+                                type="button"
+                                onClick={() => setMode('jk')}
+                                className={`px-5 py-2 text-sm font-medium rounded-full transition-all duration-200
+      ${mode === 'jk'
+                                        ? 'bg-[#d12429] text-white shadow-sm'
+                                        : 'text-neutral-700 hover:bg-neutral-300'}
+    `}
                             >
-                                {bottoms.map((b) => (
-                                    <option key={b.id} value={b.id}>
-                                        {b.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </Field>
-                    )}
-
-                    {/* JK-mode: choose a fixed design */}
-                    {mode === 'jk' && hasJK && (
-                        <Field labelText="JK Design">
-                            <select
-                                className="input"
-                                value={jkId}
-                                onChange={(e) => setJkId(e.target.value)}
+                                JK Designs
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setMode('custom')}
+                                className={`
+      px-5 py-2 text-sm font-medium rounded-full transition-all duration-200
+      ${mode === 'custom'
+                                        ? 'bg-[#d12429] text-white shadow-sm'
+                                        : 'text-neutral-700 hover:bg-neutral-300'}
+    `}
                             >
-                                {jkDesigns.map((d) => (
-                                    <option key={d.id} value={d.id}>
-                                        {d.name}
-                                    </option>
+                                Custom
+                            </button>
+                        </div>
+                    )}
+
+                    {/* 
+          IMPORTANT: Key the accordion stack by `mode` so it remounts on toggle.
+          That way only the first section (Grip Tape) opens by default each time.
+        */}
+                    <div key={`accordion-stack-${mode}`}>
+                        {/* 1) Always-first accordion: open by default */}
+                        <AccordionSection title="Grip Tape" defaultOpen={mode !== 'jk'}>
+                            <OptionsGrid>
+                                {grips.map((g) => (
+                                    <OptionTile
+                                        key={g.id}
+                                        label={g.name}
+                                        image={g.image}
+                                        selected={gripId === g.id}
+                                        onClick={() => setGripId(g.id)}
+                                    />
                                 ))}
-                            </select>
-                            <p className="text-xs text-neutral-500">
-                                Fixed artwork; token overlay and positioning controls are disabled.
-                            </p>
-                        </Field>
-                    )}
+                            </OptionsGrid>
+                        </AccordionSection>
 
-                    {/* Layout (custom only) */}
-                    {/* {mode === 'custom' && (
-                        <Field labelText="Layout">
-                            <div className="flex gap-2">
-                                <button
-                                    type="button"
-                                    className={`btn ${layout === 'horizontalLeft' ? 'btn-primary' : 'btn-ghost'}`}
-                                    onClick={() => setLayout('horizontalLeft')}
-                                    disabled={controlsDisabled}
-                                >
-                                    Horizontal (left)
-                                </button>
-                                <button
-                                    type="button"
-                                    className={`btn ${layout === 'verticalTail' ? 'btn-primary' : 'btn-ghost'}`}
-                                    onClick={() => setLayout('verticalTail')}
-                                    disabled={controlsDisabled}
-                                >
-                                    Vertical (tail)
-                                </button>
-                            </div>
-                        </Field>
-                    )} */}
+                        {/* 2) Custom-only accordions (all closed by default) */}
+                        {mode === 'custom' && (
+                            <>
+                                <AccordionSection title="Bottom Background">
+                                    <OptionsGrid>
+                                        {bottoms.map((b) => (
+                                            <OptionTile
+                                                key={b.id}
+                                                label={b.name}
+                                                image={b.image}
+                                                selected={bottomBgId === b.id}
+                                                onClick={() => setBottomBgId(b.id)}
+                                            />
+                                        ))}
+                                    </OptionsGrid>
+                                </AccordionSection>
+                                <AccordionSection title="Glyph Layer">
+                                    <div className="space-y-3">
+                                        <OptionsGrid>
+                                            {glyphsWithNone.map((g) => (
+                                                <OptionTile
+                                                    key={g.id}
+                                                    label={g.name}
+                                                    image={g.image}
+                                                    selected={glyphId === g.id}
+                                                    onClick={() => setGlyphId(g.id)}
+                                                />
+                                            ))}
+                                        </OptionsGrid>
 
-                    {/* Token ID + style (custom only) */}
-                    {mode === 'custom' && (
-                        <Field labelText="Moonbird Token ID">
-                            <div className="flex flex-wrap items-center gap-2">
-                                <input
-                                    className="input w-36"
-                                    type="number"
-                                    placeholder="e.g. 8209"
-                                    min={1}
-                                    value={tokenId}
-                                    onChange={(e) => setTokenId(e.target.value.trim())}
-                                    disabled={controlsDisabled}
-                                />
-                                <div className="flex gap-1">
-                                    <button
-                                        type="button"
-                                        className={`btn ${style === 'illustrated' ? 'btn-primary' : 'btn-ghost'}`}
-                                        onClick={() => setStyle('illustrated')}
-                                        disabled={!ILLU_BASE || controlsDisabled}
-                                        title={ILLU_BASE ? 'Use illustrated' : 'Set NEXT_PUBLIC_MOONBIRDS_ILLU_BASE'}
+                                        {glyphId !== 'none' && (
+                                            <Field labelText="Glyph Tint">
+                                                <input
+                                                    type="color"
+                                                    value={glyphTint}
+                                                    onChange={(e) => setGlyphTint(e.target.value)}
+                                                />
+                                            </Field>
+                                        )}
+                                    </div>
+                                </AccordionSection>
+
+                                <AccordionSection title="Moonbird Token">
+                                    <div className="space-y-4">
+                                        <Field labelText="Token ID">
+                                            <div className="flex flex-wrap items-center gap-2">
+                                                <input
+                                                    className="input w-36"
+                                                    type="number"
+                                                    placeholder="e.g. 8209"
+                                                    min={1}
+                                                    value={tokenId}
+                                                    onChange={(e) => setTokenId(e.target.value.trim())}
+                                                    disabled={controlsDisabled}
+                                                />
+                                                <div className="flex gap-1">
+                                                    <button
+                                                        type="button"
+                                                        className={`btn ${style === 'illustrated' ? 'btn-primary' : 'btn-ghost'}`}
+                                                        onClick={() => setStyle('illustrated')}
+                                                        disabled={!ILLU_BASE || controlsDisabled}
+                                                        title={ILLU_BASE ? 'Use illustrated' : 'Set NEXT_PUBLIC_MOONBIRDS_ILLU_BASE'}
+                                                    >
+                                                        Illustrated
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        className={`btn ${style === 'pixel' ? 'btn-primary' : 'btn-ghost'}`}
+                                                        onClick={() => setStyle('pixel')}
+                                                        disabled={!PIXEL_BASE || controlsDisabled}
+                                                        title={PIXEL_BASE ? 'Use pixel' : 'Set NEXT_PUBLIC_MOONBIRDS_PIXEL_BASE'}
+                                                    >
+                                                        Pixel
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <p className="text-xs text-neutral-500">
+                                                Token is composited onto the selected background.
+                                            </p>
+                                        </Field>
+
+                                        <Field labelText="Token Scale">
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    className="input w-28"
+                                                    type="number"
+                                                    step={0.25}
+                                                    min={0.25}
+                                                    max={10}
+                                                    value={tokenScale}
+                                                    onChange={(e) => {
+                                                        const n = Number(e.target.value)
+                                                        setTokenScale(Number.isFinite(n) ? Math.max(0.05, Math.min(10, n)) : 1)
+                                                    }}
+                                                    title="Multiply the base size"
+                                                />
+                                                <input
+                                                    className="w-full accent-neutral-800"
+                                                    type="range"
+                                                    min={0.25}
+                                                    max={5}
+                                                    step={0.25}
+                                                    value={tokenScale}
+                                                    onChange={(e) => setTokenScale(Number(e.target.value))}
+                                                    title="Drag to scale"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-ghost"
+                                                    onClick={() => setTokenScale(1)}
+                                                    title="Reset"
+                                                >
+                                                    Reset
+                                                </button>
+                                            </div>
+                                        </Field>
+
+                                        <Field labelText="Nudge Position">
+                                            <div className="grid grid-cols-3 gap-2 w-[220px]">
+                                                <div />
+                                                {/* Up */}
+                                                <button
+                                                    type="button"
+                                                    className="btn"
+                                                    onClick={() => bump(setOffsetX, nudgeValue)}
+                                                    title="Up"
+                                                >↑</button>
+                                                <div />
+                                                {/* Left */}
+                                                <button
+                                                    type="button"
+                                                    className="btn"
+                                                    onClick={() => bump(setOffsetY, -nudgeValue)}
+                                                    title="Left"
+                                                >←</button>
+                                                {/* Center */}
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-ghost"
+                                                    onClick={() => { setOffsetX(0); setOffsetY(0) }}
+                                                    title="Center"
+                                                >•</button>
+                                                {/* Right */}
+                                                <button
+                                                    type="button"
+                                                    className="btn"
+                                                    onClick={() => bump(setOffsetY, nudgeValue)}
+                                                    title="Right"
+                                                >→</button>
+                                                <div />
+                                                {/* Down */}
+                                                <button
+                                                    type="button"
+                                                    className="btn"
+                                                    onClick={() => bump(setOffsetX, -nudgeValue)}
+                                                    title="Down"
+                                                >↓</button>
+                                                <div />
+                                            </div>
+                                            <div className="flex items-center gap-3 pt-2 text-xs text-neutral-600">
+                                                <span>X: {offsetX}px</span>
+                                                <span>Y: {offsetY}px</span>
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-ghost btn-sm"
+                                                    onClick={() => { setOffsetX(0); setOffsetY(0) }}
+                                                >
+                                                    Reset
+                                                </button>
+                                            </div>
+                                        </Field>
+                                    </div>
+                                </AccordionSection>
+                            </>
+                        )}
+
+                        {/* 3) JK-only accordion (closed by default; Grip is the only open one) */}
+                        {mode === 'jk' && hasJK && (
+                            <AccordionSection title="JK Design">
+                                <Field labelText="Design">
+                                    <select
+                                        className="input"
+                                        value={jkId}
+                                        onChange={(e) => setJkId(e.target.value)}
                                     >
-                                        Illustrated
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className={`btn ${style === 'pixel' ? 'btn-primary' : 'btn-ghost'}`}
-                                        onClick={() => setStyle('pixel')}
-                                        disabled={!PIXEL_BASE || controlsDisabled}
-                                        title={PIXEL_BASE ? 'Use pixel' : 'Set NEXT_PUBLIC_MOONBIRDS_PIXEL_BASE'}
-                                    >
-                                        Pixel
-                                    </button>
-                                </div>
-                            </div>
-                            <p className="text-xs text-neutral-500">
-                                Token is composited onto the selected background (custom mode only).
-                            </p>
-                        </Field>
-                    )}
-
-                    {/* Scale (custom only) */}
-                    {mode === 'custom' && (
-                        <Field labelText="Token Scale">
-                            <div className="flex items-center gap-2">
-                                <input
-                                    className="input w-28"
-                                    type="number"
-                                    step={0.25}
-                                    min={0.25}
-                                    max={10}
-                                    value={tokenScale}
-                                    onChange={(e) => {
-                                        const n = Number(e.target.value)
-                                        setTokenScale(Number.isFinite(n) ? Math.max(0.05, Math.min(10, n)) : 1)
-                                    }}
-                                    title="Multiply the base size"
-                                    disabled={controlsDisabled}
-                                />
-                                <input
-                                    className="w-full accent-neutral-800"
-                                    type="range"
-                                    min={0.25}
-                                    max={5}
-                                    step={0.25}
-                                    value={tokenScale}
-                                    onChange={(e) => setTokenScale(Number(e.target.value))}
-                                    title="Drag to scale"
-                                    disabled={controlsDisabled}
-                                />
-                                <button
-                                    type="button"
-                                    className="btn btn-ghost"
-                                    onClick={() => setTokenScale(1)}
-                                    title="Reset"
-                                    disabled={controlsDisabled}
-                                >
-                                    Reset
-                                </button>
-                            </div>
-                        </Field>
-                    )}
-
-                    {/* Nudge (custom only) */}
-                    {mode === 'custom' && (
-                        <Field labelText="Nudge Position">
-                            <div className="grid grid-cols-3 gap-2 w-[220px]">
-                                <div />
-                                <button type="button" className="btn" onClick={() => bump(setOffsetX, nudgeValue)} title="Up">↑</button>
-                                <div />
-                                <button type="button" className="btn" onClick={() => bump(setOffsetY, -nudgeValue)} title="Left">←</button>
-                                <button type="button" className="btn btn-ghost" onClick={() => { setOffsetX(0); setOffsetY(0) }} title="Center">•</button>
-                                <button type="button" className="btn" onClick={() => bump(setOffsetY, nudgeValue)} title="Right">→</button>
-                                <div />
-                                <button type="button" className="btn" onClick={() => bump(setOffsetX, -nudgeValue)} title="Down">↓</button>
-                                <div />
-                            </div>
-                            <div className="flex items-center gap-3 pt-2 text-xs text-neutral-600">
-                                <span>X: {offsetX}px</span>
-                                <span>Y: {offsetY}px</span>
-                                <button
-                                    type="button"
-                                    className="btn btn-ghost btn-sm"
-                                    onClick={() => { setOffsetX(0); setOffsetY(0) }}
-                                    disabled={controlsDisabled}
-                                >
-                                    Reset
-                                </button>
-                            </div>
-                        </Field>
-                    )}
+                                        {jkDesigns.map((d) => (
+                                            <option key={d.id} value={d.id}>{d.name}</option>
+                                        ))}
+                                    </select>
+                                    <p className="text-xs text-neutral-500">
+                                        Fixed artwork; token and glyph controls are hidden.
+                                    </p>
+                                </Field>
+                            </AccordionSection>
+                        )}
+                    </div>
 
                     <div className="text-xs text-neutral-500 pt-2">
                         Preview is web-resolution; final print assets are prepared offline.
@@ -456,8 +635,8 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
             </aside>
 
             {/* Preview (right) */}
-            <section className="rounded-2xl border bg-white shadow-sm p-4 lg:p-5">
-                <h2 className="text-sm font-semibold mb-3">Preview</h2>
+            <section className="rounded-2xl border shadow-sm p-4 lg:p-5">
+                {/* <h2 className="text-sm font-semibold mb-3">Preview</h2> */}
                 <div className="rounded-xl bg-white overflow-hidden">
                     <DeckViewerMinimal
                         topUrl={selectedGrip.image}
@@ -468,4 +647,3 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
         </div>
     )
 }
-

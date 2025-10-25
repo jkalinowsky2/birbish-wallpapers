@@ -125,7 +125,7 @@ export default function DeckViewerMinimal({
 
                 <Suspense fallback={null}>
                     <DeckMeshes topUrl={topUrl} bottomUrl={bottomUrl} />
-                    <ContactShadows position={[0, 0.0, 0]} opacity={0.5} scale={4} blur={1.2} far={2} />
+                    <ContactShadows position={[0, 0.0, 0]} opacity={0.5} scale={2} blur={1.2} far={2} />
                 </Suspense>
 
                 <OrbitControls
