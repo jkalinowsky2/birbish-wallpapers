@@ -14,7 +14,10 @@
         { "id": "mb-blkbirbish", "label": "birbish", "image": "/deckAssets/grips/mb_birbish_blk.png" },
         { "id": "mb-red-pattern",  "label": "red pattern",  "image": "/deckAssets/grips/mb_red_pattern.png" },
         { "id": "mb-black-pattern", "label": "black pattern", "image": "/deckAssets/grips/mb_black_pattern.png" },
-
+        { "id": "mb-red-toobins", "label": "red toobins", "image": "/deckAssets/grips/mb_toobins_red.png" },
+        { "id": "mb-black-toobins", "label": "black toobins", "image": "/deckAssets/grips/mb_toobins_black.png" },
+        
+        { "id": "mb-red", "label": "red", "image": "/deckAssets/grips/mb_red.png" },
         { "id": "none", "label": "none", "image": "/deckAssets/grips/none.png" }
       ],
 
