@@ -30,7 +30,6 @@ function loadTexture(url: string) {
             url,
             async (tex) => {
                 try {
-                    // @ts-ignore - decode not typed on HTMLImageElement everywhere
                     if (tex.image?.decode) await tex.image.decode()
                 } catch {
                     // ignore decode errors
