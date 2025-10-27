@@ -2,6 +2,8 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
+import Image from 'next/image'
+import NextImage from 'next/image'
 import DeckViewerMinimal from './DeckViewerMinimal'
 import { ChevronDown } from 'lucide-react'
 
@@ -16,9 +18,9 @@ export type GlyphOption = { id: string; name: string; image: string }
 export type DeckComposerConfig = {
     collectionKey: string
     grips: GripOption[]
-    bottoms: BottomOption[]
-    glyphs?: GlyphOption[]
-    jkDesigns?: JKDesign[]
+    bottoms: BottomOption[]              // backgrounds for Custom mode
+    glyphs?: GlyphOption[]               // optional glyph overlay choices (PNG with transparency)
+    jkDesigns?: JKDesign[]               // fixed bottoms (no edits)
 }
 
 type LayoutMode = 'verticalTail' | 'horizontalLeft'
@@ -66,12 +68,14 @@ function OptionTile({
             ].join(' ')}
         >
             {/* inset thumbnail box */}
-            <div className="w-14 h-14 rounded-md overflow-hidden bg-neutral-100">
-                <img
+            <div className="w-14 h-14 rounded-md overflow-hidden bg-neutral-100 relative">
+                <Image
                     src={image}
                     alt={label}
-                    className="block w-full h-full object-cover"
-                    loading="lazy"
+                    fill
+                    sizes="56px"
+                    style={{ objectFit: 'cover' }}
+                    priority={false}
                 />
             </div>
 
@@ -109,7 +113,7 @@ export function AccordionSection({
             <button
                 type="button"
                 aria-expanded={open}
-                onClick={() => setOpen(o => !o)}
+                onClick={() => setOpen((o) => !o)}
                 className={`
           w-full flex items-center justify-between
           rounded-full px-5 py-3 mb-2
@@ -163,21 +167,28 @@ function buildPixelUrl(id: string) {
     return `${PIXEL_BASE}/${n}.png`
 }
 
-/* ---------- Image loader (cache + decode) ---------- */
+/* ---------- Image loader (with cache + decode) ---------- */
 const imgCache = new Map<string, Promise<HTMLImageElement>>()
 
 function loadImageCached(src: string): Promise<HTMLImageElement> {
     if (!src) return Promise.reject(new Error('empty src'))
+
     if (!imgCache.has(src)) {
         const p = new Promise<HTMLImageElement>((resolve, reject) => {
-            const img = new Image()
+            if (typeof window === 'undefined' || !window.Image) {
+                reject(new Error('Image constructor not available'))
+                return
+            }
+
+            const img = new window.Image() // <— use the DOM constructor explicitly
             img.crossOrigin = 'anonymous'
             img.referrerPolicy = 'no-referrer'
             img.onload = async () => {
                 try {
-                    // @ts-ignore
                     if (img.decode) await img.decode()
-                } catch {/* ignore */ }
+                } catch {
+                    // ignore decode errors; the image is still usable after onload
+                }
                 resolve(img)
             }
             img.onerror = reject
@@ -185,18 +196,8 @@ function loadImageCached(src: string): Promise<HTMLImageElement> {
         })
         imgCache.set(src, p)
     }
-    return imgCache.get(src)!
-}
 
-/* ---------- Preload ALL assets once (prevents first-use flicker) ---------- */
-function preloadAllAssets(config: DeckComposerConfig) {
-    const urls = new Set<string>()
-    config.grips.forEach(g => g.image && urls.add(g.image))
-    config.bottoms.forEach(b => b.image && urls.add(b.image))
-    config.glyphs?.forEach(g => g.image && urls.add(g.image))
-    config.jkDesigns?.forEach(j => j.image && urls.add(j.image))
-    // fire-and-forget
-    urls.forEach(u => loadImageCached(u).catch(() => { }))
+    return imgCache.get(src)!
 }
 
 /* ---------- Main component ---------- */
@@ -215,7 +216,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
     const [gripId, setGripId] = useState<string>(initialGrip.id)
     const [bottomBgId, setBottomBgId] = useState<string>(initialBottomBG.id)
 
-    // Glyph choice (include your explicit “none” asset for the tile)
+    // Glyph choice
     const glyphsWithNone = useMemo<GlyphOption[]>(
         () => [{ id: 'none', name: 'None', image: '/deckAssets/moonbirds/none.png' }, ...glyphs],
         [glyphs]
@@ -224,15 +225,16 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
     const [glyphTint, setGlyphTint] = useState('#ff1a1a')
 
     // Token controls (custom mode)
-    const [tokenId, setTokenId] = useState<string>('')   // moonbird ID
-    const [style, setStyle] = useState<'illustrated' | 'pixel'>('illustrated')
-    const [layout, setLayout] = useState<LayoutMode>('horizontalLeft')
+    const [tokenId, setTokenId] = useState<string>('') // moonbird ID
+    // We don’t expose layout controls right now; keep a fixed layout:
+    const layout: LayoutMode = 'horizontalLeft'
 
     // Custom controls
     const [tokenScale, setTokenScale] = useState<number>(3.25)
     const [offsetX, setOffsetX] = useState<number>(-40)
     const [offsetY, setOffsetY] = useState<number>(60)
     const nudgeValue = 100
+    const [style, setStyle] = useState<'illustrated' | 'pixel'>('illustrated')
 
     // JK-mode state
     const [jkId, setJkId] = useState<string>(initialJKId)
@@ -244,109 +246,160 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
     const selectedGrip = grips.find((g) => g.id === gripId) ?? initialGrip
     const selectedBottomBG = bottoms.find((b) => b.id === bottomBgId) ?? initialBottomBG
     const selectedJK = jkDesigns.find((j) => j.id === jkId) ?? jkDesigns[0]
-    const selectedGlyph = glyphsWithNone.find(g => g.id === glyphId) ?? glyphsWithNone[0]
+    const selectedGlyph = glyphsWithNone.find((g) => g.id === glyphId) ?? glyphsWithNone[0]
 
     // Offscreen canvas
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
-    useEffect(() => {
-        if (!canvasRef.current && typeof document !== 'undefined') {
-            canvasRef.current = document.createElement('canvas')
-        }
-    }, [])
+    if (!canvasRef.current && typeof document !== 'undefined') {
+        canvasRef.current = document.createElement('canvas')
+    }
 
-    /* ---------- preload everything once on mount ---------- */
+    /* ---------- WARM THE CACHE ---------- */
     useEffect(() => {
-        preloadAllAssets(config)
-    }, [config])
+        const urls: string[] = [selectedBottomBG.image, selectedGrip.image]
+        if (glyphId !== 'none' && selectedGlyph.image) urls.push(selectedGlyph.image)
 
-    /* ---------- COMPOSITOR (draw offscreen, swap after ready) ---------- */
+        // Pre-warm a few likely next choices
+        bottoms.slice(0, 4).forEach((b) => urls.push(b.image))
+        glyphs.slice(0, 2).forEach((g) => urls.push(g.image))
+
+        urls.forEach((u) => {
+            if (u) loadImageCached(u).catch(() => { })
+        })
+    }, [bottoms, glyphs, selectedBottomBG.image, selectedGrip.image, glyphId, selectedGlyph?.image])
+
+    /* ---------- COMPOSITOR ---------- */
     useEffect(() => {
         let cancelled = false
 
         async function buildBottom() {
-            let newUrl = ''
             try {
+                // JK mode: preload + swap
                 if (mode === 'jk' && selectedJK?.image) {
-                    // JK mode: just preload and use decoded image
-                    const jkImg = await loadImageCached(selectedJK.image)
-                    await jkImg.decode?.().catch(() => { }) // ensure decoded
-                    newUrl = selectedJK.image
-                } else {
-                    // CUSTOM MODE
-                    const bgSrc = selectedBottomBG.image
-                    const glyphSrc = glyphId !== 'none' ? selectedGlyph.image : ''
-                    const wantPixel = style === 'pixel'
-                    const tokenSrc = tokenId
-                        ? (wantPixel ? buildPixelUrl(tokenId) : buildIllustratedUrl(tokenId))
-                        : ''
+                    await loadImageCached(selectedJK.image)
+                    if (!cancelled) setBottomPreviewUrl(selectedJK.image)
+                    return
+                }
 
-                    const [bgImg, glyphImgOrNull, tokenImgOrNull] = await Promise.all([
-                        loadImageCached(bgSrc),
-                        glyphSrc ? loadImageCached(glyphSrc) : Promise.resolve(null as any),
-                        tokenSrc ? loadImageCached(tokenSrc) : Promise.resolve(null as any),
-                    ])
+                // CUSTOM mode: determine sources first
+                const bgSrc = selectedBottomBG.image
+                const glyphSrc = glyphId !== 'none' && selectedGlyph.image ? selectedGlyph.image : ''
 
-                    const c = canvasRef.current!
-                    const ctx = c.getContext('2d')
-                    if (!ctx) return
+                const wantPixel = style === 'pixel'
+                const tokenSrc = tokenId
+                    ? wantPixel
+                        ? buildPixelUrl(tokenId)
+                        : buildIllustratedUrl(tokenId)
+                    : ''
 
-                    const W = bgImg.naturalWidth || 1600
-                    const H = bgImg.naturalHeight || 1600
-                    c.width = W
-                    c.height = H
-                    ctx.clearRect(0, 0, W, H)
-                    ctx.drawImage(bgImg, 0, 0, W, H)
+                // Load all in parallel (allow nullables cleanly)
+                const [bgImg, glyphImg, tokenImg] = await Promise.all([
+                    loadImageCached(bgSrc),
+                    glyphSrc ? loadImageCached(glyphSrc) : Promise.resolve(null),
+                    tokenSrc ? loadImageCached(tokenSrc) : Promise.resolve(null),
+                ]) as [HTMLImageElement, HTMLImageElement | null, HTMLImageElement | null]
+                // Draw offscreen
+                const c = canvasRef.current
+                if (!c) return
+                const ctx = c.getContext('2d')
+                if (!ctx) return
 
-                    if (glyphImgOrNull && glyphSrc) {
-                        const gImg = glyphImgOrNull
-                        const scale = Math.max(W / gImg.width, H / gImg.height)
-                        const gW = gImg.width * scale
-                        const gH = gImg.height * scale
-                        const gX = (W - gW) / 2
-                        const gY = (H - gH) / 2
+                const W = bgImg.naturalWidth || bgImg.width || 1600
+                const H = bgImg.naturalHeight || bgImg.height || 1600
+                c.width = W
+                c.height = H
 
-                        const tmp = document.createElement('canvas')
-                        tmp.width = gW
-                        tmp.height = gH
-                        const tctx = tmp.getContext('2d')!
-                        tctx.drawImage(gImg, 0, 0, gW, gH)
+                ctx.clearRect(0, 0, W, H)
+
+                // 1) Background
+                ctx.drawImage(bgImg, 0, 0, W, H)
+
+                // 2) Glyph (tinted), if any
+                if (glyphSrc && glyphImg) {
+                    const gSrcW = glyphImg.naturalWidth || glyphImg.width
+                    const gSrcH = glyphImg.naturalHeight || glyphImg.height
+
+                    // cover fit
+                    const scale = Math.max(W / gSrcW, H / gSrcH)
+                    const gW = Math.round(gSrcW * scale)
+                    const gH = Math.round(gSrcH * scale)
+                    const gX = Math.round((W - gW) / 2)
+                    const gY = Math.round((H - gH) / 2)
+
+                    // tint on temp canvas
+                    const tmp = document.createElement('canvas')
+                    tmp.width = Math.max(1, gW)
+                    tmp.height = Math.max(1, gH)
+                    const tctx = tmp.getContext('2d')
+                    if (tctx) {
+                        tctx.imageSmoothingEnabled = true
+                        tctx.drawImage(glyphImg, 0, 0, gW, gH)
                         tctx.globalCompositeOperation = 'source-in'
                         tctx.fillStyle = glyphTint
                         tctx.fillRect(0, 0, gW, gH)
+                        tctx.globalCompositeOperation = 'source-over'
                         ctx.drawImage(tmp, gX, gY)
                     }
+                }
 
-                    if (tokenImgOrNull && tokenSrc) {
-                        const tokenImg = tokenImgOrNull
-                        const srcW = tokenImg.naturalWidth || tokenImg.width
-                        const srcH = tokenImg.naturalHeight || tokenImg.height
-                        const baseWidthRatio =
-                            style === 'pixel' ? 0.5 : 0.38
-                        const tW = W * baseWidthRatio * tokenScale
-                        const tH = srcH * (tW / srcW)
-                        const dx = (W - tW) / 2 + offsetX
-                        const dy = (H - tH - H * 0.06) + offsetY
+                // 3) Token, if any
+                if (tokenSrc && tokenImg) {
+                    const srcW = tokenImg.naturalWidth || tokenImg.width
+                    const srcH = tokenImg.naturalHeight || tokenImg.height
+
+                    const wantHorizontal = layout === 'horizontalLeft'
+                    const baseWidthRatio =
+                        style === 'pixel'
+                            ? wantHorizontal
+                                ? 0.5
+                                : 0.55
+                            : wantHorizontal
+                                ? 0.38
+                                : 0.42
+
+                    const scaleMul = Math.max(0.05, Math.min(10, tokenScale))
+                    const tW = W * baseWidthRatio * scaleMul
+                    const tH = srcH * (tW / srcW)
+
+                    const HSTART = { cx: 675, cy: 700 }
+
+                    if (wantHorizontal) {
+                        const cx = Math.round(HSTART.cx + offsetX)
+                        const cy = Math.round(HSTART.cy + offsetY)
+
+                        const prev = ctx.imageSmoothingEnabled
+                        ctx.imageSmoothingEnabled = !(style === 'pixel')
+                        ctx.save()
+                        ctx.translate(cx, cy)
+                        ctx.rotate(Math.PI / 2) // 90° clockwise
+                        ctx.drawImage(tokenImg, -tW / 2, -tH / 2, tW, tH)
+                        ctx.restore()
+                        ctx.imageSmoothingEnabled = prev
+                    } else {
+                        const baseDx = Math.round((W - tW) / 2)
+                        const baseDy = Math.round(H - tH - H * 0.06)
+                        const dx = baseDx + Math.round(offsetX)
+                        const dy = baseDy + Math.round(offsetY)
+
+                        const prev = ctx.imageSmoothingEnabled
+                        ctx.imageSmoothingEnabled = !(style === 'pixel')
                         ctx.drawImage(tokenImg, dx, dy, tW, tH)
+                        ctx.imageSmoothingEnabled = prev
                     }
-
-                    newUrl = c.toDataURL('image/png')
                 }
 
-                // 🧠 Wait for image decode before swapping into React
-                if (newUrl) {
-                    const img = new Image()
-                    img.loading = 'eager'
-                    img.src = newUrl
-                    await img.decode?.().catch(() => { })
-                    if (!cancelled) setBottomPreviewUrl(newUrl)
-                }
-            } catch (err) {
-                console.warn('buildBottom failed:', err)
+                // finalize
+                const url = c.toDataURL('image/png')
+                if (!cancelled) setBottomPreviewUrl(url)
+            } catch {
+                if (!cancelled) setBottomPreviewUrl((prev) => prev) // keep previous to avoid flicker
             }
         }
 
         buildBottom()
-        return () => { cancelled = true }
+        return () => {
+            cancelled = true
+        }
     }, [
         mode,
         selectedJK?.image,
@@ -364,7 +417,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
 
     // helpers
     const bump = (setter: React.Dispatch<React.SetStateAction<number>>, delta: number) => {
-        setter(v => v + delta)
+        setter((v) => v + delta)
     }
 
     const controlsDisabled = mode === 'jk'
@@ -399,12 +452,12 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                         </div>
                     )}
 
-                    {/* Key the accordion stack by `mode` so the first section opens by default when switching */}
+                    {/* Key the accordion stack by `mode` */}
                     <div key={`accordion-stack-${mode}`}>
-                        {/* 1) Grip (open by default unless you want closed for JK mode) */}
+                        {/* 1) Grip (open by default unless in JK mode you prefer closed) */}
                         <AccordionSection title="Grip Tape" defaultOpen={mode !== 'jk'}>
                             <OptionsGrid>
-                                {grips.map(g => (
+                                {grips.map((g) => (
                                     <OptionTile
                                         key={g.id}
                                         label={g.name}
@@ -421,7 +474,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                             <>
                                 <AccordionSection title="Bottom Background">
                                     <OptionsGrid>
-                                        {bottoms.map(b => (
+                                        {bottoms.map((b) => (
                                             <OptionTile
                                                 key={b.id}
                                                 label={b.name}
@@ -436,7 +489,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                 <AccordionSection title="Glyph Layer">
                                     <div className="space-y-3">
                                         <OptionsGrid>
-                                            {glyphsWithNone.map(g => (
+                                            {glyphsWithNone.map((g) => (
                                                 <OptionTile
                                                     key={g.id}
                                                     label={g.name}
@@ -543,7 +596,9 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                                     className="btn"
                                                     onClick={() => bump(setOffsetX, nudgeValue)}
                                                     title="Up"
-                                                >↑</button>
+                                                >
+                                                    ↑
+                                                </button>
                                                 <div />
                                                 {/* Left */}
                                                 <button
@@ -551,21 +606,30 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                                     className="btn"
                                                     onClick={() => bump(setOffsetY, -nudgeValue)}
                                                     title="Left"
-                                                >←</button>
+                                                >
+                                                    ←
+                                                </button>
                                                 {/* Center */}
                                                 <button
                                                     type="button"
                                                     className="btn btn-ghost"
-                                                    onClick={() => { setOffsetX(0); setOffsetY(0) }}
+                                                    onClick={() => {
+                                                        setOffsetX(0)
+                                                        setOffsetY(0)
+                                                    }}
                                                     title="Center"
-                                                >•</button>
+                                                >
+                                                    •
+                                                </button>
                                                 {/* Right */}
                                                 <button
                                                     type="button"
                                                     className="btn"
                                                     onClick={() => bump(setOffsetY, nudgeValue)}
                                                     title="Right"
-                                                >→</button>
+                                                >
+                                                    →
+                                                </button>
                                                 <div />
                                                 {/* Down */}
                                                 <button
@@ -573,7 +637,9 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                                     className="btn"
                                                     onClick={() => bump(setOffsetX, -nudgeValue)}
                                                     title="Down"
-                                                >↓</button>
+                                                >
+                                                    ↓
+                                                </button>
                                                 <div />
                                             </div>
                                             <div className="flex items-center gap-3 pt-2 text-xs text-neutral-600">
@@ -582,7 +648,10 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                                 <button
                                                     type="button"
                                                     className="btn btn-ghost btn-sm"
-                                                    onClick={() => { setOffsetX(0); setOffsetY(0) }}
+                                                    onClick={() => {
+                                                        setOffsetX(0)
+                                                        setOffsetY(0)
+                                                    }}
                                                 >
                                                     Reset
                                                 </button>
@@ -602,8 +671,10 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                         value={jkId}
                                         onChange={(e) => setJkId(e.target.value)}
                                     >
-                                        {jkDesigns.map(d => (
-                                            <option key={d.id} value={d.id}>{d.name}</option>
+                                        {jkDesigns.map((d) => (
+                                            <option key={d.id} value={d.id}>
+                                                {d.name}
+                                            </option>
                                         ))}
                                     </select>
                                     <p className="text-xs text-neutral-500">
@@ -623,10 +694,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
             {/* Preview (right) */}
             <section className="rounded-2xl border shadow-sm p-4 lg:p-5">
                 <div className="rounded-xl bg-white overflow-hidden">
-                    <DeckViewerMinimal
-                        topUrl={selectedGrip.image}
-                        bottomUrl={bottomPreviewUrl}
-                    />
+                    <DeckViewerMinimal topUrl={selectedGrip.image} bottomUrl={bottomPreviewUrl} />
                 </div>
             </section>
         </div>
@@ -651,9 +719,9 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
 // export type DeckComposerConfig = {
 //     collectionKey: string
 //     grips: GripOption[]
-//     bottoms: BottomOption[]              // backgrounds for Custom mode
-//     glyphs?: GlyphOption[]               // optional glyph overlay choices (PNG with transparency)
-//     jkDesigns?: JKDesign[]               // fixed bottoms (no edits)
+//     bottoms: BottomOption[]
+//     glyphs?: GlyphOption[]
+//     jkDesigns?: JKDesign[]
 // }
 
 // type LayoutMode = 'verticalTail' | 'horizontalLeft'
@@ -693,14 +761,14 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
 //             type="button"
 //             onClick={onClick}
 //             className={[
-//                 "flex flex-col items-center justify-start",
-//                 "rounded-xl bg-white border border-neutral-200 p-2",
-//                 "transition hover:border-neutral-300",
-//                 "overflow-hidden",
-//                 selected ? "shadow-[inset_0_0_0_2px_#111]" : "shadow-none",
-//             ].join(" ")}
+//                 'flex flex-col items-center justify-start',
+//                 'rounded-xl bg-white border border-neutral-200 p-2',
+//                 'transition hover:border-neutral-300',
+//                 'overflow-hidden',
+//                 selected ? 'shadow-[inset_0_0_0_2px_#111]' : 'shadow-none',
+//             ].join(' ')}
 //         >
-//             {/* slightly smaller thumb box so it’s inset visually */}
+//             {/* inset thumbnail box */}
 //             <div className="w-14 h-14 rounded-md overflow-hidden bg-neutral-100">
 //                 <img
 //                     src={image}
@@ -761,7 +829,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
 //                 />
 //             </button>
 
-//             {/* Content: lighter panel with soft shadow, rounded-2xl */}
+//             {/* Content */}
 //             <div
 //                 className={`
 //           overflow-hidden transition-[max-height,opacity,transform]
@@ -797,39 +865,41 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
 //     if (!Number.isFinite(n) || n < 1 || !PIXEL_BASE) return ''
 //     return `${PIXEL_BASE}/${n}.png`
 // }
-// const imgCache = new Map<string, Promise<HTMLImageElement>>();
-// /* ---------- Image loader ---------- */
-// function loadImage(src: string): Promise<HTMLImageElement> {
-//     return new Promise((resolve, reject) => {
-//         const img = new Image()
-//         img.crossOrigin = 'anonymous'
-//         img.onload = () => resolve(img)
-//         img.onerror = reject
-//         img.src = src
-//     })
-// }
+
+// /* ---------- Image loader (cache + decode) ---------- */
+// const imgCache = new Map<string, Promise<HTMLImageElement>>()
+
 // function loadImageCached(src: string): Promise<HTMLImageElement> {
-//     if (!src) return Promise.reject(new Error('empty src'));
+//     if (!src) return Promise.reject(new Error('empty src'))
 //     if (!imgCache.has(src)) {
 //         const p = new Promise<HTMLImageElement>((resolve, reject) => {
-//             const img = new Image();
-//             img.crossOrigin = 'anonymous';
-//             img.referrerPolicy = 'no-referrer';
+//             const img = new Image()
+//             img.crossOrigin = 'anonymous'
+//             img.referrerPolicy = 'no-referrer'
 //             img.onload = async () => {
 //                 try {
-//                     // Ensure pixels are decoded before we use it (prevents flicker)
-//                     // decode() is widely supported; fall back to resolve if not.
 //                     // @ts-ignore
-//                     if (img.decode) await img.decode();
-//                 } catch { /* ignore decode errors; image is still usable */ }
-//                 resolve(img);
-//             };
-//             img.onerror = reject;
-//             img.src = src;
-//         });
-//         imgCache.set(src, p);
+//                     if (img.decode) await img.decode()
+//                 } catch {/* ignore */ }
+//                 resolve(img)
+//             }
+//             img.onerror = reject
+//             img.src = src
+//         })
+//         imgCache.set(src, p)
 //     }
-//     return imgCache.get(src)!;
+//     return imgCache.get(src)!
+// }
+
+// /* ---------- Preload ALL assets once (prevents first-use flicker) ---------- */
+// function preloadAllAssets(config: DeckComposerConfig) {
+//     const urls = new Set<string>()
+//     config.grips.forEach(g => g.image && urls.add(g.image))
+//     config.bottoms.forEach(b => b.image && urls.add(b.image))
+//     config.glyphs?.forEach(g => g.image && urls.add(g.image))
+//     config.jkDesigns?.forEach(j => j.image && urls.add(j.image))
+//     // fire-and-forget
+//     urls.forEach(u => loadImageCached(u).catch(() => { }))
 // }
 
 // /* ---------- Main component ---------- */
@@ -848,7 +918,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
 //     const [gripId, setGripId] = useState<string>(initialGrip.id)
 //     const [bottomBgId, setBottomBgId] = useState<string>(initialBottomBG.id)
 
-//     // Glyph choice (with “none” as default)
+//     // Glyph choice (include your explicit “none” asset for the tile)
 //     const glyphsWithNone = useMemo<GlyphOption[]>(
 //         () => [{ id: 'none', name: 'None', image: '/deckAssets/moonbirds/none.png' }, ...glyphs],
 //         [glyphs]
@@ -862,9 +932,9 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
 //     const [layout, setLayout] = useState<LayoutMode>('horizontalLeft')
 
 //     // Custom controls
-//     const [tokenScale, setTokenScale] = useState<number>(3.25) // multiplies base size
-//     const [offsetX, setOffsetX] = useState<number>(-40)        // px relative to center (canvas space)
-//     const [offsetY, setOffsetY] = useState<number>(60)         // px relative to center (canvas space)
+//     const [tokenScale, setTokenScale] = useState<number>(3.25)
+//     const [offsetX, setOffsetX] = useState<number>(-40)
+//     const [offsetY, setOffsetY] = useState<number>(60)
 //     const nudgeValue = 100
 
 //     // JK-mode state
@@ -881,146 +951,100 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
 
 //     // Offscreen canvas
 //     const canvasRef = useRef<HTMLCanvasElement | null>(null)
-//     if (!canvasRef.current && typeof document !== 'undefined') {
-//         canvasRef.current = document.createElement('canvas')
-//     }
-
 //     useEffect(() => {
-//         // Warm the currently selected assets
-//         const urls: string[] = [
-//             selectedBottomBG.image,
-//             selectedGrip.image,
-//         ];
-//         if (glyphId !== 'none' && selectedGlyph.image) urls.push(selectedGlyph.image);
+//         if (!canvasRef.current && typeof document !== 'undefined') {
+//             canvasRef.current = document.createElement('canvas')
+//         }
+//     }, [])
 
-//         // Optionally pre-warm the first few options in each list
-//         bottoms.slice(0, 4).forEach(b => urls.push(b.image));
-//         glyphs.slice(0, 2).forEach(g => urls.push(g.image));
+//     /* ---------- preload everything once on mount ---------- */
+//     useEffect(() => {
+//         preloadAllAssets(config)
+//     }, [config])
 
-//         urls.forEach(u => { if (u) loadImageCached(u).catch(() => { }); });
-//     }, [bottoms, glyphs, selectedBottomBG.image, selectedGrip.image, glyphId, selectedGlyph?.image]);
-
-
-//     /* ---------- COMPOSITOR ---------- */
+//     /* ---------- COMPOSITOR (draw offscreen, swap after ready) ---------- */
 //     useEffect(() => {
 //         let cancelled = false
 
 //         async function buildBottom() {
-//             // JK mode: use fixed art directly
-//             if (mode === 'jk' && selectedJK?.image) {
-//                 if (!cancelled) setBottomPreviewUrl(selectedJK.image)
-//                 return
-//             }
-
-//             // CUSTOM mode
+//             let newUrl = ''
 //             try {
-//                 const bgImg = await loadImage(selectedBottomBG.image)
+//                 if (mode === 'jk' && selectedJK?.image) {
+//                     // JK mode: just preload and use decoded image
+//                     const jkImg = await loadImageCached(selectedJK.image)
+//                     await jkImg.decode?.().catch(() => { }) // ensure decoded
+//                     newUrl = selectedJK.image
+//                 } else {
+//                     // CUSTOM MODE
+//                     const bgSrc = selectedBottomBG.image
+//                     const glyphSrc = glyphId !== 'none' ? selectedGlyph.image : ''
+//                     const wantPixel = style === 'pixel'
+//                     const tokenSrc = tokenId
+//                         ? (wantPixel ? buildPixelUrl(tokenId) : buildIllustratedUrl(tokenId))
+//                         : ''
 
-//                 const c = canvasRef.current!
-//                 const ctx = c.getContext('2d')
-//                 if (!ctx) return
+//                     const [bgImg, glyphImgOrNull, tokenImgOrNull] = await Promise.all([
+//                         loadImageCached(bgSrc),
+//                         glyphSrc ? loadImageCached(glyphSrc) : Promise.resolve(null as any),
+//                         tokenSrc ? loadImageCached(tokenSrc) : Promise.resolve(null as any),
+//                     ])
 
-//                 const W = bgImg.naturalWidth || bgImg.width || 1600
-//                 const H = bgImg.naturalHeight || bgImg.height || 1600
-//                 c.width = W
-//                 c.height = H
+//                     const c = canvasRef.current!
+//                     const ctx = c.getContext('2d')
+//                     if (!ctx) return
 
-//                 ctx.clearRect(0, 0, W, H)
+//                     const W = bgImg.naturalWidth || 1600
+//                     const H = bgImg.naturalHeight || 1600
+//                     c.width = W
+//                     c.height = H
+//                     ctx.clearRect(0, 0, W, H)
+//                     ctx.drawImage(bgImg, 0, 0, W, H)
 
-//                 // 1) Background
-//                 ctx.drawImage(bgImg, 0, 0, W, H)
+//                     if (glyphImgOrNull && glyphSrc) {
+//                         const gImg = glyphImgOrNull
+//                         const scale = Math.max(W / gImg.width, H / gImg.height)
+//                         const gW = gImg.width * scale
+//                         const gH = gImg.height * scale
+//                         const gX = (W - gW) / 2
+//                         const gY = (H - gH) / 2
 
-//                 // 2) Optional Glyph (between background and token)
-//                 if (selectedGlyph.id !== 'none' && selectedGlyph.image) {
-//                     try {
-//                         const glyphImg = await loadImage(selectedGlyph.image)
-//                         const gSrcW = glyphImg.naturalWidth || glyphImg.width
-//                         const gSrcH = glyphImg.naturalHeight || glyphImg.height
-
-//                         // Fit to deck (cover) while preserving AR
-//                         const scale = Math.max(W / gSrcW, H / gSrcH)
-//                         const gW = Math.round(gSrcW * scale)
-//                         const gH = Math.round(gSrcH * scale)
-//                         const gX = Math.round((W - gW) / 2)
-//                         const gY = Math.round((H - gH) / 2)
-
-//                         // Tint on an offscreen canvas so blending is isolated
 //                         const tmp = document.createElement('canvas')
-//                         tmp.width = Math.max(1, gW)
-//                         tmp.height = Math.max(1, gH)
-//                         const tctx = tmp.getContext('2d')
-//                         if (tctx) {
-//                             tctx.imageSmoothingEnabled = true
-//                             tctx.drawImage(glyphImg, 0, 0, gW, gH)
-//                             tctx.globalCompositeOperation = 'source-in'
-//                             tctx.fillStyle = glyphTint
-//                             tctx.fillRect(0, 0, gW, gH)
-//                             tctx.globalCompositeOperation = 'source-over'
-//                             ctx.drawImage(tmp, gX, gY)
-//                         }
-//                     } catch (err) {
-//                         console.warn('Glyph draw error:', err)
+//                         tmp.width = gW
+//                         tmp.height = gH
+//                         const tctx = tmp.getContext('2d')!
+//                         tctx.drawImage(gImg, 0, 0, gW, gH)
+//                         tctx.globalCompositeOperation = 'source-in'
+//                         tctx.fillStyle = glyphTint
+//                         tctx.fillRect(0, 0, gW, gH)
+//                         ctx.drawImage(tmp, gX, gY)
 //                     }
-//                 }
 
-//                 // 3) Optional Token
-//                 const wantPixel = style === 'pixel'
-//                 const tokenSrc = tokenId
-//                     ? (wantPixel ? buildPixelUrl(tokenId) : buildIllustratedUrl(tokenId))
-//                     : ''
-
-//                 if (tokenSrc) {
-//                     try {
-//                         const tokenImg = await loadImage(tokenSrc)
+//                     if (tokenImgOrNull && tokenSrc) {
+//                         const tokenImg = tokenImgOrNull
 //                         const srcW = tokenImg.naturalWidth || tokenImg.width
 //                         const srcH = tokenImg.naturalHeight || tokenImg.height
-
-//                         const wantHorizontal = layout === 'horizontalLeft'
 //                         const baseWidthRatio =
-//                             style === 'pixel'
-//                                 ? (wantHorizontal ? 0.50 : 0.55)
-//                                 : (wantHorizontal ? 0.38 : 0.42)
-
-//                         const scaleMul = Math.max(0.05, Math.min(10, tokenScale))
-//                         const tW = W * baseWidthRatio * scaleMul
+//                             style === 'pixel' ? 0.5 : 0.38
+//                         const tW = W * baseWidthRatio * tokenScale
 //                         const tH = srcH * (tW / srcW)
-
-//                         // Manual start for horizontal layout (canvas pixels)
-//                         const HSTART = { cx: 675, cy: 700 }
-
-//                         if (wantHorizontal) {
-//                             const cx = Math.round(HSTART.cx + offsetX)
-//                             const cy = Math.round(HSTART.cy + offsetY)
-
-//                             const prev = ctx.imageSmoothingEnabled
-//                             ctx.imageSmoothingEnabled = !wantPixel
-//                             ctx.save()
-//                             ctx.translate(cx, cy)
-//                             ctx.rotate(Math.PI / 2) // 90° clockwise
-//                             ctx.drawImage(tokenImg, -tW / 2, -tH / 2, tW, tH)
-//                             ctx.restore()
-//                             ctx.imageSmoothingEnabled = prev
-//                         } else {
-//                             const baseDx = Math.round((W - tW) / 2)
-//                             const baseDy = Math.round(H - tH - H * 0.06)
-//                             const dx = baseDx + Math.round(offsetX)
-//                             const dy = baseDy + Math.round(offsetY)
-
-//                             const prev = ctx.imageSmoothingEnabled
-//                             ctx.imageSmoothingEnabled = !wantPixel
-//                             ctx.drawImage(tokenImg, dx, dy, tW, tH)
-//                             ctx.imageSmoothingEnabled = prev
-//                         }
-//                     } catch {
-//                         /* ignore token errors; bg + glyph still render */
+//                         const dx = (W - tW) / 2 + offsetX
+//                         const dy = (H - tH - H * 0.06) + offsetY
+//                         ctx.drawImage(tokenImg, dx, dy, tW, tH)
 //                     }
+
+//                     newUrl = c.toDataURL('image/png')
 //                 }
 
-//                 // finalize
-//                 const url = c.toDataURL('image/png')
-//                 if (!cancelled) setBottomPreviewUrl(url)
-//             } catch {
-//                 if (!cancelled) setBottomPreviewUrl(selectedBottomBG.image)
+//                 // 🧠 Wait for image decode before swapping into React
+//                 if (newUrl) {
+//                     const img = new Image()
+//                     img.loading = 'eager'
+//                     img.src = newUrl
+//                     await img.decode?.().catch(() => { })
+//                     if (!cancelled) setBottomPreviewUrl(newUrl)
+//                 }
+//             } catch (err) {
+//                 console.warn('buildBottom failed:', err)
 //             }
 //         }
 
@@ -1028,11 +1052,11 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
 //         return () => { cancelled = true }
 //     }, [
 //         mode,
-//         selectedJK?.image,          // JK image or…
-//         selectedBottomBG.image,     // …custom background
+//         selectedJK?.image,
+//         selectedBottomBG.image,
 //         glyphId,
-//         glyphTint,                  // 🔄 updates preview when color changes
-//         glyphsWithNone,             // memoized, safe in deps
+//         glyphTint,
+//         selectedGlyph?.image,
 //         tokenId,
 //         style,
 //         tokenScale,
@@ -1043,18 +1067,15 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
 
 //     // helpers
 //     const bump = (setter: React.Dispatch<React.SetStateAction<number>>, delta: number) => {
-//         setter((v) => v + delta)
+//         setter(v => v + delta)
 //     }
 
 //     const controlsDisabled = mode === 'jk'
 
 //     return (
 //         <div className="grid gap-6 sm:grid-cols-[380px_minmax(0,1fr)] items-stretch">
-
 //             {/* Settings (left) */}
 //             <aside className="h-full lg:sticky lg:top-6 h-fit p-2 lg:p-4">
-//                 {/* <h2 className="text-sm font-semibold mb-3">Settings</h2> */}
-
 //                 <div className="space-y-3">
 //                     {/* Mode (JK vs Custom) — always visible */}
 //                     {hasJK && (
@@ -1063,10 +1084,8 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
 //                                 type="button"
 //                                 onClick={() => setMode('jk')}
 //                                 className={`px-5 py-2 text-sm font-medium rounded-full transition-all duration-200
-//       ${mode === 'jk'
-//                                         ? 'bg-[#d12429] text-white shadow-sm'
-//                                         : 'text-neutral-700 hover:bg-neutral-300'}
-//     `}
+//                   ${mode === 'jk' ? 'bg-[#d12429] text-white shadow-sm' : 'text-neutral-700 hover:bg-neutral-300'}
+//                 `}
 //                             >
 //                                 JK Designs
 //                             </button>
@@ -1074,26 +1093,21 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
 //                                 type="button"
 //                                 onClick={() => setMode('custom')}
 //                                 className={`
-//       px-5 py-2 text-sm font-medium rounded-full transition-all duration-200
-//       ${mode === 'custom'
-//                                         ? 'bg-[#d12429] text-white shadow-sm'
-//                                         : 'text-neutral-700 hover:bg-neutral-300'}
-//     `}
+//                   px-5 py-2 text-sm font-medium rounded-full transition-all duration-200
+//                   ${mode === 'custom' ? 'bg-[#d12429] text-white shadow-sm' : 'text-neutral-700 hover:bg-neutral-300'}
+//                 `}
 //                             >
 //                                 Custom
 //                             </button>
 //                         </div>
 //                     )}
 
-//                     {/* 
-//           IMPORTANT: Key the accordion stack by `mode` so it remounts on toggle.
-//           That way only the first section (Grip Tape) opens by default each time.
-//         */}
+//                     {/* Key the accordion stack by `mode` so the first section opens by default when switching */}
 //                     <div key={`accordion-stack-${mode}`}>
-//                         {/* 1) Always-first accordion: open by default */}
+//                         {/* 1) Grip (open by default unless you want closed for JK mode) */}
 //                         <AccordionSection title="Grip Tape" defaultOpen={mode !== 'jk'}>
 //                             <OptionsGrid>
-//                                 {grips.map((g) => (
+//                                 {grips.map(g => (
 //                                     <OptionTile
 //                                         key={g.id}
 //                                         label={g.name}
@@ -1105,12 +1119,12 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
 //                             </OptionsGrid>
 //                         </AccordionSection>
 
-//                         {/* 2) Custom-only accordions (all closed by default) */}
+//                         {/* 2) Custom-only accordions */}
 //                         {mode === 'custom' && (
 //                             <>
 //                                 <AccordionSection title="Bottom Background">
 //                                     <OptionsGrid>
-//                                         {bottoms.map((b) => (
+//                                         {bottoms.map(b => (
 //                                             <OptionTile
 //                                                 key={b.id}
 //                                                 label={b.name}
@@ -1121,10 +1135,11 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
 //                                         ))}
 //                                     </OptionsGrid>
 //                                 </AccordionSection>
+
 //                                 <AccordionSection title="Glyph Layer">
 //                                     <div className="space-y-3">
 //                                         <OptionsGrid>
-//                                             {glyphsWithNone.map((g) => (
+//                                             {glyphsWithNone.map(g => (
 //                                                 <OptionTile
 //                                                     key={g.id}
 //                                                     label={g.name}
@@ -1281,7 +1296,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
 //                             </>
 //                         )}
 
-//                         {/* 3) JK-only accordion (closed by default; Grip is the only open one) */}
+//                         {/* 3) JK-only */}
 //                         {mode === 'jk' && hasJK && (
 //                             <AccordionSection title="JK Design">
 //                                 <Field labelText="Design">
@@ -1290,7 +1305,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
 //                                         value={jkId}
 //                                         onChange={(e) => setJkId(e.target.value)}
 //                                     >
-//                                         {jkDesigns.map((d) => (
+//                                         {jkDesigns.map(d => (
 //                                             <option key={d.id} value={d.id}>{d.name}</option>
 //                                         ))}
 //                                     </select>
@@ -1310,7 +1325,6 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
 
 //             {/* Preview (right) */}
 //             <section className="rounded-2xl border shadow-sm p-4 lg:p-5">
-//                 {/* <h2 className="text-sm font-semibold mb-3">Preview</h2> */}
 //                 <div className="rounded-xl bg-white overflow-hidden">
 //                     <DeckViewerMinimal
 //                         topUrl={selectedGrip.image}

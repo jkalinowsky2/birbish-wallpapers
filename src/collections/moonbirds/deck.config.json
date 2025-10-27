@@ -18,7 +18,7 @@
         { "id": "mb-black-toobins", "label": "black toobins", "image": "/deckAssets/grips/mb_toobins_black.png" },
         
         { "id": "mb-red", "label": "red", "image": "/deckAssets/grips/mb_red.png" },
-        { "id": "none", "label": "none", "image": "/deckAssets/grips/none.png" }
+        { "id": "none", "label": "black", "image": "/deckAssets/grips/none.png" }
       ],
 
      "bottoms": [
