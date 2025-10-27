@@ -22,6 +22,17 @@
       ],
 
      "bottoms": [
+        { "id": "mb-gray",  "label": "gray",  "image": "/deckAssets/moonbirds/gray.png" },
+        { "id": "mb-green",  "label": "green",  "image": "/deckAssets/moonbirds/green.png" },
+        { "id": "mb-pink",  "label": "pink",  "image": "/deckAssets/moonbirds/pink.png" },
+        { "id": "mb-yellow",  "label": "yellow",  "image": "/deckAssets/moonbirds/yellow.png" },
+        { "id": "mb-purple",  "label": "purple",  "image": "/deckAssets/moonbirds/purple.png" },
+        { "id": "mb-blue",  "label": "blue",  "image": "/deckAssets/moonbirds/blue.png" },
+        { "id": "mb-red",  "label": "glitch red",  "image": "/deckAssets/moonbirds/glitch_red.png" },
+        { "id": "mb-jade",  "label": "jade green",  "image": "/deckAssets/moonbirds/jade_green.png" },
+        { "id": "mb-enlightened",  "label": "enlightened purple",  "image": "/deckAssets/moonbirds/enlightened_purple.png" },
+        { "id": "mb-cosmic",  "label": "cosmic purple",  "image": "/deckAssets/moonbirds/cosmic_purple.png" },
+
         { "id": "mb-red-grad-pattern",  "label": "red gradient",  "image": "/deckAssets/moonbirds/mb_red_gradient2.png" },
         { "id": "mb-starlight",  "label": "starlight",  "image": "/deckAssets/moonbirds/mb_starlight.png" },
         { "id": "mb-wood",  "label": "natural",  "image": "/deckAssets/moonbirds/woodgrain.png" }
@@ -31,6 +42,11 @@
       "glyphs": [
         { "id": "birbishPaint", "name": "Birbish Paint", "image": "/deckAssets/moonbirds/birbishPaint.png"}, 
         { "id": "sunburst", "name": "Sunburst", "image": "/deckAssets/moonbirds/sunburst.png"}
+      ],
+
+     "glyphs2": [
+        { "id": "birbishPaint2", "name": "Birbish Paint", "image": "/deckAssets/moonbirds/birbishPaint.png"}, 
+        { "id": "sunburst2", "name": "Sunburst", "image": "/deckAssets/moonbirds/sunburst.png"}
       ],
 
       "jkDesigns": [
