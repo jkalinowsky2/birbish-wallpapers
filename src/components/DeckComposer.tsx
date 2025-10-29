@@ -1097,7 +1097,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                             <option key={d.id} value={d.id}>{d.name}</option>
                                         ))}
                                     </select>
-                                    <p className="text-xs text-neutral-500">Fixed artwork; token and glyph controls are hidden.</p>
+                                    <p className="text-xs text-neutral-500">Fixed artwork; token and glyph controls are hidden, more coming soon!</p>
                                 </Field>
                             </AccordionSection>
                         )}
