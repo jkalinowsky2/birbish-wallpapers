@@ -48,6 +48,8 @@
         { "id": "birbishPaint", "name": "birbish paint", "image": "/deckAssets/moonbirds/birbishPaint.png"}, 
         { "id": "sunburst", "name": "sunburst", "image": "/deckAssets/moonbirds/sunburst.png"},
         { "id": "owlglyph", "name": "owl glyph", "image": "/deckAssets/moonbirds/owl_glyph.png"},
+        { "id": "splatter1", "name": "splatter", "image": "/deckAssets/moonbirds/splatter1.png"},
+
         { "id": "moonbirdsh", "name": "moonbirds", "image": "/deckAssets/moonbirds/moonbirds.png"}
 
       ],
@@ -55,7 +57,7 @@
      "glyphs2": [
         { "id": "birbishPaint2", "name": "birbish paint", "image": "/deckAssets/moonbirds/birbishPaint.png"}, 
         { "id": "sunburst2", "name": "sunburst", "image": "/deckAssets/moonbirds/sunburst.png"},
-        { "id": "splatter", "name": "splatter 2", "image": "/deckAssets/moonbirds/splatter2.png"},
+        { "id": "splatter2", "name": "splatter", "image": "/deckAssets/moonbirds/splatter2.png"},
         { "id": "owlglyph", "name": "owl glyph", "image": "/deckAssets/moonbirds/owl_glyph.png"},
         { "id": "moonbirdsh", "name": "moonbirds", "image": "/deckAssets/moonbirds/moonbirds.png"}
 
@@ -64,7 +66,7 @@
     "glyphs3": [
         { "id": "birbishPaint2", "name": "birbish paint", "image": "/deckAssets/moonbirds/birbishPaint.png"}, 
         { "id": "sunburst2", "name": "sunburst", "image": "/deckAssets/moonbirds/sunburst.png"},
-        { "id": "splatter", "name": "splatter 2", "image": "/deckAssets/moonbirds/splatter2.png"},
+        { "id": "splatter3", "name": "splatter", "image": "/deckAssets/moonbirds/splatter3.png"},
         { "id": "owlglyph", "name": "owl glyph", "image": "/deckAssets/moonbirds/owl_glyph.png"},
         { "id": "moonbirdsh", "name": "moonbirds", "image": "/deckAssets/moonbirds/moonbirds.png"}
 
