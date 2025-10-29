@@ -264,7 +264,6 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
             {/* Settings (left) */}
             <aside className="h-full lg:sticky lg:top-6 h-fit rounded-2xl border bg-white shadow-sm p-4 lg:p-5">
                 <h2 className="text-sm font-semibold mb-3">Settings</h2>
-
                 <div className="space-y-4">
                     {/* Mode */}
                     {hasJK && (
@@ -285,7 +284,12 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                     Custom
                                 </button>
                             </div>
+    {/* ✅ Description goes here */}
+    <p className="text-xs text-neutral-500 mt-2">
+      Choose <strong>JK Designs</strong> for preset artwork or <strong>Custom</strong> to build your own deck.
+    </p>
                         </Field>
+
                     )}
 
                     {/* Grip (top) */}

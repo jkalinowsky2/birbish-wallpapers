@@ -501,7 +501,9 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                 Custom
                             </button>
                         </div>
+                        
                     )}
+        <p className="text-xs text-neutral-500 mt-0"> Choose a JK Design or custom design your own deck. </p>
 
                     <div key={`accordion-stack-${mode}`}>
                         {/* Grip */}
