@@ -170,11 +170,16 @@ function loadImageCached(src: string): Promise<HTMLImageElement> {
             img.referrerPolicy = 'no-referrer'
             img.onload = async () => {
                 try {
-                    // @ ts-expect-error decode may not exist
-                    if ((img as any).decode) await (img as any).decode()
-                } catch { /* ignore */ }
-                resolve(img)
-            }
+                    // Narrow to a type that may have decode()
+                    const withDecode = img as HTMLImageElement & { decode?: () => Promise<void> };
+                    if (typeof withDecode.decode === 'function') {
+                        await withDecode.decode();
+                    }
+                } catch {
+                    /* ignore */
+                }
+                resolve(img);
+            };
             img.onerror = () => reject(new Error(`Failed to load ${src}`))
             img.src = src
         })
