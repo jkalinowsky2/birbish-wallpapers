@@ -618,18 +618,18 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                         <Field labelText="Nudge Position">
                                             <div className="grid grid-cols-3 gap-2 w-[220px]">
                                                 <div />
-                                                <button type="button" className="btn" onClick={() => setOffsetY(v => v - nudgeValue)} title="Up">↑</button>
+                                                <button type="button" className="btn" onClick={() => setOffsetX(v => v + nudgeValue)} title="Up">↑</button>
                                                 <div />
-                                                <button type="button" className="btn" onClick={() => setOffsetX(v => v - nudgeValue)} title="Left">←</button>
+                                                <button type="button" className="btn" onClick={() => setOffsetY(v => v - nudgeValue)} title="Left">←</button>
                                                 <button
                                                     type="button"
                                                     className="btn btn-ghost"
                                                     onClick={() => { setOffsetX(0); setOffsetY(0) }}
                                                     title="Center"
                                                 >•</button>
-                                                <button type="button" className="btn" onClick={() => setOffsetX(v => v + nudgeValue)} title="Right">→</button>
+                                                <button type="button" className="btn" onClick={() => setOffsetY(v => v + nudgeValue)} title="Right">→</button>
                                                 <div />
-                                                <button type="button" className="btn" onClick={() => setOffsetY(v => v + nudgeValue)} title="Down">↓</button>
+                                                <button type="button" className="btn" onClick={() => setOffsetX(v => v - nudgeValue)} title="Down">↓</button>
                                                 <div />
                                             </div>
                                             <div className="flex items-center gap-3 pt-2 text-xs text-neutral-600">
@@ -721,9 +721,9 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                                 <Field labelText="Glyph 1 Nudge">
                                                     <div className="grid grid-cols-3 gap-2 w-[220px]">
                                                         <div />
-                                                        <button type="button" className="btn" onClick={() => setGlyph1OffsetY(v => v - nudgeValue)}>↑</button>
+                                                        <button type="button" className="btn" onClick={() => setGlyph1OffsetX(v => v +nudgeValue)}>↑</button>
                                                         <div />
-                                                        <button type="button" className="btn" onClick={() => setGlyph1OffsetX(v => v - nudgeValue)}>←</button>
+                                                        <button type="button" className="btn" onClick={() => setGlyph1OffsetY(v => v - nudgeValue)}>←</button>
                                                         <button
                                                             type="button"
                                                             className="btn btn-ghost"
@@ -731,9 +731,9 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                                         >
                                                             •
                                                         </button>
-                                                        <button type="button" className="btn" onClick={() => setGlyph1OffsetX(v => v + nudgeValue)}>→</button>
+                                                        <button type="button" className="btn" onClick={() => setGlyph1OffsetY(v => v + nudgeValue)}>→</button>
                                                         <div />
-                                                        <button type="button" className="btn" onClick={() => setGlyph1OffsetY(v => v + nudgeValue)}>↓</button>
+                                                        <button type="button" className="btn" onClick={() => setGlyph1OffsetX(v => v - nudgeValue)}>↓</button>
                                                         <div />
                                                     </div>
                                                     <div className="flex items-center gap-3 pt-2 text-xs text-neutral-600">
@@ -825,9 +825,9 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                                 <Field labelText="Glyph 2 Nudge">
                                                     <div className="grid grid-cols-3 gap-2 w-[220px]">
                                                         <div />
-                                                        <button type="button" className="btn" onClick={() => setGlyph2OffsetY(v => v - nudgeValue)}>↑</button>
+                                                        <button type="button" className="btn" onClick={() => setGlyph2OffsetX(v => v + nudgeValue)}>↑</button>
                                                         <div />
-                                                        <button type="button" className="btn" onClick={() => setGlyph2OffsetX(v => v - nudgeValue)}>←</button>
+                                                        <button type="button" className="btn" onClick={() => setGlyph2OffsetY(v => v - nudgeValue)}>←</button>
                                                         <button
                                                             type="button"
                                                             className="btn btn-ghost"
@@ -835,9 +835,9 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                                         >
                                                             •
                                                         </button>
-                                                        <button type="button" className="btn" onClick={() => setGlyph2OffsetX(v => v + nudgeValue)}>→</button>
+                                                        <button type="button" className="btn" onClick={() => setGlyph2OffsetY(v => v + nudgeValue)}>→</button>
                                                         <div />
-                                                        <button type="button" className="btn" onClick={() => setGlyph2OffsetY(v => v + nudgeValue)}>↓</button>
+                                                        <button type="button" className="btn" onClick={() => setGlyph2OffsetX(v => v - nudgeValue)}>↓</button>
                                                         <div />
                                                     </div>
                                                     <div className="flex items-center gap-3 pt-2 text-xs text-neutral-600">
@@ -940,9 +940,9 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                                 <Field labelText="Nudge">
                                                     <div className="grid grid-cols-3 gap-2 w-[220px]">
                                                         <div />
-                                                        <button type="button" className="btn" onClick={() => setGlyph3OffsetY(v => v - nudgeValue)}>↑</button>
+                                                        <button type="button" className="btn" onClick={() => setGlyph3OffsetX(v => v + nudgeValue)}>↑</button>
                                                         <div />
-                                                        <button type="button" className="btn" onClick={() => setGlyph3OffsetX(v => v - nudgeValue)}>←</button>
+                                                        <button type="button" className="btn" onClick={() => setGlyph3OffsetY(v => v - nudgeValue)}>←</button>
                                                         <button
                                                             type="button"
                                                             className="btn btn-ghost"
@@ -950,9 +950,9 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                                         >
                                                             •
                                                         </button>
-                                                        <button type="button" className="btn" onClick={() => setGlyph3OffsetX(v => v + nudgeValue)}>→</button>
+                                                        <button type="button" className="btn" onClick={() => setGlyph3OffsetY(v => v + nudgeValue)}>→</button>
                                                         <div />
-                                                        <button type="button" className="btn" onClick={() => setGlyph3OffsetY(v => v + nudgeValue)}>↓</button>
+                                                        <button type="button" className="btn" onClick={() => setGlyph3OffsetX(v => v - nudgeValue)}>↓</button>
                                                         <div />
                                                     </div>
                                                     <div className="flex items-center gap-3 pt-2 text-xs text-neutral-600">
