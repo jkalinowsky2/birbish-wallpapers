@@ -34,6 +34,7 @@ export type PerCollectionDeckConfig = {
   bottoms?: BottomItem[]
   glyphs?: GlyphItem[]
   glyphs2?: GlyphItem[]
+  glyphs3?: GlyphItem[]
   jkDesigns?: JKDesignItem[]
   defaults?: {
     style?: 'illustrated' | 'pixel' | 'oddity'
@@ -110,6 +111,12 @@ export function buildDeckComposerConfig(collectionKey: string): DeckComposerConf
     image: g.image,
   }))
 
+    const glyphs3 = (col.glyphs3 ?? []).map((g) => ({
+    id: g.id,
+    name: g.name ?? g.label ?? g.id,
+    image: g.image,
+  }))
+
   const jkDesigns = (col.jkDesigns ?? []).map((j) => ({
     id: j.id,
     name: j.name,
@@ -122,6 +129,7 @@ export function buildDeckComposerConfig(collectionKey: string): DeckComposerConf
     bottoms,
     glyphs,
     glyphs2,
+    glyphs3,
     jkDesigns,
   }
 }
