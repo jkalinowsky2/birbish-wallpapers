@@ -1083,7 +1083,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                         {/* JK-only */}
                         {mode === 'jk' && hasJK && (
                             <AccordionSection
-                                title="JK Design"
+                                title="JK Designs"
                                 open={openId === 'jk'}
                                 onToggle={(next) => setOpenId(next ? 'jk' : '')}
                             >
