@@ -279,9 +279,11 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
     const [glyph1Blend, setGlyph1Blend] = useState<GlobalCompositeOperation>('source-over');
     const [glyph2Blend, setGlyph2Blend] = useState<GlobalCompositeOperation>('source-over');
     const [glyph3Blend, setGlyph3Blend] = useState<GlobalCompositeOperation>('source-over'); // if you have a 3rd layer
+    // Text layer state
+    const [textBlend, setTextBlend] = useState<GlobalCompositeOperation>('source-over'); // NEW
 
     // Text layer state
-    type TextFont = 'impact' | 'sans' | 'oscine' | 'graffiti'
+    type TextFont = 'impact' | 'sans' | 'oscine' | 'graffiti' | 'gazpacho'
 
     const [textValue, setTextValue] = useState<string>('')
     const [textColor, setTextColor] = useState<string>('#111111')
@@ -299,6 +301,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
     const [offsetX, setOffsetX] = useState<number>(-40)
     const [offsetY, setOffsetY] = useState<number>(60)
     const nudgeValue = 100
+    const nudgeValueSm = 25
 
     // JK selection
     const [jkId, setJkId] = useState<string>(initialJKId)
@@ -438,21 +441,23 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                 if (glyph3Img) drawGlyph(glyph3Img, glyphTint3, glyph3Scale, glyph3OffsetX, glyph3OffsetY, glyph3Blend);
 
                 // 2.5) Text layer (on top of glyphs, behind token)
+                // 2.5) Text layer (on top of glyphs, behind token)
                 if (textValue.trim()) {
-                    const basePx = Math.round(W * 0.12); // ~12% of width
-                    const px = Math.max(10, Math.min(2000, Math.round(basePx * Math.max(0.05, Math.min(20, textScale)))));
-
-                    // font stacks that usually exist without extra CSS
+                    const basePx = Math.round(W * 0.12);
+                    const px = Math.max(10,Math.min(4000, Math.round(basePx * Math.max(0.05, textScale)))
+                    );
                     const fontFamily =
                         textFont === 'graffiti'
                             ? "'graffiti', cursive"
                             : textFont === 'oscine'
                                 ? "'oscine', sans-serif"
-                                : textFont === 'impact'
-                                    ? "Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif"
+                                : textFont === 'gazpacho'
+                                    ? "'gazpacho', black"
+                                    : textFont === 'impact'
+                                        ? "Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif"
                                         : "system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif";
 
-                    ctx.font = `${px}px ${fontFamily}`;
+
                     ctx.save();
                     ctx.translate(W / 2 + textOffsetX, H / 2 + textOffsetY);
                     ctx.rotate((textRotation * Math.PI) / 180);
@@ -460,6 +465,10 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                     ctx.font = `${px}px ${fontFamily}`;
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
+
+                    // apply blend mode while drawing text
+                    const prevBlend = ctx.globalCompositeOperation;
+                    ctx.globalCompositeOperation = textBlend;
 
                     // subtle outline for readability
                     ctx.lineWidth = Math.max(1, Math.round(W * 0.003));
@@ -469,8 +478,44 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                     ctx.fillStyle = textColor;
                     ctx.fillText(textValue, 0, 0);
 
+                    ctx.globalCompositeOperation = prevBlend;
                     ctx.restore();
                 }
+                // if (textValue.trim()) {
+                //     const basePx = Math.round(W * 0.12); // ~12% of width
+                //     const px = Math.max(10, Math.min(2000, Math.round(basePx * Math.max(0.05, Math.min(20, textScale)))));
+
+                //     // font stacks that usually exist without extra CSS
+                //     const fontFamily =
+                //         textFont === 'graffiti'
+                //             ? "'graffiti', cursive"
+                //             : textFont === 'oscine'
+                //                 ? "'oscine', sans-serif"
+                //                 : textFont === 'gazpacho'
+                //                     ? "'gazpacho', black"
+                //                     : textFont === 'impact'
+                //                         ? "Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif"
+                //                         : "system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif";
+
+                //     ctx.font = `${px}px ${fontFamily}`;
+                //     ctx.save();
+                //     ctx.translate(W / 2 + textOffsetX, H / 2 + textOffsetY);
+                //     ctx.rotate((textRotation * Math.PI) / 180);
+
+                //     ctx.font = `${px}px ${fontFamily}`;
+                //     ctx.textAlign = 'center';
+                //     ctx.textBaseline = 'middle';
+
+                //     // subtle outline for readability
+                //     ctx.lineWidth = Math.max(1, Math.round(W * 0.003));
+                //     ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+                //     ctx.strokeText(textValue, 0, 0);
+
+                //     ctx.fillStyle = textColor;
+                //     ctx.fillText(textValue, 0, 0);
+
+                //     ctx.restore();
+                // }
 
                 // 3) Token
                 if (tokenImg && tokenSrc) {
@@ -530,7 +575,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
         glyphId1, glyphTint1, selectedGlyph1?.image, glyph1Scale, glyph1OffsetX, glyph1OffsetY, glyph1Blend,
         glyphId2, glyphTint2, selectedGlyph2?.image, glyph2Scale, glyph2OffsetX, glyph2OffsetY, glyph2Blend,
         glyphId3, glyphTint3, selectedGlyph3?.image, glyph3Scale, glyph3OffsetX, glyph3OffsetY, glyph3Blend,
-        tokenId, style, tokenScale, offsetX, offsetY, textValue, textColor, textFont, textScale, textOffsetX, textOffsetY, textRotation,
+        tokenId, style, tokenScale, offsetX, offsetY, textValue, textColor, textFont, textScale, textOffsetX, textOffsetY, textRotation, textBlend,
     ])
 
     // helpers
@@ -1056,43 +1101,48 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                             </div>
                                         </Field>
 
-                                        <div className="flex items-end gap-4">
-                                            <Field labelText="Font" className="flex-1">
-                                                {/* <select
+                                        <Field labelText="Font" className="flex-1">
+                                            {/* <select
                                                     className="input"
                                                     value={textFont}
                                                     onChange={(e) => setTextFont(e.target.value as TextFont)}
                                                 > */}
-                                                <select
-                                                    className="input"
-                                                    value={textFont}
-                                                    onChange={async (e) => {
-                                                        const next = e.target.value as TextFont;
-                                                        // map your option to the actual @font-face family name
-                                                        const faceName =
-                                                            next === 'graffiti'
-                                                                ? 'graffiti'
-                                                                : next === 'oscine'
-                                                                    ? 'oscine'
+                                            <select
+                                                className="input"
+                                                value={textFont}
+                                                onChange={async (e) => {
+                                                    const next = e.target.value as TextFont;
+                                                    // map your option to the actual @font-face family name
+                                                    const faceName =
+                                                        next === 'graffiti'
+                                                            ? 'graffiti'
+                                                            : next === 'oscine'
+                                                                ? 'oscine'
+                                                                : next === 'gazpacho'
+                                                                    ? 'gazpacho'
                                                                     : next === 'impact'
                                                                         ? 'Impact'
                                                                         : ''; // sans/mono use system stacks
 
-                                                        if (faceName) {
-                                                            await ensureFontLoaded(faceName);
-                                                        }
-                                                        setTextFont(next);
-                                                    }}
-                                                >
-                                                    {/* options... */}
+                                                    if (faceName) {
+                                                        await ensureFontLoaded(faceName);
+                                                    }
+                                                    setTextFont(next);
+                                                }}
+                                            >
+                                                {/* options... */}
 
-                                                    {/* <option value="impact">Impact / Narrow Bold</option> */}
-                                                    <option value="oscine">Oscine XBold</option>
-                                                    <option value="graffiti">Graffiti</option>
-                                                    {/* <option value="sans">Sans Serif</option>
+                                                {/* <option value="impact">Impact / Narrow Bold</option> */}
+                                                <option value="oscine">Oscine XBold</option>
+                                                <option value="graffiti">Graffiti</option>
+                                                <option value="gazpacho">Gazpacho</option>
+                                                {/* <option value="sans">Sans Serif</option>
                                                     <option value="mono">Monospace</option> */}
-                                                </select>
-                                            </Field>
+                                            </select>
+                                        </Field>
+
+                                        <div className="flex items-end gap-4">
+                                            {/*  */}
 
                                             <Field labelText="Color" className="w-[104px]">
                                                 <input
@@ -1107,6 +1157,21 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
           "
                                                     title="Pick text color"
                                                 />
+                                            </Field>
+                                            <Field labelText="Blend Mode">
+                                                <select
+                                                    className="input"
+                                                    value={textBlend}
+                                                    onChange={(e) => setTextBlend(e.target.value as GlobalCompositeOperation)}
+                                                    title="How the text mixes with the artwork"
+                                                >
+                                                    {BLEND_MODES.map((m) => (
+                                                        <option key={m} value={m}>{m}</option>
+                                                    ))}
+                                                </select>
+                                                {/* <p className="text-xs text-neutral-500">
+                                                    Tip: <code>multiply</code> darkens (ink), <code>screen</code> brightens (glow), <code>overlay</code> boosts contrast.
+                                                </p> */}
                                             </Field>
                                         </div>
 
@@ -1169,9 +1234,9 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                         <Field labelText="Nudge">
                                             <div className="grid grid-cols-3 gap-2 w-[220px]">
                                                 <div />
-                                                <button type="button" className="btn" onClick={() => setTextOffsetX(v => v + nudgeValue)}>↑</button>
+                                                <button type="button" className="btn" onClick={() => setTextOffsetX(v => v + nudgeValueSm)}>↑</button>
                                                 <div />
-                                                <button type="button" className="btn" onClick={() => setTextOffsetY(v => v - nudgeValue)}>←</button>
+                                                <button type="button" className="btn" onClick={() => setTextOffsetY(v => v - nudgeValueSm)}>←</button>
                                                 <button
                                                     type="button"
                                                     className="btn btn-ghost"
@@ -1180,9 +1245,9 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                                 >
                                                     •
                                                 </button>
-                                                <button type="button" className="btn" onClick={() => setTextOffsetY(v => v + nudgeValue)}>→</button>
+                                                <button type="button" className="btn" onClick={() => setTextOffsetY(v => v + nudgeValueSm)}>→</button>
                                                 <div />
-                                                <button type="button" className="btn" onClick={() => setTextOffsetX(v => v - nudgeValue)}>↓</button>
+                                                <button type="button" className="btn" onClick={() => setTextOffsetX(v => v - nudgeValueSm)}>↓</button>
                                                 <div />
                                             </div>
                                             <div className="flex items-center gap-3 pt-2 text-xs text-neutral-600">
@@ -1200,109 +1265,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                     </div>
                                 </AccordionSection>
 
-                                {/* <AccordionSection
-                                    title="Moonbird Token"
-                                    open={openId === 'token'}
-                                    onToggle={(next) => setOpenId(next ? 'token' : '')}
-                                >
-                                    <div className="space-y-4">
-                                        <Field labelText="Token ID">
-                                            <div className="flex flex-wrap items-center gap-2">
-                                                <input
-                                                    className="input w-36"
-                                                    type="number"
-                                                    placeholder="e.g. 8209"
-                                                    min={1}
-                                                    value={tokenId}
-                                                    onChange={(e) => setTokenId(e.target.value.trim())}
-                                                    disabled={controlsDisabled}
-                                                />
-                                                <div className="flex gap-1">
-                                                    <button
-                                                        type="button"
-                                                        className={`btn ${style === 'illustrated' ? 'btn-primary' : 'btn-ghost'}`}
-                                                        onClick={() => setStyle('illustrated')}
-                                                        disabled={!ILLU_BASE || controlsDisabled}
-                                                        title={ILLU_BASE ? 'Use illustrated' : 'Set NEXT_PUBLIC_MOONBIRDS_ILLU_BASE'}
-                                                    >
-                                                        Illustrated
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        className={`btn ${style === 'pixel' ? 'btn-primary' : 'btn-ghost'}`}
-                                                        onClick={() => setStyle('pixel')}
-                                                        disabled={!PIXEL_BASE || controlsDisabled}
-                                                        title={PIXEL_BASE ? 'Use pixel' : 'Set NEXT_PUBLIC_MOONBIRDS_PIXEL_BASE'}
-                                                    >
-                                                        Pixel
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <p className="text-xs text-neutral-500">Token is composited onto the selected background.</p>
-                                        </Field>
 
-                                        <Field labelText="Token Scale">
-                                            <div className="flex items-center gap-2">
-                                                <input
-                                                    className="input w-28"
-                                                    type="number"
-                                                    step={0.25}
-                                                    min={0.25}
-                                                    max={10}
-                                                    value={tokenScale}
-                                                    onChange={(e) => {
-                                                        const n = Number(e.target.value)
-                                                        setTokenScale(Number.isFinite(n) ? Math.max(0.05, Math.min(10, n)) : 1)
-                                                    }}
-                                                    title="Multiply the base size"
-                                                />
-                                                <input
-                                                    className="w-full accent-neutral-800"
-                                                    type="range"
-                                                    min={0.25}
-                                                    max={5}
-                                                    step={0.25}
-                                                    value={tokenScale}
-                                                    onChange={(e) => setTokenScale(Number(e.target.value))}
-                                                    title="Drag to scale"
-                                                />
-                                                <button type="button" className="btn btn-ghost" onClick={() => setTokenScale(1)} title="Reset">
-                                                    Reset
-                                                </button>
-                                            </div>
-                                        </Field>
-
-                                        <Field labelText="Nudge Position">
-                                            <div className="grid grid-cols-3 gap-2 w-[220px]">
-                                                <div />
-                                                <button type="button" className="btn" onClick={() => setOffsetY(v => v - nudgeValue)} title="Up">↑</button>
-                                                <div />
-                                                <button type="button" className="btn" onClick={() => setOffsetX(v => v - nudgeValue)} title="Left">←</button>
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-ghost"
-                                                    onClick={() => { setOffsetX(0); setOffsetY(0) }}
-                                                    title="Center"
-                                                >•</button>
-                                                <button type="button" className="btn" onClick={() => setOffsetX(v => v + nudgeValue)} title="Right">→</button>
-                                                <div />
-                                                <button type="button" className="btn" onClick={() => setOffsetY(v => v + nudgeValue)} title="Down">↓</button>
-                                                <div />
-                                            </div>
-                                            <div className="flex items-center gap-3 pt-2 text-xs text-neutral-600">
-                                                <span>X: {offsetX}px</span>
-                                                <span>Y: {offsetY}px</span>
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-ghost btn-sm"
-                                                    onClick={() => { setOffsetX(0); setOffsetY(0) }}
-                                                >
-                                                    Reset
-                                                </button>
-                                            </div>
-                                        </Field>
-                                    </div>
-                                </AccordionSection> */}
                             </>
                         )}
 
