@@ -23,6 +23,7 @@
 
      "bottoms": [
         { "id": "mb-white",  "label": "white",  "image": "/deckAssets/moonbirds/white.png" },
+        { "id": "mb-black",  "label": "black",  "image": "/deckAssets/moonbirds/black.png" },
         { "id": "mb-gray",  "label": "gray",  "image": "/deckAssets/moonbirds/gray.png" },
         { "id": "mb-green",  "label": "green",  "image": "/deckAssets/moonbirds/green.png" },
         { "id": "mb-pink",  "label": "pink",  "image": "/deckAssets/moonbirds/pink.png" },

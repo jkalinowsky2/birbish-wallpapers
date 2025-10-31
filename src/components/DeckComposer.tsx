@@ -205,6 +205,30 @@ function loadImageCached(src: string): Promise<HTMLImageElement> {
     return imgCache.get(src)!
 }
 
+async function loadImageRaw(src: string): Promise<HTMLImageElement> {
+    // Uses cache for normal URLs; data: URLs can still go through fine
+    return loadImageCached(src);
+}
+
+/** Rotate an image to horizontal orientation (90° counter-clockwise) on its own canvas. */
+function makeHorizontalCanvas(img: HTMLImageElement): HTMLCanvasElement {
+    const srcW = img.naturalWidth || img.width;
+    const srcH = img.naturalHeight || img.height;
+
+    const can = document.createElement('canvas');
+    can.width = srcH;   // rotated width
+    can.height = srcW;  // rotated height
+
+    const ctx = can.getContext('2d')!;
+    ctx.save();
+    // rotate -90deg around top-left (0,0):
+    ctx.translate(0, can.height);
+    ctx.rotate(-Math.PI / 2);
+    ctx.drawImage(img, 0, 0, srcW, srcH);
+    ctx.restore();
+    return can;
+}
+
 /* ---------- Main component ---------- */
 export default function DeckComposer({ config }: { config: DeckComposerConfig }) {
     const { grips, bottoms, jkDesigns = [], glyphs = [], glyphs2 = [], glyphs3 = [] } = config
@@ -444,7 +468,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                 // 2.5) Text layer (on top of glyphs, behind token)
                 if (textValue.trim()) {
                     const basePx = Math.round(W * 0.12);
-                    const px = Math.max(10,Math.min(4000, Math.round(basePx * Math.max(0.05, textScale)))
+                    const px = Math.max(10, Math.min(4000, Math.round(basePx * Math.max(0.05, textScale)))
                     );
                     const fontFamily =
                         textFont === 'graffiti'
@@ -582,6 +606,104 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
     const controlsDisabled = mode === 'jk'
     const nudge = (setter: React.Dispatch<React.SetStateAction<number>>, delta: number) =>
         setter((v) => v + delta)
+
+    async function exportCombinedHorizontal(filename = 'GenerationalMerch_MB_Deck.png') {
+        const GAP = 20;
+        const BOX_W = 2560;
+        const BOX_H = 800;
+
+        // 1) Grab the renders
+        const topPng = await window.deckCapture?.({
+            view: 'top',
+            width: BOX_W,
+            height: BOX_H,
+            marginX: 1.12,
+            marginYFactor: 0.88,
+        });
+        const botPng = await window.deckCapture?.({
+            view: 'bottom',
+            width: BOX_W,
+            height: BOX_H,
+            marginX: 1.12,
+            marginYFactor: 0.88,
+        });
+        if (!topPng || !botPng) return;
+
+        // 2) Compose
+        const out = document.createElement('canvas');
+        out.width = BOX_W;
+        out.height = BOX_H * 2 + GAP + 140; // leave space for branding
+        const ctx = out.getContext('2d')!;
+        ctx.fillStyle = '#f7f7f7';
+        ctx.fillRect(0, 0, out.width, out.height);
+
+        // load the top/bottom renders
+        const topImg = new window.Image();
+        const botImg = new window.Image();
+        await new Promise<void>((res, rej) => {
+            let n = 0;
+            const done = () => (++n === 2 ? res() : undefined);
+            topImg.onload = done;
+            botImg.onload = done;
+            topImg.onerror = rej;
+            botImg.onerror = rej;
+            topImg.src = topPng;
+            botImg.src = botPng;
+        });
+
+        // draw helper
+        function drawContain(img: HTMLImageElement, x: number, y: number, w: number, h: number) {
+            const iw = img.naturalWidth || img.width;
+            const ih = img.naturalHeight || img.height;
+            const s = Math.min(w / iw, h / ih);
+            const dw = iw * s;
+            const dh = ih * s;
+            const dx = x + (w - dw) / 2;
+            const dy = y + (h - dh) / 2;
+            ctx.drawImage(img, dx, dy, dw, dh);
+        }
+
+        drawContain(topImg, 0, 0, BOX_W, BOX_H);
+        ctx.save();
+        ctx.translate(BOX_W / 2, BOX_H + GAP + BOX_H / 2); // move origin to center of bottom slot
+        ctx.rotate(Math.PI); // rotate 180 degrees
+        drawContain(botImg, -BOX_W / 2, -BOX_H / 2, BOX_W, BOX_H);
+        ctx.restore();
+
+        // 3) Branding: logo bottom-left
+        const logo = new window.Image();
+        await new Promise<void>((res, rej) => {
+            logo.onload = () => res();
+            logo.onerror = () => rej();
+            logo.src = '/assets/gmlong.png';
+        });
+
+        const logoW = BOX_W * 0.18;
+        const logoH = logoW * (logo.naturalHeight / logo.naturalWidth);
+        const logoX = 50;
+        const logoY = out.height - logoH - 40;
+        ctx.drawImage(logo, logoX, logoY, logoW, logoH);
+
+        // 4) Web image bottom-right
+        const web = new window.Image();
+        await new Promise<void>((res, rej) => {
+            web.onload = () => res();
+            web.onerror = () => rej();
+            web.src = '/assets/gmweb.png';
+        });
+
+        const webW = BOX_W * 0.15;
+        const webH = webW * (web.naturalHeight / web.naturalWidth);
+        const webX = out.width - webW - 50;
+        const webY = out.height - webH - 40;
+        ctx.drawImage(web, webX, webY, webW, webH);
+
+        // 5) Download
+        const a = document.createElement('a');
+        a.href = out.toDataURL('image/png');
+        a.download = filename;
+        a.click();
+    }
 
     return (
         <div className="grid gap-6 sm:grid-cols-[380px_minmax(0,1fr)] items-stretch">
@@ -1304,10 +1426,24 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
 
             {/* Preview */}
             < section className="rounded-2xl border shadow-sm p-4 lg:p-5" >
+                <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-sm font-medium">Preview</h3>
+                    <div className="flex gap-2">
+                        <button
+                            type="button"
+                            className="btn btn-primary"
+                            onClick={() => void exportCombinedHorizontal()}   // <-- wrap it
+                            title="Download a single PNG with top & bottom, both horizontal"
+                        >
+                            Download combined PNG
+                        </button>
+                    </div>
+                </div>
                 <div className="rounded-xl bg-white overflow-hidden">
                     <DeckViewerMinimal topUrl={selectedGrip.image} bottomUrl={bottomPreviewUrl} />
                 </div>
             </section >
+
         </div >
     )
 }
