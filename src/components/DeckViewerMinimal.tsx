@@ -30,25 +30,36 @@ declare global {
 }
 
 /* ---------- Small texture loader that does NOT suspend ---------- */
-const loader = new THREE.TextureLoader()
+const loader = new THREE.TextureLoader();
+
 function loadTexture(url: string) {
     return new Promise<THREE.Texture>((resolve, reject) => {
-        if (!url) return reject(new Error('Empty texture URL'))
+        if (!url) return reject(new Error('Empty texture URL'));
+
         loader.load(
             url,
             async (tex) => {
-                try { if ((tex.image as any)?.decode) await (tex.image as any).decode() } catch { /* ignore */ }
-                tex.colorSpace = THREE.SRGBColorSpace
-                tex.flipY = true
-                tex.anisotropy = 8
-                tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping
-                tex.needsUpdate = true
-                resolve(tex)
+                try {
+                    // HTMLImageElement has decode(); ImageBitmap does not.
+                    const img = tex.image as HTMLImageElement | ImageBitmap | ({} & { decode?: () => Promise<void> });
+                    if ('decode' in img && typeof img.decode === 'function') {
+                        await img.decode();
+                    }
+                } catch {
+                    /* ignore decode errors */
+                }
+
+                tex.colorSpace = THREE.SRGBColorSpace;
+                tex.flipY = true;
+                tex.anisotropy = 8;
+                tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
+                tex.needsUpdate = true;
+                resolve(tex);
             },
             undefined,
             reject
-        )
-    })
+        );
+    });
 }
 
 /* ---------- Deck meshes ---------- */
@@ -119,29 +130,7 @@ const DeckMeshes = ({ topUrl, bottomUrl, rootRef }: { topUrl: string; bottomUrl:
 useGLTF.preload('/models/deck.glb')
 
 
-/* ---------- Fit helpers used by capture ---------- */
-function fitXZToAspect(box: THREE.Box3, aspect: number, margin = 1.14) {
-    // Visible plane (top/bottom view) is X (width) by Z (height)
-    const size = box.getSize(new THREE.Vector3());
-    const center = box.getCenter(new THREE.Vector3());
 
-    // Keep the horizontal (X) margin exactly as-is,
-    // but allow a tighter vertical (Z) margin.
-    const marginX = margin;        // lock side spacing
-    const marginY = margin * 0.90; // shrink top/bottom (tweak 0.90 → 0.85…1.0)
-
-    // 1) FIX width using marginX
-    const halfW = (size.x * marginX) / 2;
-
-    // 2) Compute the height required to keep the output aspect using that width
-    const desiredHalfH = halfW / aspect;
-
-    // 3) Ensure we still at least include the deck vertically with the chosen marginY
-    const minHalfH = (size.z * marginY) / 2;
-    const halfH = Math.max(minHalfH, desiredHalfH);
-
-    return { center, halfW, halfH };
-}
 
 /** Fit the deck’s XZ bounds to an output aspect.
  *  Keeps side margin (marginX) fixed and only grows height as needed.

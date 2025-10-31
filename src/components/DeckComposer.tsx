@@ -663,6 +663,8 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
             ctx.drawImage(img, dx, dy, dw, dh);
         }
 
+
+        
         drawContain(topImg, 0, 0, BOX_W, BOX_H);
         ctx.save();
         ctx.translate(BOX_W / 2, BOX_H + GAP + BOX_H / 2); // move origin to center of bottom slot
