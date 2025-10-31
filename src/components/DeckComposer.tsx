@@ -664,7 +664,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
         }
 
 
-        
+
         drawContain(topImg, 0, 0, BOX_W, BOX_H);
         ctx.save();
         ctx.translate(BOX_W / 2, BOX_H + GAP + BOX_H / 2); // move origin to center of bottom slot
@@ -706,9 +706,34 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
         a.download = filename;
         a.click();
     }
-
+    function MobileSaveBar({ onSave }: { onSave: () => void }) {
+        return (
+            <div
+                className="
+        lg:hidden fixed inset-x-0 bottom-0 z-[1000]
+        border-t border-neutral-200
+        bg-white/90
+      "
+                style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)' }}
+            >
+                <div className="px-4 pt-3">
+                    <button
+                        type="button"
+                        onClick={onSave}
+                        className="btn btn-primary w-full"
+                        aria-label="Download combined PNG"
+                        title="Download combined PNG"
+                    >
+                        Save / Download
+                    </button>
+                </div>
+            </div>
+        );
+    }
     return (
-        <div className="grid gap-6 sm:grid-cols-[380px_minmax(0,1fr)] items-stretch">
+    <>
+        <div className="grid gap-6 sm:grid-cols-[380px_minmax(0,1fr)] items-stretch pb-28 lg:pb-0">
+
             {/* Settings */}
             <aside className="h-full lg:sticky lg:top-6 h-fit p-2 lg:p-4">
                 <div className="space-y-3">
@@ -1419,7 +1444,14 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                             </AccordionSection>
                         )}
                     </div>
-
+                    <button
+                        type="button"
+                        className="btn btn-primary mt-6"
+                        onClick={() => void exportCombinedHorizontal()}   // <-- wrap it
+                        title="Download a single PNG with top & bottom, both horizontal"
+                    >
+                        Download combined PNG
+                    </button>
                     <div className="text-xs text-neutral-500 pt-2">
                         Preview is web-resolution; final print assets are prepared offline.
                     </div>
@@ -1429,23 +1461,25 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
             {/* Preview */}
             < section className="rounded-2xl border shadow-sm p-4 lg:p-5" >
                 <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-sm font-medium">Preview</h3>
+                    {/* <h3 className="text-sm font-medium">Preview</h3> */}
                     <div className="flex gap-2">
-                        <button
+                        {/* <button
                             type="button"
                             className="btn btn-primary"
                             onClick={() => void exportCombinedHorizontal()}   // <-- wrap it
                             title="Download a single PNG with top & bottom, both horizontal"
                         >
                             Download combined PNG
-                        </button>
+                        </button> */}
                     </div>
                 </div>
                 <div className="rounded-xl bg-white overflow-hidden">
                     <DeckViewerMinimal topUrl={selectedGrip.image} bottomUrl={bottomPreviewUrl} />
                 </div>
-            </section >
 
+            </section >
         </div >
+        <MobileSaveBar onSave={() => void exportCombinedHorizontal()} />
+            </>
     )
 }
