@@ -731,739 +731,773 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
         );
     }
     return (
-    <>
-        <div className="grid gap-6 sm:grid-cols-[380px_minmax(0,1fr)] items-stretch pb-28 lg:pb-0">
+        <>
+            <div className="grid gap-6 sm:grid-cols-[380px_minmax(0,1fr)] items-stretch pb-28 lg:pb-0">
 
-            {/* Settings */}
-            <aside className="h-full lg:sticky lg:top-6 h-fit p-2 lg:p-4">
-                <div className="space-y-3">
-                    {hasJK && (
-                        <div className="inline-flex rounded-full bg-neutral-200 p-1">
-                            <button
-                                type="button"
-                                onClick={() => setMode('jk')}
-                                className={`px-5 py-2 text-sm font-medium rounded-full transition-all duration-200
+                {/* Settings */}
+                <aside className="h-full lg:sticky lg:top-6 h-fit p-2 lg:p-4">
+                    <div className="space-y-3">
+                        {hasJK && (
+                            <div className="inline-flex rounded-full bg-neutral-200 p-1">
+                                <button
+                                    type="button"
+                                    onClick={() => setMode('jk')}
+                                    className={`px-5 py-2 text-sm font-medium rounded-full transition-all duration-200
                   ${mode === 'jk' ? 'bg-[#d12429] text-white shadow-sm' : 'text-neutral-700 hover:bg-neutral-300'}
                 `}
-                            >
-                                JK Designs
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setMode('custom')}
-                                className={`px-5 py-2 text-sm font-medium rounded-full transition-all duration-200
+                                >
+                                    JK Designs
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setMode('custom')}
+                                    className={`px-5 py-2 text-sm font-medium rounded-full transition-all duration-200
                   ${mode === 'custom' ? 'bg-[#d12429] text-white shadow-sm' : 'text-neutral-700 hover:bg-neutral-300'}
                 `}
+                                >
+                                    Custom
+                                </button>
+                            </div>
+
+                        )}
+                        <p className="text-xs text-neutral-500 mt-0"> Choose a JK Design or custom design your own deck. </p>
+
+                        <div key={`accordion-stack-${mode}`}>
+                            {/* Grip */}
+                            <AccordionSection
+                                title="Grip Tape"
+                                open={openId === 'grip'}
+                                onToggle={(next) => setOpenId(next ? 'grip' : '')}
                             >
-                                Custom
-                            </button>
-                        </div>
+                                <OptionsGrid>
+                                    {grips.map((g) => (
+                                        <OptionTile
+                                            key={g.id}
+                                            label={g.name}
+                                            image={g.image}
+                                            selected={gripId === g.id}
+                                            onClick={() => setGripId(g.id)}
+                                        />
+                                    ))}
+                                </OptionsGrid>
+                            </AccordionSection>
 
-                    )}
-                    <p className="text-xs text-neutral-500 mt-0"> Choose a JK Design or custom design your own deck. </p>
-
-                    <div key={`accordion-stack-${mode}`}>
-                        {/* Grip */}
-                        <AccordionSection
-                            title="Grip Tape"
-                            open={openId === 'grip'}
-                            onToggle={(next) => setOpenId(next ? 'grip' : '')}
-                        >
-                            <OptionsGrid>
-                                {grips.map((g) => (
-                                    <OptionTile
-                                        key={g.id}
-                                        label={g.name}
-                                        image={g.image}
-                                        selected={gripId === g.id}
-                                        onClick={() => setGripId(g.id)}
-                                    />
-                                ))}
-                            </OptionsGrid>
-                        </AccordionSection>
-
-                        {/* Custom-only */}
-                        {mode === 'custom' && (
-                            <>
-                                <AccordionSection
-                                    title="Bottom Background"
-                                    open={openId === 'bg'}
-                                    onToggle={(next) => setOpenId(next ? 'bg' : '')}
-                                >
-                                    <OptionsGrid>
-                                        {bottoms.map((b) => (
-                                            <OptionTile
-                                                key={b.id}
-                                                label={b.name}
-                                                image={b.image}
-                                                selected={bottomBgId === b.id}
-                                                onClick={() => setBottomBgId(b.id)}
-                                            />
-                                        ))}
-                                    </OptionsGrid>
-                                </AccordionSection>
-                                <AccordionSection
-                                    title="Moonbird Token"
-                                    open={openId === 'token'}
-                                    onToggle={(next) => setOpenId(next ? 'token' : '')}
-                                >
-                                    <div className="space-y-4">
-                                        <Field labelText="Token ID">
-                                            <div className="flex flex-wrap items-center gap-2">
-                                                <input
-                                                    className="input w-36"
-                                                    type="number"
-                                                    placeholder="e.g. 8209"
-                                                    min={1}
-                                                    value={tokenId}
-                                                    onChange={(e) => setTokenId(e.target.value.trim())}
-                                                    disabled={controlsDisabled}
+                            {/* Custom-only */}
+                            {mode === 'custom' && (
+                                <>
+                                    <AccordionSection
+                                        title="Bottom Background"
+                                        open={openId === 'bg'}
+                                        onToggle={(next) => setOpenId(next ? 'bg' : '')}
+                                    >
+                                        <OptionsGrid>
+                                            {bottoms.map((b) => (
+                                                <OptionTile
+                                                    key={b.id}
+                                                    label={b.name}
+                                                    image={b.image}
+                                                    selected={bottomBgId === b.id}
+                                                    onClick={() => setBottomBgId(b.id)}
                                                 />
-                                                <div className="flex gap-1">
-                                                    <button
-                                                        type="button"
-                                                        className={`btn ${style === 'illustrated' ? 'btn-primary' : 'btn-ghost'}`}
-                                                        onClick={() => setStyle('illustrated')}
-                                                        disabled={!ILLU_BASE || controlsDisabled}
-                                                        title={ILLU_BASE ? 'Use illustrated' : 'Set NEXT_PUBLIC_MOONBIRDS_ILLU_BASE'}
-                                                    >
-                                                        Illustrated
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        className={`btn ${style === 'pixel' ? 'btn-primary' : 'btn-ghost'}`}
-                                                        onClick={() => setStyle('pixel')}
-                                                        disabled={!PIXEL_BASE || controlsDisabled}
-                                                        title={PIXEL_BASE ? 'Use pixel' : 'Set NEXT_PUBLIC_MOONBIRDS_PIXEL_BASE'}
-                                                    >
-                                                        Pixel
+                                            ))}
+                                        </OptionsGrid>
+                                    </AccordionSection>
+                                    <AccordionSection
+                                        title="Moonbird Token"
+                                        open={openId === 'token'}
+                                        onToggle={(next) => setOpenId(next ? 'token' : '')}
+                                    >
+                                        <div className="space-y-4">
+                                            <Field labelText="Token ID">
+                                                <div className="flex flex-wrap items-center gap-2">
+                                                    <input
+                                                        className="input w-36"
+                                                        type="number"
+                                                        placeholder="e.g. 8209"
+                                                        min={1}
+                                                        value={tokenId}
+                                                        onChange={(e) => setTokenId(e.target.value.trim())}
+                                                        disabled={controlsDisabled}
+                                                    />
+                                                    <div className="flex gap-1">
+                                                        <button
+                                                            type="button"
+                                                            className={`btn ${style === 'illustrated' ? 'btn-primary' : 'btn-ghost'}`}
+                                                            onClick={() => setStyle('illustrated')}
+                                                            disabled={!ILLU_BASE || controlsDisabled}
+                                                            title={ILLU_BASE ? 'Use illustrated' : 'Set NEXT_PUBLIC_MOONBIRDS_ILLU_BASE'}
+                                                        >
+                                                            Illustrated
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            className={`btn ${style === 'pixel' ? 'btn-primary' : 'btn-ghost'}`}
+                                                            onClick={() => setStyle('pixel')}
+                                                            disabled={!PIXEL_BASE || controlsDisabled}
+                                                            title={PIXEL_BASE ? 'Use pixel' : 'Set NEXT_PUBLIC_MOONBIRDS_PIXEL_BASE'}
+                                                        >
+                                                            Pixel
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <p className="text-xs text-neutral-500">Token is composited onto the selected background.</p>
+                                            </Field>
+
+                                            <Field labelText="Token Scale">
+                                                <div className="flex items-center gap-2">
+                                                    <input
+                                                        className="input w-28"
+                                                        type="number"
+                                                        step={0.25}
+                                                        min={0.25}
+                                                        max={10}
+                                                        value={tokenScale}
+                                                        onChange={(e) => {
+                                                            const n = Number(e.target.value)
+                                                            setTokenScale(Number.isFinite(n) ? Math.max(0.05, Math.min(10, n)) : 1)
+                                                        }}
+                                                        title="Multiply the base size"
+                                                    />
+                                                    <input
+                                                        className="w-full accent-neutral-800"
+                                                        type="range"
+                                                        min={0.25}
+                                                        max={5}
+                                                        step={0.25}
+                                                        value={tokenScale}
+                                                        onChange={(e) => setTokenScale(Number(e.target.value))}
+                                                        title="Drag to scale"
+                                                    />
+                                                    <button type="button" className="btn btn-ghost" onClick={() => setTokenScale(1)} title="Reset">
+                                                        Reset
                                                     </button>
                                                 </div>
-                                            </div>
-                                            <p className="text-xs text-neutral-500">Token is composited onto the selected background.</p>
-                                        </Field>
+                                            </Field>
 
-                                        <Field labelText="Token Scale">
-                                            <div className="flex items-center gap-2">
-                                                <input
-                                                    className="input w-28"
-                                                    type="number"
-                                                    step={0.25}
-                                                    min={0.25}
-                                                    max={10}
-                                                    value={tokenScale}
-                                                    onChange={(e) => {
-                                                        const n = Number(e.target.value)
-                                                        setTokenScale(Number.isFinite(n) ? Math.max(0.05, Math.min(10, n)) : 1)
-                                                    }}
-                                                    title="Multiply the base size"
-                                                />
-                                                <input
-                                                    className="w-full accent-neutral-800"
-                                                    type="range"
-                                                    min={0.25}
-                                                    max={5}
-                                                    step={0.25}
-                                                    value={tokenScale}
-                                                    onChange={(e) => setTokenScale(Number(e.target.value))}
-                                                    title="Drag to scale"
-                                                />
-                                                <button type="button" className="btn btn-ghost" onClick={() => setTokenScale(1)} title="Reset">
-                                                    Reset
-                                                </button>
-                                            </div>
-                                        </Field>
-
-                                        <Field labelText="Nudge Position">
-                                            <div className="grid grid-cols-3 gap-2 w-[220px]">
-                                                <div />
-                                                <button type="button" className="btn" onClick={() => setOffsetX(v => v + nudgeValue)} title="Up">↑</button>
-                                                <div />
-                                                <button type="button" className="btn" onClick={() => setOffsetY(v => v - nudgeValue)} title="Left">←</button>
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-ghost"
-                                                    onClick={() => { setOffsetX(0); setOffsetY(0) }}
-                                                    title="Center"
-                                                >•</button>
-                                                <button type="button" className="btn" onClick={() => setOffsetY(v => v + nudgeValue)} title="Right">→</button>
-                                                <div />
-                                                <button type="button" className="btn" onClick={() => setOffsetX(v => v - nudgeValue)} title="Down">↓</button>
-                                                <div />
-                                            </div>
-                                            <div className="flex items-center gap-3 pt-2 text-xs text-neutral-600">
-                                                <span>X: {offsetX}px</span>
-                                                <span>Y: {offsetY}px</span>
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-ghost btn-sm"
-                                                    onClick={() => { setOffsetX(0); setOffsetY(0) }}
-                                                >
-                                                    Reset
-                                                </button>
-                                            </div>
-                                        </Field>
-                                    </div>
-                                </AccordionSection>
-
-
-                                {/* Glyph 1 */}
-                                <AccordionSection
-                                    title="Glyph Layer 1"
-                                    open={openId === 'glyph1'}
-                                    onToggle={(next) => setOpenId(next ? 'glyph1' : '')}
-                                >
-                                    <div className="space-y-3">
-                                        <OptionsGrid>
-                                            {glyphs1WithNone.map((g) => (
-                                                <OptionTile
-                                                    key={`g1-${g.id}`}
-                                                    label={g.name}
-                                                    image={g.image}
-                                                    selected={glyphId1 === g.id}
-                                                    onClick={() => setGlyphId1(g.id)}
-                                                />
-                                            ))}
-                                        </OptionsGrid>
-
-                                        {glyphId1 !== 'none' && (
-                                            <>
-                                                <Field labelText="Glyph 1 Tint">
-                                                    <input type="color" value={glyphTint1} onChange={(e) => setGlyphTint1(e.target.value)} />
-                                                </Field>
-                                                <Field labelText="Glyph 1 Blend">
-                                                    <select
-                                                        className="input"
-                                                        value={glyph1Blend}
-                                                        onChange={(e) => setGlyph1Blend(e.target.value as GlobalCompositeOperation)}
-                                                        title="How the tinted glyph mixes with the background"
+                                            <Field labelText="Nudge Position">
+                                                <div className="grid grid-cols-3 gap-2 w-[220px]">
+                                                    <div />
+                                                    <button type="button" className="btn" onClick={() => setOffsetX(v => v + nudgeValue)} title="Up">↑</button>
+                                                    <div />
+                                                    <button type="button" className="btn" onClick={() => setOffsetY(v => v - nudgeValue)} title="Left">←</button>
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-ghost"
+                                                        onClick={() => { setOffsetX(0); setOffsetY(0) }}
+                                                        title="Center"
+                                                    >•</button>
+                                                    <button type="button" className="btn" onClick={() => setOffsetY(v => v + nudgeValue)} title="Right">→</button>
+                                                    <div />
+                                                    <button type="button" className="btn" onClick={() => setOffsetX(v => v - nudgeValue)} title="Down">↓</button>
+                                                    <div />
+                                                </div>
+                                                <div className="flex items-center gap-3 pt-2 text-xs text-neutral-600">
+                                                    <span>X: {offsetX}px</span>
+                                                    <span>Y: {offsetY}px</span>
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-ghost btn-sm"
+                                                        onClick={() => { setOffsetX(0); setOffsetY(0) }}
                                                     >
-                                                        {BLEND_MODES.map((m) => (
-                                                            <option key={m} value={m}>{m}</option>
-                                                        ))}
-                                                    </select>
-                                                    <p className="text-xs text-neutral-500">
-                                                        Tip: <code>multiply</code> darkens (ink look), <code>screen</code> brightens (glow), <code>overlay</code> boosts contrast.
-                                                    </p>
-                                                </Field>
+                                                        Reset
+                                                    </button>
+                                                </div>
+                                            </Field>
+                                        </div>
+                                    </AccordionSection>
 
-                                                <Field labelText="Glyph 1 Scale">
-                                                    <div className="flex items-center gap-2">
-                                                        <input
-                                                            className="input w-28"
-                                                            type="number"
-                                                            step={0.25}
-                                                            min={0.1}
-                                                            max={5}
-                                                            value={glyph1Scale}
-                                                            onChange={(e) =>
-                                                                setGlyph1Scale(Math.max(0.1, Math.min(5, Number(e.target.value) || 1)))
-                                                            }
-                                                            title="Multiply the base size"
-                                                        />
-                                                        <input
-                                                            className="w-full accent-neutral-800"
-                                                            type="range"
-                                                            min={0.1}
-                                                            max={5}
-                                                            step={0.25}
-                                                            value={glyph1Scale}
-                                                            onChange={(e) => setGlyph1Scale(Number(e.target.value))}
-                                                            title="Drag to scale"
-                                                        />
-                                                        <button type="button" className="btn btn-ghost" onClick={() => setGlyph1Scale(1)}>
-                                                            Reset
-                                                        </button>
-                                                    </div>
-                                                </Field>
 
-                                                <Field labelText="Glyph 1 Nudge">
-                                                    <div className="grid grid-cols-3 gap-2 w-[220px]">
-                                                        <div />
-                                                        <button type="button" className="btn" onClick={() => setGlyph1OffsetX(v => v + nudgeValue)}>↑</button>
-                                                        <div />
-                                                        <button type="button" className="btn" onClick={() => setGlyph1OffsetY(v => v - nudgeValue)}>←</button>
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-ghost"
-                                                            onClick={() => { setGlyph1OffsetX(0); setGlyph1OffsetY(0) }}
-                                                        >
-                                                            •
-                                                        </button>
-                                                        <button type="button" className="btn" onClick={() => setGlyph1OffsetY(v => v + nudgeValue)}>→</button>
-                                                        <div />
-                                                        <button type="button" className="btn" onClick={() => setGlyph1OffsetX(v => v - nudgeValue)}>↓</button>
-                                                        <div />
-                                                    </div>
-                                                    <div className="flex items-center gap-3 pt-2 text-xs text-neutral-600">
-                                                        <span>X: {glyph1OffsetX}px</span>
-                                                        <span>Y: {glyph1OffsetY}px</span>
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-ghost btn-sm"
-                                                            onClick={() => { setGlyph1OffsetX(0); setGlyph1OffsetY(0) }}
-                                                        >
-                                                            Reset
-                                                        </button>
-                                                    </div>
-                                                </Field>
-                                            </>
-                                        )}
-                                    </div>
-                                </AccordionSection>
+                                    {/* Glyph 1 */}
+                                    <AccordionSection
+                                        title="Glyph Layer 1"
+                                        open={openId === 'glyph1'}
+                                        onToggle={(next) => setOpenId(next ? 'glyph1' : '')}
+                                    >
+                                        <div className="space-y-3">
+                                            <OptionsGrid>
+                                                {glyphs1WithNone.map((g) => (
+                                                    <OptionTile
+                                                        key={`g1-${g.id}`}
+                                                        label={g.name}
+                                                        image={g.image}
+                                                        selected={glyphId1 === g.id}
+                                                        onClick={() => setGlyphId1(g.id)}
+                                                    />
+                                                ))}
+                                            </OptionsGrid>
 
-                                {/* Glyph 2 */}
-                                <AccordionSection
-                                    title="Glyph Layer 2"
-                                    open={openId === 'glyph2'}
-                                    onToggle={(next) => setOpenId(next ? 'glyph2' : '')}
-                                >
-                                    <div className="space-y-3">
-                                        <OptionsGrid>
-                                            {glyphs2WithNone.map((g) => (
-                                                <OptionTile
-                                                    key={`g2-${g.id}`}
-                                                    label={g.name}
-                                                    image={g.image}
-                                                    selected={glyphId2 === g.id}
-                                                    onClick={() => setGlyphId2(g.id)}
-                                                />
-                                            ))}
-                                        </OptionsGrid>
-
-                                        {glyphId2 !== 'none' && (
-                                            <>
-                                                <Field labelText="Glyph 2 Tint">
-                                                    <input type="color" value={glyphTint2} onChange={(e) => setGlyphTint2(e.target.value)} />
-                                                </Field>
-                                                <Field labelText="Glyph 2 Blend">
-                                                    <select
-                                                        className="input"
-                                                        value={glyph2Blend}
-                                                        onChange={(e) => setGlyph2Blend(e.target.value as GlobalCompositeOperation)}
-                                                        title="How the tinted glyph mixes with the background"
-                                                    >
-                                                        {BLEND_MODES.map((m) => (
-                                                            <option key={m} value={m}>{m}</option>
-                                                        ))}
-                                                    </select>
-                                                    <p className="text-xs text-neutral-500">
-                                                        Tip: <code>multiply</code> darkens (ink look), <code>screen</code> brightens (glow), <code>overlay</code> boosts contrast.
-                                                    </p>
-                                                </Field>
-                                                <Field labelText="Glyph 2 Scale">
-                                                    <div className="flex items-center gap-2">
-                                                        <input
-                                                            className="input w-28"
-                                                            type="number"
-                                                            step={0.25}
-                                                            min={0.1}
-                                                            max={5}
-                                                            value={glyph2Scale}
-                                                            onChange={(e) =>
-                                                                setGlyph2Scale(Math.max(0.1, Math.min(5, Number(e.target.value) || 1)))
-                                                            }
-                                                            title="Multiply the base size"
-                                                        />
-                                                        <input
-                                                            className="w-full accent-neutral-800"
-                                                            type="range"
-                                                            min={0.1}
-                                                            max={5}
-                                                            step={0.25}
-                                                            value={glyph2Scale}
-                                                            onChange={(e) => setGlyph2Scale(Number(e.target.value))}
-                                                            title="Drag to scale"
-                                                        />
-                                                        <button type="button" className="btn btn-ghost" onClick={() => setGlyph2Scale(1)}>
-                                                            Reset
-                                                        </button>
-                                                    </div>
-                                                </Field>
-
-                                                <Field labelText="Glyph 2 Nudge">
-                                                    <div className="grid grid-cols-3 gap-2 w-[220px]">
-                                                        <div />
-                                                        <button type="button" className="btn" onClick={() => setGlyph2OffsetX(v => v + nudgeValue)}>↑</button>
-                                                        <div />
-                                                        <button type="button" className="btn" onClick={() => setGlyph2OffsetY(v => v - nudgeValue)}>←</button>
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-ghost"
-                                                            onClick={() => { setGlyph2OffsetX(0); setGlyph2OffsetY(0) }}
-                                                        >
-                                                            •
-                                                        </button>
-                                                        <button type="button" className="btn" onClick={() => setGlyph2OffsetY(v => v + nudgeValue)}>→</button>
-                                                        <div />
-                                                        <button type="button" className="btn" onClick={() => setGlyph2OffsetX(v => v - nudgeValue)}>↓</button>
-                                                        <div />
-                                                    </div>
-                                                    <div className="flex items-center gap-3 pt-2 text-xs text-neutral-600">
-                                                        <span>X: {glyph2OffsetX}px</span>
-                                                        <span>Y: {glyph2OffsetY}px</span>
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-ghost btn-sm"
-                                                            onClick={() => { setGlyph2OffsetX(0); setGlyph2OffsetY(0) }}
-                                                        >
-                                                            Reset
-                                                        </button>
-                                                    </div>
-                                                </Field>
-                                            </>
-                                        )}
-                                    </div>
-                                </AccordionSection>
-
-                                {/* Glyph 3 (NEW) */}
-                                <AccordionSection
-                                    title="Glyph Layer 3"
-                                    open={openId === 'glyph3'}
-                                    onToggle={(next) => setOpenId(next ? 'glyph3' : '')}
-                                >
-                                    <div className="space-y-3">
-                                        <OptionsGrid>
-                                            {glyphs3WithNone.map((g) => (
-                                                <OptionTile
-                                                    key={`g3-${g.id}`}
-                                                    label={g.name}
-                                                    image={g.image}
-                                                    selected={glyphId3 === g.id}
-                                                    onClick={() => setGlyphId3(g.id)}
-                                                />
-                                            ))}
-                                        </OptionsGrid>
-
-                                        {glyphId3 !== 'none' && (
-                                            <>
-                                                <div className="flex items-end gap-4">
-                                                    <Field labelText="Tint" className="w-[88px]">
-                                                        <input
-                                                            type="color"
-                                                            value={glyphTint3}
-                                                            onChange={(e) => setGlyphTint3(e.target.value)}
-                                                            className="
-        h-11 w-full rounded-md border border-neutral-300 p-0 cursor-pointer
-        [&::-webkit-color-swatch-wrapper]:p-0
-        [&::-webkit-color-swatch]:border-0
-        [&::-moz-color-swatch]:border-0
-      "
-                                                            title="Pick tint"
-                                                        />
+                                            {glyphId1 !== 'none' && (
+                                                <>
+                                                    <Field labelText="Glyph 1 Tint">
+                                                        <input type="color" value={glyphTint1} onChange={(e) => setGlyphTint1(e.target.value)} />
                                                     </Field>
-
-                                                    <Field labelText="Blend Mode" className="flex-1">
+                                                    <Field labelText="Glyph 1 Blend">
                                                         <select
-                                                            className="input h-11"
-                                                            value={glyph3Blend}
-                                                            onChange={(e) => setGlyph3Blend(e.target.value as GlobalCompositeOperation)}
+                                                            className="input"
+                                                            value={glyph1Blend}
+                                                            onChange={(e) => setGlyph1Blend(e.target.value as GlobalCompositeOperation)}
                                                             title="How the tinted glyph mixes with the background"
                                                         >
                                                             {BLEND_MODES.map((m) => (
                                                                 <option key={m} value={m}>{m}</option>
                                                             ))}
                                                         </select>
+                                                        <p className="text-xs text-neutral-500">
+                                                            Tip: <code>multiply</code> darkens (ink look), <code>screen</code> brightens (glow), <code>overlay</code> boosts contrast.
+                                                        </p>
                                                     </Field>
+
+                                                    <Field labelText="Glyph 1 Scale">
+                                                        <div className="flex items-center gap-2">
+                                                            <input
+                                                                className="input w-28"
+                                                                type="number"
+                                                                step={0.25}
+                                                                min={0.1}
+                                                                max={5}
+                                                                value={glyph1Scale}
+                                                                onChange={(e) =>
+                                                                    setGlyph1Scale(Math.max(0.1, Math.min(5, Number(e.target.value) || 1)))
+                                                                }
+                                                                title="Multiply the base size"
+                                                            />
+                                                            <input
+                                                                className="w-full accent-neutral-800"
+                                                                type="range"
+                                                                min={0.1}
+                                                                max={5}
+                                                                step={0.25}
+                                                                value={glyph1Scale}
+                                                                onChange={(e) => setGlyph1Scale(Number(e.target.value))}
+                                                                title="Drag to scale"
+                                                            />
+                                                            <button type="button" className="btn btn-ghost" onClick={() => setGlyph1Scale(1)}>
+                                                                Reset
+                                                            </button>
+                                                        </div>
+                                                    </Field>
+
+                                                    <Field labelText="Glyph 1 Nudge">
+                                                        <div className="grid grid-cols-3 gap-2 w-[220px]">
+                                                            <div />
+                                                            <button type="button" className="btn" onClick={() => setGlyph1OffsetX(v => v + nudgeValue)}>↑</button>
+                                                            <div />
+                                                            <button type="button" className="btn" onClick={() => setGlyph1OffsetY(v => v - nudgeValue)}>←</button>
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-ghost"
+                                                                onClick={() => { setGlyph1OffsetX(0); setGlyph1OffsetY(0) }}
+                                                            >
+                                                                •
+                                                            </button>
+                                                            <button type="button" className="btn" onClick={() => setGlyph1OffsetY(v => v + nudgeValue)}>→</button>
+                                                            <div />
+                                                            <button type="button" className="btn" onClick={() => setGlyph1OffsetX(v => v - nudgeValue)}>↓</button>
+                                                            <div />
+                                                        </div>
+                                                        <div className="flex items-center gap-3 pt-2 text-xs text-neutral-600">
+                                                            <span>X: {glyph1OffsetX}px</span>
+                                                            <span>Y: {glyph1OffsetY}px</span>
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-ghost btn-sm"
+                                                                onClick={() => { setGlyph1OffsetX(0); setGlyph1OffsetY(0) }}
+                                                            >
+                                                                Reset
+                                                            </button>
+                                                        </div>
+                                                    </Field>
+                                                </>
+                                            )}
+                                        </div>
+                                    </AccordionSection>
+
+                                    {/* Glyph 2 */}
+                                    <AccordionSection
+                                        title="Glyph Layer 2"
+                                        open={openId === 'glyph2'}
+                                        onToggle={(next) => setOpenId(next ? 'glyph2' : '')}
+                                    >
+                                        <div className="space-y-3">
+                                            <OptionsGrid>
+                                                {glyphs2WithNone.map((g) => (
+                                                    <OptionTile
+                                                        key={`g2-${g.id}`}
+                                                        label={g.name}
+                                                        image={g.image}
+                                                        selected={glyphId2 === g.id}
+                                                        onClick={() => setGlyphId2(g.id)}
+                                                    />
+                                                ))}
+                                            </OptionsGrid>
+
+                                            {glyphId2 !== 'none' && (
+                                                <>
+                                                    <Field labelText="Glyph 2 Tint">
+                                                        <input type="color" value={glyphTint2} onChange={(e) => setGlyphTint2(e.target.value)} />
+                                                    </Field>
+                                                    <Field labelText="Glyph 2 Blend">
+                                                        <select
+                                                            className="input"
+                                                            value={glyph2Blend}
+                                                            onChange={(e) => setGlyph2Blend(e.target.value as GlobalCompositeOperation)}
+                                                            title="How the tinted glyph mixes with the background"
+                                                        >
+                                                            {BLEND_MODES.map((m) => (
+                                                                <option key={m} value={m}>{m}</option>
+                                                            ))}
+                                                        </select>
+                                                        <p className="text-xs text-neutral-500">
+                                                            Tip: <code>multiply</code> darkens (ink look), <code>screen</code> brightens (glow), <code>overlay</code> boosts contrast.
+                                                        </p>
+                                                    </Field>
+                                                    <Field labelText="Glyph 2 Scale">
+                                                        <div className="flex items-center gap-2">
+                                                            <input
+                                                                className="input w-28"
+                                                                type="number"
+                                                                step={0.25}
+                                                                min={0.1}
+                                                                max={5}
+                                                                value={glyph2Scale}
+                                                                onChange={(e) =>
+                                                                    setGlyph2Scale(Math.max(0.1, Math.min(5, Number(e.target.value) || 1)))
+                                                                }
+                                                                title="Multiply the base size"
+                                                            />
+                                                            <input
+                                                                className="w-full accent-neutral-800"
+                                                                type="range"
+                                                                min={0.1}
+                                                                max={5}
+                                                                step={0.25}
+                                                                value={glyph2Scale}
+                                                                onChange={(e) => setGlyph2Scale(Number(e.target.value))}
+                                                                title="Drag to scale"
+                                                            />
+                                                            <button type="button" className="btn btn-ghost" onClick={() => setGlyph2Scale(1)}>
+                                                                Reset
+                                                            </button>
+                                                        </div>
+                                                    </Field>
+
+                                                    <Field labelText="Glyph 2 Nudge">
+                                                        <div className="grid grid-cols-3 gap-2 w-[220px]">
+                                                            <div />
+                                                            <button type="button" className="btn" onClick={() => setGlyph2OffsetX(v => v + nudgeValue)}>↑</button>
+                                                            <div />
+                                                            <button type="button" className="btn" onClick={() => setGlyph2OffsetY(v => v - nudgeValue)}>←</button>
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-ghost"
+                                                                onClick={() => { setGlyph2OffsetX(0); setGlyph2OffsetY(0) }}
+                                                            >
+                                                                •
+                                                            </button>
+                                                            <button type="button" className="btn" onClick={() => setGlyph2OffsetY(v => v + nudgeValue)}>→</button>
+                                                            <div />
+                                                            <button type="button" className="btn" onClick={() => setGlyph2OffsetX(v => v - nudgeValue)}>↓</button>
+                                                            <div />
+                                                        </div>
+                                                        <div className="flex items-center gap-3 pt-2 text-xs text-neutral-600">
+                                                            <span>X: {glyph2OffsetX}px</span>
+                                                            <span>Y: {glyph2OffsetY}px</span>
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-ghost btn-sm"
+                                                                onClick={() => { setGlyph2OffsetX(0); setGlyph2OffsetY(0) }}
+                                                            >
+                                                                Reset
+                                                            </button>
+                                                        </div>
+                                                    </Field>
+                                                </>
+                                            )}
+                                        </div>
+                                    </AccordionSection>
+
+                                    {/* Glyph 3 (NEW) */}
+                                    <AccordionSection
+                                        title="Glyph Layer 3"
+                                        open={openId === 'glyph3'}
+                                        onToggle={(next) => setOpenId(next ? 'glyph3' : '')}
+                                    >
+                                        <div className="space-y-3">
+                                            <OptionsGrid>
+                                                {glyphs3WithNone.map((g) => (
+                                                    <OptionTile
+                                                        key={`g3-${g.id}`}
+                                                        label={g.name}
+                                                        image={g.image}
+                                                        selected={glyphId3 === g.id}
+                                                        onClick={() => setGlyphId3(g.id)}
+                                                    />
+                                                ))}
+                                            </OptionsGrid>
+
+                                            {glyphId3 !== 'none' && (
+                                                <>
+                                                    <div className="flex items-end gap-4">
+                                                        <Field labelText="Tint" className="w-[88px]">
+                                                            <input
+                                                                type="color"
+                                                                value={glyphTint3}
+                                                                onChange={(e) => setGlyphTint3(e.target.value)}
+                                                                className="
+        h-11 w-full rounded-md border border-neutral-300 p-0 cursor-pointer
+        [&::-webkit-color-swatch-wrapper]:p-0
+        [&::-webkit-color-swatch]:border-0
+        [&::-moz-color-swatch]:border-0
+      "
+                                                                title="Pick tint"
+                                                            />
+                                                        </Field>
+
+                                                        <Field labelText="Blend Mode" className="flex-1">
+                                                            <select
+                                                                className="input h-11"
+                                                                value={glyph3Blend}
+                                                                onChange={(e) => setGlyph3Blend(e.target.value as GlobalCompositeOperation)}
+                                                                title="How the tinted glyph mixes with the background"
+                                                            >
+                                                                {BLEND_MODES.map((m) => (
+                                                                    <option key={m} value={m}>{m}</option>
+                                                                ))}
+                                                            </select>
+                                                        </Field>
+                                                    </div>
+                                                    <Field labelText="Scale">
+                                                        <div className="flex items-center gap-2">
+                                                            <input
+                                                                className="input w-28"
+                                                                type="number"
+                                                                step={0.25}
+                                                                min={0.1}
+                                                                max={5}
+                                                                value={glyph3Scale}
+                                                                onChange={(e) =>
+                                                                    setGlyph3Scale(Math.max(0.1, Math.min(5, Number(e.target.value) || 1)))
+                                                                }
+                                                                title="Multiply the base size"
+                                                            />
+                                                            <input
+                                                                className="w-full accent-neutral-800"
+                                                                type="range"
+                                                                min={0.1}
+                                                                max={5}
+                                                                step={0.25}
+                                                                value={glyph3Scale}
+                                                                onChange={(e) => setGlyph3Scale(Number(e.target.value))}
+                                                                title="Drag to scale"
+                                                            />
+                                                            <button type="button" className="btn btn-ghost" onClick={() => setGlyph3Scale(1)}>
+                                                                Reset
+                                                            </button>
+                                                        </div>
+                                                    </Field>
+
+                                                    <Field labelText="Nudge">
+                                                        <div className="grid grid-cols-3 gap-2 w-[220px]">
+                                                            <div />
+                                                            <button type="button" className="btn" onClick={() => setGlyph3OffsetX(v => v + nudgeValue)}>↑</button>
+                                                            <div />
+                                                            <button type="button" className="btn" onClick={() => setGlyph3OffsetY(v => v - nudgeValue)}>←</button>
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-ghost"
+                                                                onClick={() => { setGlyph3OffsetX(0); setGlyph3OffsetY(0) }}
+                                                            >
+                                                                •
+                                                            </button>
+                                                            <button type="button" className="btn" onClick={() => setGlyph3OffsetY(v => v + nudgeValue)}>→</button>
+                                                            <div />
+                                                            <button type="button" className="btn" onClick={() => setGlyph3OffsetX(v => v - nudgeValue)}>↓</button>
+                                                            <div />
+                                                        </div>
+                                                        <div className="flex items-center gap-3 pt-2 text-xs text-neutral-600">
+                                                            <span>X: {glyph3OffsetX}px</span>
+                                                            <span>Y: {glyph3OffsetY}px</span>
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-ghost btn-sm"
+                                                                onClick={() => { setGlyph3OffsetX(0); setGlyph3OffsetY(0) }}
+                                                            >
+                                                                Reset
+                                                            </button>
+                                                        </div>
+                                                    </Field>
+                                                </>
+                                            )}
+                                        </div>
+                                    </AccordionSection>
+                                    <AccordionSection
+                                        title="Text Layer"
+                                        open={openId === 'text'}
+                                        onToggle={(next) => setOpenId(next ? 'text' : '')}
+                                    >
+                                        <div className="space-y-4">
+                                            <Field labelText="Text (max 10 chars)">
+                                                <div className="flex items-center gap-2">
+                                                    <input
+                                                        className="input w-full"
+                                                        type="text"
+                                                        maxLength={10}
+                                                        value={textValue}
+                                                        onChange={(e) => setTextValue(e.target.value.slice(0, 10))}
+                                                        placeholder="e.g. BIRB"
+                                                    />
+                                                    <span className="text-xs text-neutral-500 tabular-nums">{textValue.length}/10</span>
                                                 </div>
-                                                <Field labelText="Scale">
-                                                    <div className="flex items-center gap-2">
-                                                        <input
-                                                            className="input w-28"
-                                                            type="number"
-                                                            step={0.25}
-                                                            min={0.1}
-                                                            max={5}
-                                                            value={glyph3Scale}
-                                                            onChange={(e) =>
-                                                                setGlyph3Scale(Math.max(0.1, Math.min(5, Number(e.target.value) || 1)))
-                                                            }
-                                                            title="Multiply the base size"
-                                                        />
-                                                        <input
-                                                            className="w-full accent-neutral-800"
-                                                            type="range"
-                                                            min={0.1}
-                                                            max={5}
-                                                            step={0.25}
-                                                            value={glyph3Scale}
-                                                            onChange={(e) => setGlyph3Scale(Number(e.target.value))}
-                                                            title="Drag to scale"
-                                                        />
-                                                        <button type="button" className="btn btn-ghost" onClick={() => setGlyph3Scale(1)}>
-                                                            Reset
-                                                        </button>
-                                                    </div>
-                                                </Field>
+                                            </Field>
 
-                                                <Field labelText="Nudge">
-                                                    <div className="grid grid-cols-3 gap-2 w-[220px]">
-                                                        <div />
-                                                        <button type="button" className="btn" onClick={() => setGlyph3OffsetX(v => v + nudgeValue)}>↑</button>
-                                                        <div />
-                                                        <button type="button" className="btn" onClick={() => setGlyph3OffsetY(v => v - nudgeValue)}>←</button>
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-ghost"
-                                                            onClick={() => { setGlyph3OffsetX(0); setGlyph3OffsetY(0) }}
-                                                        >
-                                                            •
-                                                        </button>
-                                                        <button type="button" className="btn" onClick={() => setGlyph3OffsetY(v => v + nudgeValue)}>→</button>
-                                                        <div />
-                                                        <button type="button" className="btn" onClick={() => setGlyph3OffsetX(v => v - nudgeValue)}>↓</button>
-                                                        <div />
-                                                    </div>
-                                                    <div className="flex items-center gap-3 pt-2 text-xs text-neutral-600">
-                                                        <span>X: {glyph3OffsetX}px</span>
-                                                        <span>Y: {glyph3OffsetY}px</span>
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-ghost btn-sm"
-                                                            onClick={() => { setGlyph3OffsetX(0); setGlyph3OffsetY(0) }}
-                                                        >
-                                                            Reset
-                                                        </button>
-                                                    </div>
-                                                </Field>
-                                            </>
-                                        )}
-                                    </div>
-                                </AccordionSection>
-                                <AccordionSection
-                                    title="Text Layer"
-                                    open={openId === 'text'}
-                                    onToggle={(next) => setOpenId(next ? 'text' : '')}
-                                >
-                                    <div className="space-y-4">
-                                        <Field labelText="Text (max 10 chars)">
-                                            <div className="flex items-center gap-2">
-                                                <input
-                                                    className="input w-full"
-                                                    type="text"
-                                                    maxLength={10}
-                                                    value={textValue}
-                                                    onChange={(e) => setTextValue(e.target.value.slice(0, 10))}
-                                                    placeholder="e.g. BIRB"
-                                                />
-                                                <span className="text-xs text-neutral-500 tabular-nums">{textValue.length}/10</span>
-                                            </div>
-                                        </Field>
-
-                                        <Field labelText="Font" className="flex-1">
-                                            {/* <select
+                                            <Field labelText="Font" className="flex-1">
+                                                {/* <select
                                                     className="input"
                                                     value={textFont}
                                                     onChange={(e) => setTextFont(e.target.value as TextFont)}
                                                 > */}
-                                            <select
-                                                className="input"
-                                                value={textFont}
-                                                onChange={async (e) => {
-                                                    const next = e.target.value as TextFont;
-                                                    // map your option to the actual @font-face family name
-                                                    const faceName =
-                                                        next === 'graffiti'
-                                                            ? 'graffiti'
-                                                            : next === 'oscine'
-                                                                ? 'oscine'
-                                                                : next === 'gazpacho'
-                                                                    ? 'gazpacho'
-                                                                    : next === 'impact'
-                                                                        ? 'Impact'
-                                                                        : ''; // sans/mono use system stacks
+                                                <select
+                                                    className="input"
+                                                    value={textFont}
+                                                    onChange={async (e) => {
+                                                        const next = e.target.value as TextFont;
+                                                        // map your option to the actual @font-face family name
+                                                        const faceName =
+                                                            next === 'graffiti'
+                                                                ? 'graffiti'
+                                                                : next === 'oscine'
+                                                                    ? 'oscine'
+                                                                    : next === 'gazpacho'
+                                                                        ? 'gazpacho'
+                                                                        : next === 'impact'
+                                                                            ? 'Impact'
+                                                                            : ''; // sans/mono use system stacks
 
-                                                    if (faceName) {
-                                                        await ensureFontLoaded(faceName);
-                                                    }
-                                                    setTextFont(next);
-                                                }}
-                                            >
-                                                {/* options... */}
+                                                        if (faceName) {
+                                                            await ensureFontLoaded(faceName);
+                                                        }
+                                                        setTextFont(next);
+                                                    }}
+                                                >
+                                                    {/* options... */}
 
-                                                {/* <option value="impact">Impact / Narrow Bold</option> */}
-                                                <option value="oscine">Oscine XBold</option>
-                                                <option value="graffiti">Graffiti</option>
-                                                <option value="gazpacho">Gazpacho</option>
-                                                {/* <option value="sans">Sans Serif</option>
+                                                    {/* <option value="impact">Impact / Narrow Bold</option> */}
+                                                    <option value="oscine">Oscine XBold</option>
+                                                    <option value="graffiti">Graffiti</option>
+                                                    <option value="gazpacho">Gazpacho</option>
+                                                    {/* <option value="sans">Sans Serif</option>
                                                     <option value="mono">Monospace</option> */}
-                                            </select>
-                                        </Field>
+                                                </select>
+                                            </Field>
 
-                                        <div className="flex items-end gap-4">
-                                            {/*  */}
+                                            <div className="flex items-end gap-4">
+                                                {/*  */}
 
-                                            <Field labelText="Color" className="w-[104px]">
-                                                <input
-                                                    type="color"
-                                                    value={textColor}
-                                                    onChange={(e) => setTextColor(e.target.value)}
-                                                    className="
+                                                <Field labelText="Color" className="w-[104px]">
+                                                    <input
+                                                        type="color"
+                                                        value={textColor}
+                                                        onChange={(e) => setTextColor(e.target.value)}
+                                                        className="
             h-11 w-full rounded-md border border-neutral-300 p-0 cursor-pointer
             [&::-webkit-color-swatch-wrapper]:p-0
             [&::-webkit-color-swatch]:border-0
             [&::-moz-color-swatch]:border-0
           "
-                                                    title="Pick text color"
-                                                />
-                                            </Field>
-                                            <Field labelText="Blend Mode">
-                                                <select
-                                                    className="input"
-                                                    value={textBlend}
-                                                    onChange={(e) => setTextBlend(e.target.value as GlobalCompositeOperation)}
-                                                    title="How the text mixes with the artwork"
-                                                >
-                                                    {BLEND_MODES.map((m) => (
-                                                        <option key={m} value={m}>{m}</option>
-                                                    ))}
-                                                </select>
-                                                {/* <p className="text-xs text-neutral-500">
+                                                        title="Pick text color"
+                                                    />
+                                                </Field>
+                                                <Field labelText="Blend Mode">
+                                                    <select
+                                                        className="input"
+                                                        value={textBlend}
+                                                        onChange={(e) => setTextBlend(e.target.value as GlobalCompositeOperation)}
+                                                        title="How the text mixes with the artwork"
+                                                    >
+                                                        {BLEND_MODES.map((m) => (
+                                                            <option key={m} value={m}>{m}</option>
+                                                        ))}
+                                                    </select>
+                                                    {/* <p className="text-xs text-neutral-500">
                                                     Tip: <code>multiply</code> darkens (ink), <code>screen</code> brightens (glow), <code>overlay</code> boosts contrast.
                                                 </p> */}
+                                                </Field>
+                                            </div>
+
+                                            <Field labelText="Scale">
+                                                <div className="flex items-center gap-2">
+                                                    <input
+                                                        className="input w-28"
+                                                        type="number"
+                                                        step={1}
+                                                        min={1}
+                                                        max={15}
+                                                        value={textScale}
+                                                        onChange={(e) => setTextScale(Math.max(1, Math.min(15, Number(e.target.value) || 1)))}
+                                                        title="Multiply the base size"
+                                                    />
+                                                    <input
+                                                        className="w-full accent-neutral-800"
+                                                        type="range"
+                                                        min={1}
+                                                        max={15}
+                                                        step={1}
+                                                        value={textScale}
+                                                        onChange={(e) => setTextScale(Number(e.target.value))}
+                                                        title="Drag to scale"
+                                                    />
+                                                    <button type="button" className="btn btn-ghost" onClick={() => setTextScale(1)}>
+                                                        Reset
+                                                    </button>
+                                                </div>
+                                            </Field>
+
+                                            <Field labelText="Rotate">
+                                                <div className="flex items-center gap-2">
+                                                    <input
+                                                        className="input w-28"
+                                                        type="number"
+                                                        step={5}
+                                                        min={-180}
+                                                        max={180}
+                                                        value={textRotation}
+                                                        onChange={(e) => setTextRotation(Math.max(-180, Math.min(180, Number(e.target.value) || 0)))}
+                                                        title="Degrees"
+                                                    />
+                                                    <input
+                                                        className="w-full accent-neutral-800"
+                                                        type="range"
+                                                        min={-180}
+                                                        max={180}
+                                                        step={5}
+                                                        value={textRotation}
+                                                        onChange={(e) => setTextRotation(Number(e.target.value))}
+                                                        title="Drag to rotate"
+                                                    />
+                                                    <button type="button" className="btn btn-ghost" onClick={() => setTextRotation(0)}>
+                                                        Reset
+                                                    </button>
+                                                </div>
+                                            </Field>
+
+                                            <Field labelText="Nudge">
+                                                <div className="grid grid-cols-3 gap-2 w-[220px]">
+                                                    <div />
+                                                    <button type="button" className="btn" onClick={() => setTextOffsetX(v => v + nudgeValueSm)}>↑</button>
+                                                    <div />
+                                                    <button type="button" className="btn" onClick={() => setTextOffsetY(v => v - nudgeValueSm)}>←</button>
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-ghost"
+                                                        onClick={() => { setTextOffsetX(0); setTextOffsetY(0) }}
+                                                        title="Center"
+                                                    >
+                                                        •
+                                                    </button>
+                                                    <button type="button" className="btn" onClick={() => setTextOffsetY(v => v + nudgeValueSm)}>→</button>
+                                                    <div />
+                                                    <button type="button" className="btn" onClick={() => setTextOffsetX(v => v - nudgeValueSm)}>↓</button>
+                                                    <div />
+                                                </div>
+                                                <div className="flex items-center gap-3 pt-2 text-xs text-neutral-600">
+                                                    <span>X: {textOffsetX}px</span>
+                                                    <span>Y: {textOffsetY}px</span>
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-ghost btn-sm"
+                                                        onClick={() => { setTextOffsetX(0); setTextOffsetY(0) }}
+                                                    >
+                                                        Reset
+                                                    </button>
+                                                </div>
                                             </Field>
                                         </div>
+                                    </AccordionSection>
 
-                                        <Field labelText="Scale">
-                                            <div className="flex items-center gap-2">
-                                                <input
-                                                    className="input w-28"
-                                                    type="number"
-                                                    step={1}
-                                                    min={1}
-                                                    max={15}
-                                                    value={textScale}
-                                                    onChange={(e) => setTextScale(Math.max(1, Math.min(15, Number(e.target.value) || 1)))}
-                                                    title="Multiply the base size"
-                                                />
-                                                <input
-                                                    className="w-full accent-neutral-800"
-                                                    type="range"
-                                                    min={1}
-                                                    max={15}
-                                                    step={1}
-                                                    value={textScale}
-                                                    onChange={(e) => setTextScale(Number(e.target.value))}
-                                                    title="Drag to scale"
-                                                />
-                                                <button type="button" className="btn btn-ghost" onClick={() => setTextScale(1)}>
-                                                    Reset
-                                                </button>
-                                            </div>
-                                        </Field>
 
-                                        <Field labelText="Rotate">
-                                            <div className="flex items-center gap-2">
-                                                <input
-                                                    className="input w-28"
-                                                    type="number"
-                                                    step={5}
-                                                    min={-180}
-                                                    max={180}
-                                                    value={textRotation}
-                                                    onChange={(e) => setTextRotation(Math.max(-180, Math.min(180, Number(e.target.value) || 0)))}
-                                                    title="Degrees"
-                                                />
-                                                <input
-                                                    className="w-full accent-neutral-800"
-                                                    type="range"
-                                                    min={-180}
-                                                    max={180}
-                                                    step={5}
-                                                    value={textRotation}
-                                                    onChange={(e) => setTextRotation(Number(e.target.value))}
-                                                    title="Drag to rotate"
-                                                />
-                                                <button type="button" className="btn btn-ghost" onClick={() => setTextRotation(0)}>
-                                                    Reset
-                                                </button>
-                                            </div>
-                                        </Field>
+                                </>
+                            )}
 
-                                        <Field labelText="Nudge">
-                                            <div className="grid grid-cols-3 gap-2 w-[220px]">
-                                                <div />
-                                                <button type="button" className="btn" onClick={() => setTextOffsetX(v => v + nudgeValueSm)}>↑</button>
-                                                <div />
-                                                <button type="button" className="btn" onClick={() => setTextOffsetY(v => v - nudgeValueSm)}>←</button>
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-ghost"
-                                                    onClick={() => { setTextOffsetX(0); setTextOffsetY(0) }}
-                                                    title="Center"
-                                                >
-                                                    •
-                                                </button>
-                                                <button type="button" className="btn" onClick={() => setTextOffsetY(v => v + nudgeValueSm)}>→</button>
-                                                <div />
-                                                <button type="button" className="btn" onClick={() => setTextOffsetX(v => v - nudgeValueSm)}>↓</button>
-                                                <div />
-                                            </div>
-                                            <div className="flex items-center gap-3 pt-2 text-xs text-neutral-600">
-                                                <span>X: {textOffsetX}px</span>
-                                                <span>Y: {textOffsetY}px</span>
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-ghost btn-sm"
-                                                    onClick={() => { setTextOffsetX(0); setTextOffsetY(0) }}
-                                                >
-                                                    Reset
-                                                </button>
-                                            </div>
-                                        </Field>
+                            {/* JK-only */}
+                            {mode === 'jk' && hasJK && (
+                                <AccordionSection
+                                    title="JK Designs"
+                                    open={openId === 'jk'}
+                                    onToggle={(next) => setOpenId(next ? 'jk' : '')}
+                                >
+                                    <div className="space-y-3">
+                                        <OptionsGrid>
+                                            {jkDesigns.map((d) => (
+                                                <OptionTile
+                                                    key={d.id}
+                                                    label={d.name}
+                                                    image={d.image}
+                                                    selected={jkId === d.id}
+                                                    onClick={() => setJkId(d.id)}
+                                                />
+                                            ))}
+                                        </OptionsGrid>
+                                        <p className="text-xs text-neutral-500">
+                                            Fixed artwork; token and glyph controls are hidden, more coming soon!
+                                        </p>
                                     </div>
                                 </AccordionSection>
-
-
-                            </>
-                        )}
-
-                        {/* JK-only */}
-                        {mode === 'jk' && hasJK && (
-                            <AccordionSection
-                                title="JK Designs"
-                                open={openId === 'jk'}
-                                onToggle={(next) => setOpenId(next ? 'jk' : '')}
+                            )}
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 mt-6">
+                            <button
+                                type="button"
+                                className="btn btn-primary"
+                                onClick={() => void exportCombinedHorizontal()}
+                                title="Download PNG (top & bottom combined)"
                             >
-                                <div className="space-y-3">
-                                    <OptionsGrid>
-                                        {jkDesigns.map((d) => (
-                                            <OptionTile
-                                                key={d.id}
-                                                label={d.name}
-                                                image={d.image}
-                                                selected={jkId === d.id}
-                                                onClick={() => setJkId(d.id)}
-                                            />
-                                        ))}
-                                    </OptionsGrid>
-                                    <p className="text-xs text-neutral-500">
-                                        Fixed artwork; token and glyph controls are hidden, more coming soon!
-                                    </p>
-                                </div>
-                            </AccordionSection>
-                        )}
-                    </div>
-                    <button
-                        type="button"
-                        className="btn btn-primary mt-6"
-                        onClick={() => void exportCombinedHorizontal()}   // <-- wrap it
-                        title="Download a single PNG with top & bottom, both horizontal"
-                    >
-                        Download combined PNG
-                    </button>
-                    <div className="text-xs text-neutral-500 pt-2">
-                        Preview is web-resolution; final print assets are prepared offline.
-                    </div>
-                </div>
-            </aside >
+                                Download PNG
+                            </button>
 
-            {/* Preview */}
-            < section className="rounded-2xl border shadow-sm p-4 lg:p-5" >
-                <div className="flex items-center justify-between mb-3">
-                    {/* <h3 className="text-sm font-medium">Preview</h3> */}
-                    <div className="flex gap-2">
-                        {/* <button
+                            <button
+                                type="button"
+                                className="btn btn-primary"
+                                onClick={() => void exportCombinedHorizontal('GenerationalMerch_MB_Deck.jpeg')}
+                                title="Download JPEG (top & bottom combined)"
+                            >
+                                Download JPEG
+                            </button>
+
+                            {/* Optional mobile-only Share/Save button */}
+                            {typeof navigator !== 'undefined' && !!navigator.share && (
+                                <button
+                                    type="button"
+                                    className="btn col-span-2 lg:hidden"
+                                    onClick={async () => {
+                                        const png = await window.deckCapture?.({ view: 'top', width: 2560, height: 800 });
+                                        if (!png) return;
+                                        const blob = await (await fetch(png)).blob();
+                                        const file = new File([blob], 'deck.png', { type: blob.type });
+                                        await navigator.share({
+                                            files: [file],
+                                            title: 'Generational Merch Deck',
+                                            text: 'My Moonbirds deck design 🛹',
+                                        });
+                                    }}
+                                    title="Share / Save to Photos"
+                                >
+                                    Share / Save
+                                </button>
+                            )}
+                        </div>
+
+                        <div className="text-xs text-neutral-500 pt-2">
+                            Preview is web-resolution; final print assets are prepared offline.
+                        </div>
+                    </div>
+                </aside >
+
+                {/* Preview */}
+                < section className="rounded-2xl border shadow-sm p-4 lg:p-5" >
+                    <div className="flex items-center justify-between mb-3">
+                        {/* <h3 className="text-sm font-medium">Preview</h3> */}
+                        <div className="flex gap-2">
+                            {/* <button
                             type="button"
                             className="btn btn-primary"
                             onClick={() => void exportCombinedHorizontal()}   // <-- wrap it
@@ -1471,15 +1505,14 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                         >
                             Download combined PNG
                         </button> */}
+                        </div>
                     </div>
-                </div>
-                <div className="rounded-xl bg-white overflow-hidden">
-                    <DeckViewerMinimal topUrl={selectedGrip.image} bottomUrl={bottomPreviewUrl} />
-                </div>
+                    <div className="rounded-xl bg-white overflow-hidden">
+                        <DeckViewerMinimal topUrl={selectedGrip.image} bottomUrl={bottomPreviewUrl} />
+                    </div>
 
-            </section >
-        </div >
-        <MobileSaveBar onSave={() => void exportCombinedHorizontal()} />
-            </>
+                </section >
+            </div >
+        </>
     )
 }
