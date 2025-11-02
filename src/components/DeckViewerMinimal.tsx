@@ -180,16 +180,9 @@ function CameraController({ controlsRef }: { controlsRef: React.MutableRefObject
         view,
         width,
         height,
-        margin,                 // legacy
+        margin,
         marginX,
         marginYFactor,
-    }: {
-        view: 'top' | 'bottom'
-        width: number
-        height: number
-        marginX?: number
-        marginYFactor?: number
-        margin?: number
     }) => {
         const top = scene.getObjectByName('DeckTop');
         const bottom = scene.getObjectByName('DeckBottom');
@@ -203,30 +196,90 @@ function CameraController({ controlsRef }: { controlsRef: React.MutableRefObject
         const { center, halfW, halfH } = fitXZToAspectSeparate(
             box,
             width / height,
-            marginX ?? margin ?? 1.12,       // ← side margin (keep width padding)
-            marginYFactor ?? 0.90            // ← tighten top/bottom
+            marginX ?? margin ?? 1.12,
+            marginYFactor ?? 0.20
         );
 
         const cam = new THREE.OrthographicCamera(-halfW, halfW, halfH, -halfH, 0.01, 100);
-        cam.up.set(0, 0, -1);  // horizontal deck
+        cam.up.set(0, 0, -1);
         const size = box.getSize(new THREE.Vector3());
         const yOffset = size.y * 2 + 1;
         cam.position.set(center.x, view === 'top' ? center.y + yOffset : center.y - yOffset, center.z);
         cam.lookAt(center);
         cam.updateProjectionMatrix();
 
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        // ---- Transparent capture setup ----
+        const prevBackground = scene.background;           // save viewer background
+        scene.background = null;                           // <— make capture transparent
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true /* premultipliedAlpha default true */ });
         renderer.setPixelRatio(1);
         renderer.setSize(width, height);
-        renderer.setClearColor(0xf7f7f7, 1);
+        renderer.setClearColor(0x000000, 0);              // fully transparent clear
 
         renderer.render(scene, cam);
         const dataUrl = renderer.domElement.toDataURL('image/png');
+
+        // ---- Restore viewer state ----
+        scene.background = prevBackground;
         renderer.dispose();
         // @ts-expect-error allow GC in some envs
         renderer.domElement = null;
+
         return dataUrl;
     };
+    // window.deckCapture = async ({
+    //     view,
+    //     width,
+    //     height,
+    //     margin,                 // legacy
+    //     marginX,
+    //     marginYFactor,
+    // }: {
+    //     view: 'top' | 'bottom'
+    //     width: number
+    //     height: number
+    //     marginX?: number
+    //     marginYFactor?: number
+    //     margin?: number
+    // }) => {
+    //     const top = scene.getObjectByName('DeckTop');
+    //     const bottom = scene.getObjectByName('DeckBottom');
+    //     const target: THREE.Object3D = (top || bottom) ? new THREE.Group() : scene;
+    //     if (target instanceof THREE.Group && (top || bottom)) {
+    //         if (top) target.add(top.clone());
+    //         if (bottom) target.add(bottom.clone());
+    //     }
+
+    //     const box = new THREE.Box3().setFromObject(target);
+    //     const { center, halfW, halfH } = fitXZToAspectSeparate(
+    //         box,
+    //         width / height,
+    //         marginX ?? margin ?? 1.12,       // ← side margin (keep width padding)
+    //         marginYFactor ?? 0.20            // ← tighten top/bottom
+    //     );
+
+    //     const cam = new THREE.OrthographicCamera(-halfW, halfW, halfH, -halfH, 0.01, 100);
+    //     cam.up.set(0, 0, -1);  // horizontal deck
+    //     const size = box.getSize(new THREE.Vector3());
+    //     const yOffset = size.y * 2 + 1;
+    //     cam.position.set(center.x, view === 'top' ? center.y + yOffset : center.y - yOffset, center.z);
+    //     cam.lookAt(center);
+    //     cam.updateProjectionMatrix();
+
+    //     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    //     renderer.setPixelRatio(1);
+    //     renderer.setSize(width, height);
+    //     // renderer.setClearColor(0xf7f7f7, 1);
+    //       renderer.setClearColor(0x000000, 0)
+
+    //     renderer.render(scene, cam);
+    //     const dataUrl = renderer.domElement.toDataURL('image/png');
+    //     renderer.dispose();
+    //     // @ts-expect-error allow GC in some envs
+    //     renderer.domElement = null;
+    //     return dataUrl;
+    // };
 
     return null
 }

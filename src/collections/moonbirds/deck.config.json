@@ -32,44 +32,53 @@
         { "id": "mb-blue",  "label": "blue",  "image": "/deckAssets/moonbirds/blue.png" },
         { "id": "mb-red",  "label": "glitch red",  "image": "/deckAssets/moonbirds/glitch_red.png" },
         { "id": "mb-jade",  "label": "jade green",  "image": "/deckAssets/moonbirds/jade_green.png" },
-        { "id": "mb-enlightened",  "label": "enlightened purple",  "image": "/deckAssets/moonbirds/enlightened_purple.png" },
+        { "id": "mb-enlightened",  "label": "enlight. purple",  "image": "/deckAssets/moonbirds/enlightened_purple.png" },
         { "id": "mb-cosmic",  "label": "cosmic purple",  "image": "/deckAssets/moonbirds/cosmic_purple.png" },
-
+       { "id": "mb-cream",  "label": "cream",  "image": "/deckAssets/moonbirds/mb_cream.png" },
         { "id": "mb-red-grad-pattern",  "label": "red pattern",  "image": "/deckAssets/moonbirds/mb_red_gradient2.png" },
         { "id": "mb-pat-wh",  "label": "white pattern",  "image": "/deckAssets/moonbirds/mb_pattern_white.png" },
         { "id": "mb-starlight",  "label": "starlight",  "image": "/deckAssets/moonbirds/mb_starlight.png" },
         { "id": "mb-abs-red",  "label": "abstract red",  "image": "/deckAssets/moonbirds/mb_abstract_red.png" },
         { "id": "mb-abs-wh",  "label": "abstract white",  "image": "/deckAssets/moonbirds/mb_abstract_white.png" },
+        { "id": "mb-abs-blk",  "label": "abstract black",  "image": "/deckAssets/moonbirds/mb_abstract_black.png" },
 
         { "id": "mb-wood",  "label": "natural",  "image": "/deckAssets/moonbirds/woodgrain.png" }
     
       ],
 
       "glyphs": [
-        { "id": "birbishPaint", "name": "birbish paint", "image": "/deckAssets/moonbirds/birbishPaint.png"}, 
-        { "id": "sunburst", "name": "sunburst", "image": "/deckAssets/moonbirds/sunburst.png"},
-        { "id": "owlglyph", "name": "owl glyph", "image": "/deckAssets/moonbirds/owl_glyph.png"},
         { "id": "splatter1", "name": "splatter", "image": "/deckAssets/moonbirds/splatter1.png"},
+        { "id": "splatter2", "name": "splatter 2", "image": "/deckAssets/moonbirds/splatter2.png"},
+        { "id": "splatter3", "name": "splatter 3", "image": "/deckAssets/moonbirds/splatter3.png"},
 
-        { "id": "moonbirdsh", "name": "moonbirds", "image": "/deckAssets/moonbirds/moonbirds.png"}
+        { "id": "sunburst", "name": "sunburst", "image": "/deckAssets/moonbirds/sunburst.png"}
+
+
 
       ],
 
      "glyphs2": [
+        { "id": "splatter1", "name": "splatter", "image": "/deckAssets/moonbirds/splatter1.png"},
+        { "id": "splatter2", "name": "splatter 2", "image": "/deckAssets/moonbirds/splatter2.png"},
+        { "id": "splatter3", "name": "splatter 3", "image": "/deckAssets/moonbirds/splatter3.png"},
+
         { "id": "birbishPaint2", "name": "birbish paint", "image": "/deckAssets/moonbirds/birbishPaint.png"}, 
-        { "id": "sunburst2", "name": "sunburst", "image": "/deckAssets/moonbirds/sunburst.png"},
-        { "id": "splatter2", "name": "splatter", "image": "/deckAssets/moonbirds/splatter2.png"},
-        { "id": "owlglyph", "name": "owl glyph", "image": "/deckAssets/moonbirds/owl_glyph.png"},
+
         { "id": "moonbirdsh", "name": "moonbirds", "image": "/deckAssets/moonbirds/moonbirds.png"}
+
 
       ],
 
     "glyphs3": [
+        { "id": "splatter1", "name": "splatter", "image": "/deckAssets/moonbirds/splatter1.png"},
+        { "id": "splatter2", "name": "splatter 2", "image": "/deckAssets/moonbirds/splatter2.png"},
+        { "id": "splatter3", "name": "splatter 3", "image": "/deckAssets/moonbirds/splatter3.png"},
         { "id": "birbishPaint2", "name": "birbish paint", "image": "/deckAssets/moonbirds/birbishPaint.png"}, 
-        { "id": "sunburst2", "name": "sunburst", "image": "/deckAssets/moonbirds/sunburst.png"},
-        { "id": "splatter3", "name": "splatter", "image": "/deckAssets/moonbirds/splatter3.png"},
-        { "id": "owlglyph", "name": "owl glyph", "image": "/deckAssets/moonbirds/owl_glyph.png"},
-        { "id": "moonbirdsh", "name": "moonbirds", "image": "/deckAssets/moonbirds/moonbirds.png"}
+        { "id": "moonbirdsh", "name": "moonbirds", "image": "/deckAssets/moonbirds/moonbirds.png"},
+        { "id": "birblogo", "name": "birb logo", "image": "/deckAssets/overlays/birblogo.png"},
+        { "id": "birblogo2", "name": "birb logo 2", "image": "/deckAssets/overlays/birblogo2.png"},
+        { "id": "birbeyes", "name": "birb eyes", "image": "/deckAssets/overlays/birbeyes.png"},
+        { "id": "owlglyph", "name": "owl glyph", "image": "/deckAssets/overlays/owl_glyph.png"}
 
       ],
 
