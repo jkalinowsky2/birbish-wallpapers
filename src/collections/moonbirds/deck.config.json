@@ -87,7 +87,7 @@
       "jkDesigns": [
         { "id": "toobins", "name": "Twisted Toobins", "image": "/deckAssets/moonbirds/toobins.png" },
         { "id": "birbish", "name": "Birb, Pip, & Zen", "image": "/deckAssets/moonbirds/jk_birbish.png" },
-        { "id": "birbleather", "name": "Leather", "image": "/deckAssets/moonbirds/birbleather.png" }
+        { "id": "birbleather", "name": "Leather Daddy", "image": "/deckAssets/moonbirds/birbleather.png" }
       ],
 
       "defaults": {
