@@ -317,7 +317,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
     const [textBlend, setTextBlend] = useState<GlobalCompositeOperation>('source-over'); // NEW
 
     // Text layer state
-    type TextFont = 'impact' | 'sans' | 'oscine' | 'graffiti' | 'gazpacho'
+    type TextFont = 'impact' | 'sans' | 'oscine' | 'graffiti' | 'gazpacho' | 'pridi'
 
     const [textValue, setTextValue] = useState<string>('')
     const [textColor, setTextColor] = useState<string>('#111111')
@@ -493,7 +493,9 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                         textFont === 'graffiti'
                             ? "'graffiti', cursive"
                             : textFont === 'oscine'
-                                ? "'oscine', sans-serif"
+                                ? "'oscine', regular"
+                            : textFont === 'pridi'
+                                ? "'pridi', sans-serif"
                                 : textFont === 'gazpacho'
                                     ? "'gazpacho', black"
                                     : textFont === 'impact'
@@ -1352,6 +1354,8 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                                                 ? 'graffiti'
                                                                 : next === 'oscine'
                                                                     ? 'oscine'
+                                                                          : next === 'pridi'
+                                                                    ? 'pridi'
                                                                     : next === 'gazpacho'
                                                                         ? 'gazpacho'
                                                                         : next === 'impact'
@@ -1368,6 +1372,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
 
                                                     {/* <option value="impact">Impact / Narrow Bold</option> */}
                                                     <option value="oscine">Oscine XBold</option>
+                                                    <option value="pridi">Pridi</option>
                                                     <option value="graffiti">Graffiti</option>
                                                     <option value="gazpacho">Gazpacho</option>
                                                     {/* <option value="sans">Sans Serif</option>
