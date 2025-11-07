@@ -89,7 +89,7 @@
         { "id": "tomatobird", "name": "tomato bird", "image": "/deckAssets/overlays/tomatobird.png"},
         { "id": "birblogosticker", "name": "birb logo", "image": "/deckAssets/overlays/birblogosticker.png"},
         { "id": "birbsticker", "name": "birb oval", "image": "/deckAssets/overlays/birbsticker.png"},
-        { "id": "iluvmb", "name": "i❤️mb", "image": "/deckAssets/overlays/iluvmbs.png"},
+        { "id": "iluvmb", "name": "i❤️mb", "image": "/deckAssets/overlays/iluvmb.png"},
         { "id": "toobinssticker", "name": "toobins", "image": "/deckAssets/overlays/toobinssticker.png"}
 
       ],
