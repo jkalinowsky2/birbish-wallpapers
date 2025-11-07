@@ -266,7 +266,6 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
         [glyphs4]
     )
     // Layer 1 state
-
     const [glyphId1, setGlyphId1] = useState<string>('none')
     const [glyphTint1, setGlyphTint1] = useState('#7c1315')
     const [glyph1Scale, setGlyph1Scale] = useState<number>(1)
@@ -334,53 +333,6 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
     const [glyph4Blend, setGlyph4Blend] = useState<GlobalCompositeOperation>('source-over'); // if you have a 4th layer
     // Text layer state
     const [textBlend, setTextBlend] = useState<GlobalCompositeOperation>('source-over'); // NEW
-
-
-    ///////NEW GLYPH ACCORDION
-
-    // Which glyph tab is open inside the "Glyphs" accordion
-    const [activeGlyphTab, setActiveGlyphTab] = useState<'g1' | 'g2' | 'g3'>('g1')
-
-    // A lightweight "view model" per layer so one UI can drive any of them
-    const glyphVM = {
-        g1: {
-            label: 'Glyph 1',
-            options: glyphs1WithNone,
-            id: glyphId1, setId: setGlyphId1,
-            tint: glyphTint1, setTint: setGlyphTint1,
-            scale: glyph1Scale, setScale: setGlyph1Scale,
-            offX: glyph1OffsetX, setOffX: setGlyph1OffsetX,
-            offY: glyph1OffsetY, setOffY: setGlyph1OffsetY,
-            blend: glyph1Blend, setBlend: setGlyph1Blend,
-            rot: glyph1Rotation, setRot: setGlyph1Rotation,
-            flipX: glyph1FlipX, setFlipX: setGlyph1FlipX,
-        },
-        g2: {
-            label: 'Glyph 2',
-            options: glyphs2WithNone,
-            id: glyphId2, setId: setGlyphId2,
-            tint: glyphTint2, setTint: setGlyphTint2,
-            scale: glyph2Scale, setScale: setGlyph2Scale,
-            offX: glyph2OffsetX, setOffX: setGlyph2OffsetX,
-            offY: glyph2OffsetY, setOffY: setGlyph2OffsetY,
-            blend: glyph2Blend, setBlend: setGlyph2Blend,
-            rot: glyph2Rotation, setRot: setGlyph2Rotation,
-            flipX: glyph2FlipX, setFlipX: setGlyph2FlipX,
-        },
-        g3: {
-            label: 'Glyph 3',
-            options: glyphs3WithNone,
-            id: glyphId3, setId: setGlyphId3,
-            tint: glyphTint3, setTint: setGlyphTint3,
-            scale: glyph3Scale, setScale: setGlyph3Scale,
-            offX: glyph3OffsetX, setOffX: setGlyph3OffsetX,
-            offY: glyph3OffsetY, setOffY: setGlyph3OffsetY,
-            blend: glyph3Blend, setBlend: setGlyph3Blend,
-            rot: glyph3Rotation, setRot: setGlyph3Rotation,
-            flipX: glyph3FlipX, setFlipX: setGlyph3FlipX,
-        },
-    } as const
-    //////////
 
     // Text layer state
     type TextFont = 'impact' | 'sans' | 'oscine' | 'graffiti' | 'gazpacho' | 'pridi'
@@ -799,138 +751,6 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
             </div>
         );
     }
-
-    function GlyphControls({
-        vm,
-    }: {
-        vm: {
-            label: string
-            options: GlyphOption[]
-            id: string; setId: (v: string) => void
-            tint: string; setTint: (v: string) => void
-            scale: number; setScale: (v: number) => void
-            offX: number; setOffX: (updater: (v: number) => number | number) => void
-            offY: number; setOffY: (updater: (v: number) => number | number) => void
-            blend: GlobalCompositeOperation; setBlend: (v: GlobalCompositeOperation) => void
-            rot: number; setRot: (updater: (v: number) => number | number) => void
-            flipX: boolean; setFlipX: (v: boolean) => void
-        }
-    }) {
-        const hasSelection = vm.id !== 'none'
-        return (
-            <div className="space-y-3">
-                <OptionsGrid>
-                    {vm.options.map((g) => (
-                        <OptionTile
-                            key={`${vm.label}-${g.id}`}
-                            label={g.name}
-                            image={g.image}
-                            selected={vm.id === g.id}
-                            onClick={() => vm.setId(g.id)}
-                        />
-                    ))}
-                </OptionsGrid>
-
-                {hasSelection && (
-                    <>
-                        {/* Tint / Blend / Scale */}
-                        <div className="flex items-end gap-3 sm:gap-4 flex-wrap sm:flex-nowrap">
-                            <Field labelText="Tint" className="w-[50px] shrink-0">
-                                <input
-                                    type="color"
-                                    value={vm.tint}
-                                    onChange={(e) => vm.setTint(e.target.value)}
-                                    className="h-11 w-full rounded-md border border-neutral-300 p-0 cursor-pointer
-                           [&::-webkit-color-swatch-wrapper]:p-0
-                           [&::-webkit-color-swatch]:border-0
-                           [&::-moz-color-swatch]:border-0"
-                                />
-                            </Field>
-
-                            <Field labelText="Blend Mode" className="flex-1 min-w-0">
-                                <select
-                                    className="input h-11 w-full truncate"
-                                    value={vm.blend}
-                                    onChange={(e) => vm.setBlend(e.target.value as GlobalCompositeOperation)}
-                                >
-                                    {BLEND_MODES.map((m) => (
-                                        <option key={m} value={m}>{m}</option>
-                                    ))}
-                                </select>
-                            </Field>
-
-                            <Field labelText="Scale" className="w-[100px] shrink-0">
-                                <input
-                                    className="input h-11 w-full"
-                                    type="number"
-                                    step={0.125} min={0.125} max={5}
-                                    value={vm.scale}
-                                    onChange={(e) => vm.setScale(Math.max(0.125, Math.min(5, Number(e.target.value) || 1)))}
-                                />
-                            </Field>
-                        </div>
-
-                        {/* Nudge + Rotate/Mirror */}
-                        <div className="flex items-start gap-6 flex-wrap sm:flex-nowrap">
-                            <Field labelText="Nudge" className="shrink-0">
-                                <div className="grid grid-cols-3 gap-2 w-[130px]">
-                                    <div />
-                                    <button type="button" className="btn h-10 w-10" onClick={() => vm.setOffX((v: number) => v + nudgeValue)}>↑</button>
-                                    <div />
-                                    <button type="button" className="btn h-10 w-10" onClick={() => vm.setOffY((v: number) => v - nudgeValue)}>←</button>
-                                    <button
-                                        type="button"
-                                        className="btn btn-ghost"
-                                        onClick={() => {
-                                            vm.setOffX(() => 0);
-                                            vm.setOffY(() => 0);
-                                        }}
-                                    >
-                                        •
-                                    </button>
-                                    <button type="button" className="btn h-10 w-10" onClick={() => vm.setOffY((v: number) => v + nudgeValue)}>→</button>
-                                    <div />
-                                    <button type="button" className="btn h-10 w-10" onClick={() => vm.setOffX((v: number) => v - nudgeValue)}>↓</button>
-                                    <div />
-                                </div>
-                            </Field>
-
-                            <div className="flex flex-col gap-2 shrink-0">
-                                <Field labelText="Rotate" className="w-[220px]">
-                                    <div className="flex items-center gap-2">
-                                        <button
-                                            type="button" className="btn h-10 w-10" title="Rotate counter-clockwise"
-                                            onClick={() => vm.setRot((r: number) => (r + (vm.flipX ? 15 : -15) + 360) % 360)}
-                                        >
-                                            <RotateCcw className="w-4 h-4" />
-                                        </button>
-                                        <button
-                                            type="button" className="btn h-10 w-10" title="Rotate clockwise"
-                                            onClick={() => vm.setRot((r: number) => (r + (vm.flipX ? -15 : 15) + 360) % 360)}
-                                        >
-                                            <RotateCw className="w-4 h-4" />
-                                        </button>
-                                    </div>
-                                </Field>
-
-                                <Field labelText="Mirror" className="w-[220px] mt-4">
-                                    <label className="inline-flex items-center gap-2 select-none">
-                                        <input
-                                            type="checkbox"
-                                            className="h-4 w-4 accent-neutral-800"
-                                            checked={vm.flipX}
-                                            onChange={(e) => vm.setFlipX(e.target.checked)}
-                                        />
-                                    </label>
-                                </Field>
-                            </div>
-                        </div>
-                    </>
-                )}
-            </div>
-        )
-    }
-
     return (
         <>
             <div className="grid gap-6 sm:grid-cols-[380px_minmax(0,1fr)] items-stretch pb-28 lg:pb-0">
@@ -1107,29 +927,422 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                         </div>
                                     </AccordionSection>
 
-                                    <AccordionSection
-                                        title="Glyphs"
-                                        open={openId === 'glyphs'}
-                                        onToggle={(next) => setOpenId(next ? 'glyphs' : '')}
-                                    >
-                                        {/* Tab/segment switcher */}
-                                        <div className="inline-flex rounded-full bg-neutral-200 p-1 mb-3">
-                                            {(['g1', 'g2', 'g3'] as const).map((key) => (
-                                                <button
-                                                    key={key}
-                                                    type="button"
-                                                    onClick={() => setActiveGlyphTab(key)}
-                                                    className={`px-5 py-2 text-sm font-medium rounded-full transition-all duration-200
-          ${activeGlyphTab === key ? 'bg-[#d12429] text-white shadow-sm' : 'text-neutral-700 hover:bg-neutral-300'}
-        `}
-                                                >
-                                                    {glyphVM[key].label}
-                                                </button>
-                                            ))}
-                                        </div>
 
-                                        {/* Controls for the selected glyph */}
-                                        <GlyphControls vm={glyphVM[activeGlyphTab]} />
+                                    {/* Glyph 1 */}
+                                    <AccordionSection
+                                        title="Glyph Layer 1"
+                                        open={openId === 'glyph1'}
+                                        onToggle={(next) => setOpenId(next ? 'glyph1' : '')}
+                                    >
+                                        <div className="space-y-3">
+                                            <OptionsGrid>
+                                                {glyphs1WithNone.map((g) => (
+                                                    <OptionTile
+                                                        key={`g1-${g.id}`}
+                                                        label={g.name}
+                                                        image={g.image}
+                                                        selected={glyphId1 === g.id}
+                                                        onClick={() => setGlyphId1(g.id)}
+                                                    />
+                                                ))}
+                                            </OptionsGrid>
+
+                                            {glyphId1 !== 'none' && (
+                                                <>
+                                                    {/* Row: Tint / Blend / Scale */}
+                                                    <div className="flex items-end gap-3 sm:gap-4 flex-wrap sm:flex-nowrap">
+                                                        <Field labelText="Tint" className="w-[50px] shrink-0">
+                                                            <input
+                                                                type="color"
+                                                                value={glyphTint1}
+                                                                onChange={(e) => setGlyphTint1(e.target.value)}
+                                                                className="
+                h-11 w-full rounded-md border border-neutral-300 p-0 cursor-pointer
+                [&::-webkit-color-swatch-wrapper]:p-0
+                [&::-webkit-color-swatch]:border-0
+                [&::-moz-color-swatch]:border-0
+              "
+                                                                title="Pick tint"
+                                                            />
+                                                        </Field>
+
+                                                        <Field labelText="Blend Mode" className="flex-1 min-w-0">
+                                                            <select
+                                                                className="input h-11 w-full truncate"
+                                                                value={glyph1Blend}
+                                                                onChange={(e) => setGlyph1Blend(e.target.value as GlobalCompositeOperation)}
+                                                                title="How the tinted glyph mixes with the background"
+                                                            >
+                                                                {BLEND_MODES.map((m) => (
+                                                                    <option key={m} value={m}>{m}</option>
+                                                                ))}
+                                                            </select>
+                                                        </Field>
+
+                                                        <Field labelText="Scale" className="w-[100px] shrink-0">
+                                                            <input
+                                                                className="input h-11 w-full"
+                                                                type="number"
+                                                                step={0.125}
+                                                                min={0.125}
+                                                                max={5}
+                                                                value={glyph1Scale}
+                                                                onChange={(e) =>
+                                                                    setGlyph1Scale(Math.max(0.125, Math.min(5, Number(e.target.value) || 1)))
+                                                                }
+                                                                title="Multiply the base size"
+                                                            />
+                                                        </Field>
+                                                    </div>
+
+                                                    {/* Row: Nudge (left) + Rotate column (right) with Mirror under Rotate */}
+                                                    <div className="flex items-start gap-6 flex-wrap sm:flex-nowrap">
+                                                        {/* Nudge */}
+                                                        <Field labelText="Nudge" className="shrink-0">
+                                                            <div className="grid grid-cols-3 gap-2 w-[130px]">
+                                                                <div />
+                                                                <button type="button" className="btn h-10 w-10" onClick={() => setGlyph1OffsetX(v => v + nudgeValue)}>↑</button>
+                                                                <div />
+                                                                <button type="button" className="btn h-10 w-10" onClick={() => setGlyph1OffsetY(v => v - nudgeValue)}>←</button>
+                                                                <button
+                                                                    type="button"
+                                                                    className="btn btn-ghost"
+                                                                    onClick={() => { setGlyph1OffsetX(0); setGlyph1OffsetY(0) }}
+                                                                    title="Center"
+                                                                >•</button>
+                                                                <button type="button" className="btn h-10 w-10" onClick={() => setGlyph1OffsetY(v => v + nudgeValue)}>→</button>
+                                                                <div />
+                                                                <button type="button" className="btn h-10 w-10" onClick={() => setGlyph1OffsetX(v => v - nudgeValue)}>↓</button>
+                                                                <div />
+                                                            </div>
+                                                        </Field>
+
+                                                        {/* Rotate + Mirror stacked in one column so Mirror sits directly under Rotate */}
+                                                        <div className="flex flex-col gap-2 shrink-0">
+                                                            <Field labelText="Rotate" className="w-[220px]">
+                                                                <div className="flex items-center gap-2">
+                                                                    {/* Counter-clockwise */}
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn h-10 w-10"
+                                                                        title="Rotate counter-clockwise"
+                                                                        onClick={() =>
+                                                                            setGlyph1Rotation((r) =>
+                                                                                (r + (glyph1FlipX ? 15 : -15) + 360) % 360
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        <RotateCcw className="w-4 h-4" />
+                                                                    </button>
+
+                                                                    {/* Clockwise */}
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn h-10 w-10"
+                                                                        title="Rotate clockwise"
+                                                                        onClick={() =>
+                                                                            setGlyph1Rotation((r) =>
+                                                                                (r + (glyph1FlipX ? -15 : 15) + 360) % 360
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        <RotateCw className="w-4 h-4" />
+                                                                    </button>
+                                                                </div>
+                                                            </Field>
+
+                                                            <Field labelText="Mirror" className="w-[220px] mt-4">
+                                                                <label className="inline-flex items-center gap-2 select-none">
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        className="h-4 w-4 accent-neutral-800"
+                                                                        checked={glyph1FlipX}
+                                                                        onChange={(e) => setGlyph1FlipX(e.target.checked)}
+                                                                    />
+                                                                    {/* <span className="text-sm">Flip horizontally</span> */}
+                                                                </label>
+                                                            </Field>
+                                                        </div>
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
+                                    </AccordionSection>
+
+                                    {/* Glyph 2 */}
+                                    <AccordionSection
+                                        title="Glyph Layer 2"
+                                        open={openId === 'glyph2'}
+                                        onToggle={(next) => setOpenId(next ? 'glyph2' : '')}
+                                    >
+                                        <div className="space-y-3">
+                                            <OptionsGrid>
+                                                {glyphs2WithNone.map((g) => (
+                                                    <OptionTile
+                                                        key={`g2-${g.id}`}
+                                                        label={g.name}
+                                                        image={g.image}
+                                                        selected={glyphId2 === g.id}
+                                                        onClick={() => setGlyphId2(g.id)}
+                                                    />
+                                                ))}
+                                            </OptionsGrid>
+
+                                            {glyphId2 !== 'none' && (
+                                                <>
+                                                    {/* Row: Tint / Blend / Scale */}
+                                                    <div className="flex items-end gap-3 sm:gap-4 flex-wrap sm:flex-nowrap">
+                                                        <Field labelText="Tint" className="w-[50px] shrink-0">
+                                                            <input
+                                                                type="color"
+                                                                value={glyphTint2}
+                                                                onChange={(e) => setGlyphTint2(e.target.value)}
+                                                                className="
+                h-11 w-full rounded-md border border-neutral-300 p-0 cursor-pointer
+                [&::-webkit-color-swatch-wrapper]:p-0
+                [&::-webkit-color-swatch]:border-0
+                [&::-moz-color-swatch]:border-0
+              "
+                                                                title="Pick tint"
+                                                            />
+                                                        </Field>
+
+                                                        <Field labelText="Blend Mode" className="flex-1 min-w-0">
+                                                            <select
+                                                                className="input h-11 w-full truncate"
+                                                                value={glyph2Blend}
+                                                                onChange={(e) => setGlyph2Blend(e.target.value as GlobalCompositeOperation)}
+                                                                title="How the tinted glyph mixes with the background"
+                                                            >
+                                                                {BLEND_MODES.map((m) => (
+                                                                    <option key={m} value={m}>{m}</option>
+                                                                ))}
+                                                            </select>
+                                                        </Field>
+
+                                                        <Field labelText="Scale" className="w-[100px] shrink-0">
+                                                            <input
+                                                                className="input h-11 w-full"
+                                                                type="number"
+                                                                step={0.125}
+                                                                min={0.125}
+                                                                max={5}
+                                                                value={glyph2Scale}
+                                                                onChange={(e) =>
+                                                                    setGlyph2Scale(Math.max(0.125, Math.min(5, Number(e.target.value) || 1)))
+                                                                }
+                                                                title="Multiply the base size"
+                                                            />
+                                                        </Field>
+                                                    </div>
+
+                                                    {/* Row: Nudge + Rotate/Mirror column */}
+                                                    <div className="flex items-start gap-6 flex-wrap sm:flex-nowrap">
+                                                        {/* Nudge */}
+                                                        <Field labelText="Nudge" className="shrink-0">
+                                                            <div className="grid grid-cols-3 gap-2 w-[130px]">
+                                                                <div />
+                                                                <button type="button" className="btn h-10 w-10" onClick={() => setGlyph2OffsetX(v => v + nudgeValue)}>↑</button>
+                                                                <div />
+                                                                <button type="button" className="btn h-10 w-10" onClick={() => setGlyph2OffsetY(v => v - nudgeValue)}>←</button>
+                                                                <button
+                                                                    type="button"
+                                                                    className="btn btn-ghost"
+                                                                    onClick={() => { setGlyph2OffsetX(0); setGlyph2OffsetY(0) }}
+                                                                    title="Center"
+                                                                >•</button>
+                                                                <button type="button" className="btn h-10 w-10" onClick={() => setGlyph2OffsetY(v => v + nudgeValue)}>→</button>
+                                                                <div />
+                                                                <button type="button" className="btn h-10 w-10" onClick={() => setGlyph2OffsetX(v => v - nudgeValue)}>↓</button>
+                                                                <div />
+                                                            </div>
+                                                        </Field>
+
+                                                        {/* Rotate + Mirror */}
+                                                        <div className="flex flex-col gap-2 shrink-0">
+                                                            <Field labelText="Rotate" className="w-[220px]">
+                                                                <div className="flex items-center gap-2">
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn h-10 w-10"
+                                                                        title="Rotate counter-clockwise"
+                                                                        onClick={() =>
+                                                                            setGlyph2Rotation((r) =>
+                                                                                (r + (glyph2FlipX ? 15 : -15) + 360) % 360
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        <RotateCcw className="w-4 h-4" />
+                                                                    </button>
+
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn h-10 w-10"
+                                                                        title="Rotate clockwise"
+                                                                        onClick={() =>
+                                                                            setGlyph2Rotation((r) =>
+                                                                                (r + (glyph2FlipX ? -15 : 15) + 360) % 360
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        <RotateCw className="w-4 h-4" />
+                                                                    </button>
+                                                                </div>
+                                                            </Field>
+
+                                                            <Field labelText="Mirror" className="w-[220px] mt-4">
+                                                                <label className="inline-flex items-center gap-2 select-none">
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        className="h-4 w-4 accent-neutral-800"
+                                                                        checked={glyph2FlipX}
+                                                                        onChange={(e) => setGlyph2FlipX(e.target.checked)}
+                                                                    />
+                                                                </label>
+                                                            </Field>
+                                                        </div>
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
+                                    </AccordionSection>
+
+                                    {/* Glyph 3 */}
+                                    <AccordionSection
+                                        title="Glyph Layer 3"
+                                        open={openId === 'glyph3'}
+                                        onToggle={(next) => setOpenId(next ? 'glyph3' : '')}
+                                    >
+                                        <div className="space-y-3">
+                                            <OptionsGrid>
+                                                {glyphs3WithNone.map((g) => (
+                                                    <OptionTile
+                                                        key={`g3-${g.id}`}
+                                                        label={g.name}
+                                                        image={g.image}
+                                                        selected={glyphId3 === g.id}
+                                                        onClick={() => setGlyphId3(g.id)}
+                                                    />
+                                                ))}
+                                            </OptionsGrid>
+
+                                            {glyphId3 !== 'none' && (
+                                                <>
+                                                    {/* Row: Tint / Blend / Scale */}
+                                                    <div className="flex items-end gap-3 sm:gap-4 flex-wrap sm:flex-nowrap">
+                                                        <Field labelText="Tint" className="w-[50px] shrink-0">
+                                                            <input
+                                                                type="color"
+                                                                value={glyphTint3}
+                                                                onChange={(e) => setGlyphTint3(e.target.value)}
+                                                                className="
+                h-11 w-full rounded-md border border-neutral-300 p-0 cursor-pointer
+                [&::-webkit-color-swatch-wrapper]:p-0
+                [&::-webkit-color-swatch]:border-0
+                [&::-moz-color-swatch]:border-0
+              "
+                                                                title="Pick tint"
+                                                            />
+                                                        </Field>
+
+                                                        <Field labelText="Blend Mode" className="flex-1 min-w-0">
+                                                            <select
+                                                                className="input h-11 w-full truncate"
+                                                                value={glyph3Blend}
+                                                                onChange={(e) => setGlyph3Blend(e.target.value as GlobalCompositeOperation)}
+                                                                title="How the tinted glyph mixes with the background"
+                                                            >
+                                                                {BLEND_MODES.map((m) => (
+                                                                    <option key={m} value={m}>{m}</option>
+                                                                ))}
+                                                            </select>
+                                                        </Field>
+
+                                                        <Field labelText="Scale" className="w-[100px] shrink-0">
+                                                            <input
+                                                                className="input h-11 w-full"
+                                                                type="number"
+                                                                step={0.125}
+                                                                min={0.125}
+                                                                max={5}
+                                                                value={glyph3Scale}
+                                                                onChange={(e) =>
+                                                                    setGlyph3Scale(Math.max(0.125, Math.min(5, Number(e.target.value) || 1)))
+                                                                }
+                                                                title="Multiply the base size"
+                                                            />
+                                                        </Field>
+                                                    </div>
+
+                                                    {/* Row: Nudge + Rotate/Mirror column */}
+                                                    <div className="flex items-start gap-6 flex-wrap sm:flex-nowrap">
+                                                        {/* Nudge */}
+                                                        <Field labelText="Nudge" className="shrink-0">
+                                                            <div className="grid grid-cols-3 gap-2 w-[130px]">
+                                                                <div />
+                                                                <button type="button" className="btn h-10 w-10" onClick={() => setGlyph3OffsetX(v => v + nudgeValue)}>↑</button>
+                                                                <div />
+                                                                <button type="button" className="btn h-10 w-10" onClick={() => setGlyph3OffsetY(v => v - nudgeValue)}>←</button>
+                                                                <button
+                                                                    type="button"
+                                                                    className="btn btn-ghost"
+                                                                    onClick={() => { setGlyph3OffsetX(0); setGlyph3OffsetY(0) }}
+                                                                    title="Center"
+                                                                >•</button>
+                                                                <button type="button" className="btn h-10 w-10" onClick={() => setGlyph3OffsetY(v => v + nudgeValue)}>→</button>
+                                                                <div />
+                                                                <button type="button" className="btn h-10 w-10" onClick={() => setGlyph3OffsetX(v => v - nudgeValue)}>↓</button>
+                                                                <div />
+                                                            </div>
+                                                        </Field>
+
+                                                        {/* Rotate + Mirror */}
+                                                        <div className="flex flex-col gap-2 shrink-0">
+                                                            <Field labelText="Rotate" className="w-[220px]">
+                                                                <div className="flex items-center gap-2">
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn h-10 w-10"
+                                                                        title="Rotate counter-clockwise"
+                                                                        onClick={() =>
+                                                                            setGlyph3Rotation((r) =>
+                                                                                (r + (glyph3FlipX ? 15 : -15) + 360) % 360
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        <RotateCcw className="w-4 h-4" />
+                                                                    </button>
+
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn h-10 w-10"
+                                                                        title="Rotate clockwise"
+                                                                        onClick={() =>
+                                                                            setGlyph3Rotation((r) =>
+                                                                                (r + (glyph3FlipX ? -15 : 15) + 360) % 360
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        <RotateCw className="w-4 h-4" />
+                                                                    </button>
+                                                                </div>
+                                                            </Field>
+
+                                                            <Field labelText="Mirror" className="w-[220px] mt-4">
+                                                                <label className="inline-flex items-center gap-2 select-none">
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        className="h-4 w-4 accent-neutral-800"
+                                                                        checked={glyph3FlipX}
+                                                                        onChange={(e) => setGlyph3FlipX(e.target.checked)}
+                                                                    />
+                                                                </label>
+                                                            </Field>
+                                                        </div>
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
                                     </AccordionSection>
 
                                     {/* Glyph 4 */}
@@ -1151,7 +1364,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                                             setGlyphId4(g.id);
                                                             if (g.id !== 'none') setGlyph4Scale(0.2);
                                                         }}
-                                                        thumbClassName="w-12 h-12"
+                                                        thumbClassName="w-12 h-12" 
                                                     />
                                                 ))}
                                             </OptionsGrid>

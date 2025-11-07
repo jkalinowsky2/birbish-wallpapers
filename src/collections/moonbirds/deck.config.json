@@ -43,7 +43,9 @@
         { "id": "mb-abs-blk",  "label": "abstract black",  "image": "/deckAssets/moonbirds/mb_abstract_black.png" },
 
         { "id": "mb-wood",  "label": "natural",  "image": "/deckAssets/moonbirds/woodgrain.png" },
-        { "id": "mb-leatherlogo",  "label": "leather daddy",  "image": "/deckAssets/moonbirds/leatherlogo.png" }
+        { "id": "mb-leatherlogo",  "label": "leather daddy",  "image": "/deckAssets/moonbirds/leatherlogo.png" },
+        { "id": "mb-tomatobird",  "label": "tomato bird",  "image": "/deckAssets/moonbirds/tomatobird.png" }
+
 
     
       ],
@@ -81,6 +83,16 @@
         { "id": "birblogo2", "name": "birb logo 2", "image": "/deckAssets/overlays/birblogo2.png"},
         { "id": "birbeyes", "name": "birb eyes", "image": "/deckAssets/overlays/birbeyes.png"},
         { "id": "owlglyph", "name": "owl glyph", "image": "/deckAssets/overlays/owl_glyph.png"}
+
+      ],
+
+     "glyphs4": [
+        { "id": "ogsticker", "name": "OG sticker", "image": "/deckAssets/overlays/OGsticker.png"},
+        { "id": "tomatobird", "name": "tomato bird", "image": "/deckAssets/overlays/tomatobird.png"},
+        { "id": "birblogosticker", "name": "birb logo", "image": "/deckAssets/overlays/birblogosticker.png"},
+        { "id": "birbsticker", "name": "birb oval", "image": "/deckAssets/overlays/birbsticker.png"},
+        { "id": "iluvmb", "name": "i❤️mb", "image": "/deckAssets/overlays/iluvmb.png"},
+        { "id": "toobinssticker", "name": "toobins", "image": "/deckAssets/overlays/toobinssticker.png"}
 
       ],
 
