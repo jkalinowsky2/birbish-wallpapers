@@ -42,9 +42,7 @@
         { "id": "mb-abs-wh",  "label": "abstract white",  "image": "/deckAssets/moonbirds/mb_abstract_white.png" },
         { "id": "mb-abs-blk",  "label": "abstract black",  "image": "/deckAssets/moonbirds/mb_abstract_black.png" },
 
-        { "id": "mb-wood",  "label": "natural",  "image": "/deckAssets/moonbirds/woodgrain.png" },
-        { "id": "mb-leatherlogo",  "label": "leather daddy",  "image": "/deckAssets/moonbirds/leatherlogo.png" },
-        { "id": "mb-tomatobird",  "label": "tomato bird",  "image": "/deckAssets/moonbirds/tomatobird.png" }
+        { "id": "mb-wood",  "label": "natural",  "image": "/deckAssets/moonbirds/woodgrain.png" }
 
 
     
@@ -99,7 +97,9 @@
       "jkDesigns": [
         { "id": "toobins", "name": "Twisted Toobins", "image": "/deckAssets/moonbirds/toobins.png" },
         { "id": "birbish", "name": "Birb, Pip, & Zen", "image": "/deckAssets/moonbirds/jk_birbish.png" },
-        { "id": "birbleather", "name": "Leather Daddy", "image": "/deckAssets/moonbirds/birbleather.png" }
+        { "id": "birbleather", "name": "Leather Daddy", "image": "/deckAssets/moonbirds/birbleather.png" },
+        { "id": "mb-leatherlogo",  "label": "Leather Mommy",  "image": "/deckAssets/moonbirds/leatherlogo.png" }
+
       ],
 
       "defaults": {
