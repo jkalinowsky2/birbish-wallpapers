@@ -282,7 +282,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
     const [glyph1Rotation, setGlyph1Rotation] = useState<number>(0)
     const [glyph2Rotation, setGlyph2Rotation] = useState<number>(0)
     const [glyph3Rotation, setGlyph3Rotation] = useState<number>(0)
-    const [glyph4Rotation, setGlyph4Rotation] = useState<number>(0)
+    const [glyph4Rotation, setGlyph4Rotation] = useState<number>(90)
 
     // Layer 2 state
     const [glyphId2, setGlyphId2] = useState<string>('none')
