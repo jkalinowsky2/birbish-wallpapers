@@ -90,7 +90,8 @@
         { "id": "birblogosticker", "name": "birb logo", "image": "/deckAssets/overlays/birblogosticker.png"},
         { "id": "birbsticker", "name": "birb oval", "image": "/deckAssets/overlays/birbsticker.png"},
         { "id": "iluvmb", "name": "i❤️mb", "image": "/deckAssets/overlays/iluvmb.png"},
-        { "id": "toobinssticker", "name": "toobins", "image": "/deckAssets/overlays/toobinssticker.png"}
+        { "id": "toobinssticker", "name": "toobins", "image": "/deckAssets/overlays/toobinssticker.png"},
+        { "id": "gmsticker", "name": "gm", "image": "/deckAssets/overlays/gm.png"}
 
       ],
 
