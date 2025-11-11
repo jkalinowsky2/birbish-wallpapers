@@ -5,6 +5,8 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
+import { ConnectButton } from '@rainbow-me/rainbowkit';
+
 
 type Item = { label: string; href: string };
 
@@ -58,7 +60,12 @@ export default function Header() {
 
         {/* DESKTOP NAV */}
         <nav className="hidden md:flex items-center gap-2">
-
+          <Link
+            href="/shop"
+            className="px-3 py-2 rounded-lg text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100"
+          >
+            Sticker Shop
+          </Link>
           <Dropdown label="Wallpapers" items={WALLPAPER_ITEMS} pathname={pathname} />
           <Dropdown label="Banners" items={BANNER_ITEMS} pathname={pathname} />
           {/* <Dropdown label="Decks" items={DECK_ITEMS} pathname={pathname} /> */}
@@ -74,6 +81,11 @@ export default function Header() {
           >
             Tip Jar
           </Link>
+
+          {/* 🔌 Connect Wallet – desktop only */}
+          {/* <div className="ml-2">
+            <ConnectButton />
+          </div> */}
         </nav>
 
         {/* MOBILE TOGGLE */}
@@ -90,6 +102,13 @@ export default function Header() {
       {/* MOBILE MENU */}
       {mobileOpen && (
         <div className="md:hidden border-t">
+          <Link
+            href="/shop"
+            className={linkClasses("/shop")}
+            onClick={() => setMobileOpen(false)}
+          >
+            Sticker Shop
+          </Link>
           <div className="mx-auto max-w-6xl px-2 py-2">
             {/* Wallpapers section */}
             <button
@@ -142,7 +161,7 @@ export default function Header() {
 
 
 
-                        {/* Decks section */}
+            {/* Decks section */}
             {/* <button
               className="w-full flex items-center justify-between px-2 py-2 text-sm font-medium"
               onClick={() => setMobileOpenSection((s) => (s === "deck" ? null : "deck"))}

@@ -28,7 +28,7 @@ async function ensureFontLoaded(faceName: string, sample = 'BIRB') {
 export type GripOption = { id: string; name: string; image: string }
 export type BottomOption = { id: string; name: string; image: string }
 export type JKDesign = { id: string; name: string; image: string }
-export type GlyphOption = { id: string; name: string; image: string }
+export type GlyphOption = { id: string; name: string; image: string; tintMode?: 'any' | 'brand' | 'none'; }
 
 export type DeckComposerConfig = {
     collectionKey: string
@@ -38,6 +38,8 @@ export type DeckComposerConfig = {
     glyphs2?: GlyphOption[]     // Layer 2
     glyphs3?: GlyphOption[]     // Layer 3 (new)
     glyphs4?: GlyphOption[]     // Layer 3 (new)
+    glyphs5?: GlyphOption[]
+    glyphs6?: GlyphOption[]
     jkDesigns?: JKDesign[]
 }
 
@@ -235,7 +237,7 @@ function makeHorizontalCanvas(img: HTMLImageElement): HTMLCanvasElement {
 
 /* ---------- Main component ---------- */
 export default function DeckComposer({ config }: { config: DeckComposerConfig }) {
-    const { grips, bottoms, jkDesigns = [], glyphs = [], glyphs2 = [], glyphs3 = [], glyphs4 = [] } = config
+    const { grips, bottoms, jkDesigns = [], glyphs = [], glyphs2 = [], glyphs3 = [], glyphs4 = [], glyphs5 = [], glyphs6 = [] } = config
     const hasJK = jkDesigns.length > 0
 
     const initialGrip = useMemo(() => grips[0]!, [grips])
@@ -265,6 +267,14 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
         () => [{ id: 'none', name: 'None', image: '/deckAssets/moonbirds/none.png' }, ...glyphs4],
         [glyphs4]
     )
+    const glyphs5WithNone = useMemo<GlyphOption[]>(
+        () => [{ id: 'none', name: 'None', image: '/deckAssets/moonbirds/none.png' }, ...glyphs5],
+        [glyphs5]
+    )
+    const glyphs6WithNone = useMemo<GlyphOption[]>(
+        () => [{ id: 'none', name: 'None', image: '/deckAssets/moonbirds/none.png' }, ...glyphs6],
+        [glyphs6]
+    )
     // Layer 1 state
 
     const [glyphId1, setGlyphId1] = useState<string>('none')
@@ -277,12 +287,18 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
     const [glyph2FlipX, setGlyph2FlipX] = useState<boolean>(false)
     const [glyph3FlipX, setGlyph3FlipX] = useState<boolean>(false)
     const [glyph4FlipX, setGlyph4FlipX] = useState<boolean>(false)
+    const [glyph5FlipX, setGlyph5FlipX] = useState<boolean>(false)
+    const [glyph6FlipX, setGlyph6FlipX] = useState<boolean>(false)
+
 
 
     const [glyph1Rotation, setGlyph1Rotation] = useState<number>(0)
     const [glyph2Rotation, setGlyph2Rotation] = useState<number>(0)
     const [glyph3Rotation, setGlyph3Rotation] = useState<number>(0)
     const [glyph4Rotation, setGlyph4Rotation] = useState<number>(90)
+    const [glyph5Rotation, setGlyph5Rotation] = useState<number>(90)
+    const [glyph6Rotation, setGlyph6Rotation] = useState<number>(90)
+
 
     // Layer 2 state
     const [glyphId2, setGlyphId2] = useState<string>('none')
@@ -305,10 +321,33 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
     const [glyph4OffsetX, setGlyph4OffsetX] = useState<number>(0)
     const [glyph4OffsetY, setGlyph4OffsetY] = useState<number>(0)
 
+    // Layer 5 state (NEW)
+    const [glyphId5, setGlyphId5] = useState<string>('none')
+    const [glyphTint5, setGlyphTint5] = useState('none')
+    const [glyph5Scale, setGlyph5Scale] = useState<number>(1)
+    const [glyph5OffsetX, setGlyph5OffsetX] = useState<number>(0)
+    const [glyph5OffsetY, setGlyph5OffsetY] = useState<number>(0)
+
+    // Layer 6 state (NEW)
+    const [glyphId6, setGlyphId6] = useState<string>('none')
+    const [glyphTint6, setGlyphTint6] = useState('none')
+    const [glyph6Scale, setGlyph6Scale] = useState<number>(1)
+    const [glyph6OffsetX, setGlyph6OffsetX] = useState<number>(0)
+    const [glyph6OffsetY, setGlyph6OffsetY] = useState<number>(0)
+
     const selectedGlyph1 = glyphs1WithNone.find((g) => g.id === glyphId1) ?? glyphs1WithNone[0]
     const selectedGlyph2 = glyphs2WithNone.find((g) => g.id === glyphId2) ?? glyphs2WithNone[0]
     const selectedGlyph3 = glyphs3WithNone.find((g) => g.id === glyphId3) ?? glyphs3WithNone[0]
     const selectedGlyph4 = glyphs4WithNone.find((g) => g.id === glyphId4) ?? glyphs4WithNone[0]
+    const selectedGlyph5 = glyphs5WithNone.find((g) => g.id === glyphId5) ?? glyphs5WithNone[0]
+    const selectedGlyph6 = glyphs6WithNone.find((g) => g.id === glyphId6) ?? glyphs6WithNone[0]
+
+    const [glyph1Blend, setGlyph1Blend] = useState<GlobalCompositeOperation>('source-over');
+    const [glyph2Blend, setGlyph2Blend] = useState<GlobalCompositeOperation>('source-over');
+    const [glyph3Blend, setGlyph3Blend] = useState<GlobalCompositeOperation>('source-over'); // if you have a 3rd layer
+    const [glyph4Blend, setGlyph4Blend] = useState<GlobalCompositeOperation>('source-over'); // if you have a 4th layer
+    const [glyph5Blend, setGlyph5Blend] = useState<GlobalCompositeOperation>('source-over'); // if you have a 4th layer
+    const [glyph6Blend, setGlyph6Blend] = useState<GlobalCompositeOperation>('source-over'); // if you have a 4th layer
 
     const BLEND_MODES: GlobalCompositeOperation[] = [
         'source-over',   // default
@@ -328,10 +367,18 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
         'color',
         'luminosity',
     ];
-    const [glyph1Blend, setGlyph1Blend] = useState<GlobalCompositeOperation>('source-over');
-    const [glyph2Blend, setGlyph2Blend] = useState<GlobalCompositeOperation>('source-over');
-    const [glyph3Blend, setGlyph3Blend] = useState<GlobalCompositeOperation>('source-over'); // if you have a 3rd layer
-    const [glyph4Blend, setGlyph4Blend] = useState<GlobalCompositeOperation>('source-over'); // if you have a 4th layer
+
+    const BIRB_LOGO_COLORS = [
+        { id: 'birb-red', label: 'Birb Red', value: '#D12429' },
+        { id: 'birb-black', label: 'Black', value: '#111111' },
+        { id: 'birb-white', label: 'White', value: '#FFFFFF' },
+        { id: 'birb-cream', label: 'Cream', value: '#F6EBDD' },
+        { id: 'birb-gold', label: 'Gold', value: '#C79B3B' },
+        { id: 'birb-navy', label: 'Navy', value: '#20263A' },
+        // …whatever your guidelines say
+    ];
+
+
     // Text layer state
     const [textBlend, setTextBlend] = useState<GlobalCompositeOperation>('source-over'); // NEW
 
@@ -382,6 +429,26 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
     } as const
     //////////
 
+    type StickerTab = 'g4' | 'g5' | 'g6'
+    type NumSetter = React.Dispatch<React.SetStateAction<number>>
+    type IdSetter = React.Dispatch<React.SetStateAction<string>>
+
+    type StickerVM = {
+        id: string
+        setId: IdSetter
+        scale: number
+        setScale: NumSetter
+        offX: number
+        setOffX: NumSetter
+        offY: number
+        setOffY: NumSetter
+        rotation: number
+        setRotation: NumSetter
+        list: GlyphOption[]
+        flipX: boolean                 // NEW
+        setFlipX: (v: boolean) => void // NEW
+    }
+
     // Text layer state
     type TextFont = 'impact' | 'sans' | 'oscine' | 'graffiti' | 'gazpacho' | 'pridi'
 
@@ -412,6 +479,8 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
     // Viewer output
     const [bottomPreviewUrl, setBottomPreviewUrl] = useState<string>(initialBottomBG.image)
 
+    const [stickerTab, setStickerTab] = useState<StickerTab>('g4')
+
     // Derived selections
     const selectedGrip = grips.find((g) => g.id === gripId) ?? initialGrip
     const selectedBottomBG = bottoms.find((b) => b.id === bottomBgId) ?? initialBottomBG
@@ -432,21 +501,70 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
         if (glyphId2 !== 'none' && selectedGlyph2.image) urls.push(selectedGlyph2.image)
         if (glyphId3 !== 'none' && selectedGlyph3.image) urls.push(selectedGlyph3.image)
         if (glyphId4 !== 'none' && selectedGlyph4.image) urls.push(selectedGlyph4.image)
+        if (glyphId5 !== 'none' && selectedGlyph5.image) urls.push(selectedGlyph5.image)
+        if (glyphId6 !== 'none' && selectedGlyph6.image) urls.push(selectedGlyph6.image)
+
         bottoms.slice(0, 6).forEach((b) => urls.push(b.image))
         glyphs.slice(0, 3).forEach((g) => urls.push(g.image))
         glyphs2.slice(0, 3).forEach((g) => urls.push(g.image))
         glyphs3.slice(0, 3).forEach((g) => urls.push(g.image))
         glyphs4.slice(0, 3).forEach((g) => urls.push(g.image))
+        glyphs5.slice(0, 3).forEach((g) => urls.push(g.image))
+        glyphs6.slice(0, 3).forEach((g) => urls.push(g.image))
+
+
         urls.forEach((u) => u && loadImageCached(u).catch(() => { }))
     }, [
         bottoms,
-        glyphs, glyphs2, glyphs3, glyphs4,
+        glyphs, glyphs2, glyphs3, glyphs4, glyphs5, glyphs6,
         selectedBottomBG.image,
         selectedGrip.image,
         glyphId1, selectedGlyph1?.image,
         glyphId2, selectedGlyph2?.image,
         glyphId3, selectedGlyph3?.image,
         glyphId4, selectedGlyph4?.image,
+        glyphId5, selectedGlyph5?.image,
+        glyphId6, selectedGlyph6?.image,
+    ])
+
+    const stickerVM: StickerVM = useMemo(() => {
+        switch (stickerTab) {
+            case 'g5':
+                return {
+                    id: glyphId5, setId: setGlyphId5,
+                    scale: glyph5Scale, setScale: setGlyph5Scale,
+                    offX: glyph5OffsetX, setOffX: setGlyph5OffsetX,
+                    offY: glyph5OffsetY, setOffY: setGlyph5OffsetY,
+                    rotation: glyph5Rotation, setRotation: setGlyph5Rotation,
+                    list: glyphs5WithNone,
+                    flipX: glyph5FlipX, setFlipX: setGlyph5FlipX, // NEW
+                }
+            case 'g6':
+                return {
+                    id: glyphId6, setId: setGlyphId6,
+                    scale: glyph6Scale, setScale: setGlyph6Scale,
+                    offX: glyph6OffsetX, setOffX: setGlyph6OffsetX,
+                    offY: glyph6OffsetY, setOffY: setGlyph6OffsetY,
+                    rotation: glyph6Rotation, setRotation: setGlyph6Rotation,
+                    list: glyphs6WithNone,
+                    flipX: glyph6FlipX, setFlipX: setGlyph6FlipX, // NEW
+                }
+            default: // 'g4'
+                return {
+                    id: glyphId4, setId: setGlyphId4,
+                    scale: glyph4Scale, setScale: setGlyph4Scale,
+                    offX: glyph4OffsetX, setOffX: setGlyph4OffsetX,
+                    offY: glyph4OffsetY, setOffY: setGlyph4OffsetY,
+                    rotation: glyph4Rotation, setRotation: setGlyph4Rotation,
+                    list: glyphs4WithNone,
+                    flipX: glyph4FlipX, setFlipX: setGlyph4FlipX, // NEW
+                }
+        }
+    }, [
+        stickerTab,
+        glyphId4, glyph4Scale, glyph4OffsetX, glyph4OffsetY, glyph4Rotation, glyphs4WithNone, glyph4FlipX,
+        glyphId5, glyph5Scale, glyph5OffsetX, glyph5OffsetY, glyph5Rotation, glyphs5WithNone, glyph5FlipX,
+        glyphId6, glyph6Scale, glyph6OffsetX, glyph6OffsetY, glyph6Rotation, glyphs6WithNone, glyph6FlipX,
     ])
 
     /* ---------- Compositor ---------- */
@@ -468,11 +586,15 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                 const glyph2Src = glyphId2 !== 'none' ? selectedGlyph2.image : ''
                 const glyph3Src = glyphId3 !== 'none' ? selectedGlyph3.image : ''
                 const glyph4Src = glyphId4 !== 'none' ? selectedGlyph4.image : ''
+                const glyph5Src = glyphId5 !== 'none' ? selectedGlyph5.image : ''
+                const glyph6Src = glyphId6 !== 'none' ? selectedGlyph6.image : ''
 
                 const glyph1Img = glyph1Src ? await loadImageCached(glyph1Src) : null
                 const glyph2Img = glyph2Src ? await loadImageCached(glyph2Src) : null
                 const glyph3Img = glyph3Src ? await loadImageCached(glyph3Src) : null
                 const glyph4Img = glyph4Src ? await loadImageCached(glyph4Src) : null
+                const glyph5Img = glyph5Src ? await loadImageCached(glyph5Src) : null
+                const glyph6Img = glyph6Src ? await loadImageCached(glyph6Src) : null
 
                 const wantPixel = style === 'pixel'
                 const tokenSrc = tokenId
@@ -557,7 +679,6 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                 if (glyph1Img) drawGlyph(glyph1Img, glyphTint1, glyph1Scale, glyph1OffsetX, glyph1OffsetY, glyph1Blend, glyph1Rotation, glyph1FlipX);
                 if (glyph2Img) drawGlyph(glyph2Img, glyphTint2, glyph2Scale, glyph2OffsetX, glyph2OffsetY, glyph2Blend, glyph2Rotation, glyph2FlipX);
                 if (glyph3Img) drawGlyph(glyph3Img, glyphTint3, glyph3Scale, glyph3OffsetX, glyph3OffsetY, glyph3Blend, glyph3Rotation, glyph3FlipX);
-                if (glyph4Img) drawGlyph(glyph4Img, null, glyph4Scale, glyph4OffsetX, glyph4OffsetY, glyph4Blend, glyph4Rotation, glyph4FlipX);
 
                 // 2.5) Text layer (on top of glyphs, behind token)
                 // 2.5) Text layer (on top of glyphs, behind token)
@@ -645,6 +766,10 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                     }
                 }
 
+                if (glyph4Img) drawGlyph(glyph4Img, null, glyph4Scale, glyph4OffsetX, glyph4OffsetY, glyph4Blend, glyph4Rotation, glyph4FlipX);
+                if (glyph5Img) drawGlyph(glyph5Img, null, glyph5Scale, glyph5OffsetX, glyph5OffsetY, glyph5Blend, glyph5Rotation, glyph5FlipX);
+                if (glyph6Img) drawGlyph(glyph6Img, null, glyph6Scale, glyph6OffsetX, glyph6OffsetY, glyph6Blend, glyph6Rotation, glyph6FlipX);
+
                 const url = c.toDataURL('image/png')
                 if (!cancelled) setBottomPreviewUrl(url)
             } catch {
@@ -662,6 +787,8 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
         glyphId2, glyphTint2, selectedGlyph2?.image, glyph2Scale, glyph2OffsetX, glyph2OffsetY, glyph2Blend, glyph2Rotation, glyph2FlipX,
         glyphId3, glyphTint3, selectedGlyph3?.image, glyph3Scale, glyph3OffsetX, glyph3OffsetY, glyph3Blend, glyph3Rotation, glyph3FlipX,
         glyphId4, selectedGlyph4?.image, glyph4Scale, glyph4OffsetX, glyph4OffsetY, glyph4Rotation, glyph4FlipX,
+        glyphId5, selectedGlyph5?.image, glyph5Scale, glyph5OffsetX, glyph5OffsetY, glyph5Rotation, glyph5FlipX,
+        glyphId6, selectedGlyph6?.image, glyph6Scale, glyph6OffsetX, glyph6OffsetY, glyph6Rotation, glyph6FlipX,
         tokenId, style, tokenScale, offsetX, offsetY, textValue, textColor, textFont, textScale, textOffsetX, textOffsetY, textRotation, textBlend,
     ])
 
@@ -800,6 +927,270 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
         );
     }
 
+    // function GlyphControls({
+    //     vm,
+    // }: {
+    //     vm: {
+    //         label: string
+    //         options: GlyphOption[]
+    //         id: string; setId: (v: string) => void
+    //         tint: string; setTint: (v: string) => void
+    //         scale: number; setScale: (v: number) => void
+    //         offX: number; setOffX: (updater: (v: number) => number | number) => void
+    //         offY: number; setOffY: (updater: (v: number) => number | number) => void
+    //         blend: GlobalCompositeOperation; setBlend: (v: GlobalCompositeOperation) => void
+    //         rot: number; setRot: (updater: (v: number) => number | number) => void
+    //         flipX: boolean; setFlipX: (v: boolean) => void
+    //     }
+    // }) {
+    //     const hasSelection = vm.id !== 'none'
+    //     return (
+    //         <div className="space-y-3">
+    //             <OptionsGrid>
+    //                 {vm.options.map((g) => (
+    //                     <OptionTile
+    //                         key={`${vm.label}-${g.id}`}
+    //                         label={g.name}
+    //                         image={g.image}
+    //                         selected={vm.id === g.id}
+    //                         onClick={() => vm.setId(g.id)}
+    //                     />
+    //                 ))}
+    //             </OptionsGrid>
+
+    //             {hasSelection && (
+    //                 <>
+    //                     {/* Tint / Blend / Scale */}
+    //                     <div className="flex items-end gap-3 sm:gap-4 flex-wrap sm:flex-nowrap">
+    //                         <Field labelText="Tint" className="w-[50px] shrink-0">
+    //                             <input
+    //                                 type="color"
+    //                                 value={vm.tint}
+    //                                 onChange={(e) => vm.setTint(e.target.value)}
+    //                                 className="h-11 w-full rounded-md border border-neutral-300 p-0 cursor-pointer
+    //                        [&::-webkit-color-swatch-wrapper]:p-0
+    //                        [&::-webkit-color-swatch]:border-0
+    //                        [&::-moz-color-swatch]:border-0"
+    //                             />
+    //                         </Field>
+
+    //                         <Field labelText="Blend Mode" className="flex-1 min-w-0">
+    //                             <select
+    //                                 className="input h-11 w-full truncate"
+    //                                 value={vm.blend}
+    //                                 onChange={(e) => vm.setBlend(e.target.value as GlobalCompositeOperation)}
+    //                             >
+    //                                 {BLEND_MODES.map((m) => (
+    //                                     <option key={m} value={m}>{m}</option>
+    //                                 ))}
+    //                             </select>
+    //                         </Field>
+
+    //                         <Field labelText="Scale" className="w-[100px] shrink-0">
+    //                             <input
+    //                                 className="input h-11 w-full"
+    //                                 type="number"
+    //                                 step={0.125} min={0.125} max={5}
+    //                                 value={vm.scale}
+    //                                 onChange={(e) => vm.setScale(Math.max(0.125, Math.min(5, Number(e.target.value) || 1)))}
+    //                             />
+    //                         </Field>
+    //                     </div>
+
+    //                     {/* Nudge + Rotate/Mirror */}
+    //                     <div className="flex items-start gap-6 flex-wrap sm:flex-nowrap">
+    //                         <Field labelText="Nudge" className="shrink-0">
+    //                             <div className="grid grid-cols-3 gap-2 w-[130px]">
+    //                                 <div />
+    //                                 <button type="button" className="btn h-10 w-10" onClick={() => vm.setOffX((v: number) => v + nudgeValue)}>↑</button>
+    //                                 <div />
+    //                                 <button type="button" className="btn h-10 w-10" onClick={() => vm.setOffY((v: number) => v - nudgeValue)}>←</button>
+    //                                 <button
+    //                                     type="button"
+    //                                     className="btn btn-ghost"
+    //                                     onClick={() => {
+    //                                         vm.setOffX(() => 0);
+    //                                         vm.setOffY(() => 0);
+    //                                     }}
+    //                                 >
+    //                                     •
+    //                                 </button>
+    //                                 <button type="button" className="btn h-10 w-10" onClick={() => vm.setOffY((v: number) => v + nudgeValue)}>→</button>
+    //                                 <div />
+    //                                 <button type="button" className="btn h-10 w-10" onClick={() => vm.setOffX((v: number) => v - nudgeValue)}>↓</button>
+    //                                 <div />
+    //                             </div>
+    //                         </Field>
+
+    //                         {/* Rotate + Mirror — identical behavior to Glyphs */}
+    //                         <div className="flex flex-col gap-2 shrink-0">
+    //                             <Field labelText="Rotate" className="w-[220px]">
+    //                                 <div className="flex items-center gap-2">
+    //                                     <button
+    //                                         type="button"
+    //                                         className="btn h-10 w-10"
+    //                                         title="Rotate counter-clockwise"
+    //                                         onClick={() =>
+    //                                             vm.setRot((r: number) => (r + (vm.flipX ? 15 : -15) + 360) % 360)
+    //                                         }
+    //                                     >
+    //                                         <RotateCcw className="w-4 h-4" />
+    //                                     </button>
+    //                                     <button
+    //                                         type="button"
+    //                                         className="btn h-10 w-10"
+    //                                         title="Rotate clockwise"
+    //                                         onClick={() =>
+    //                                             vm.setRot((r: number) => (r + (vm.flipX ? -15 : 15) + 360) % 360)
+    //                                         }
+    //                                     >
+    //                                         <RotateCw className="w-4 h-4" />
+    //                                     </button>
+    //                                 </div>
+    //                             </Field>
+
+    //                             <Field labelText="Mirror" className="w-[220px] mt-4">
+    //                                 <label className="inline-flex items-center gap-2 select-none">
+    //                                     <input
+    //                                         type="checkbox"
+    //                                         className="h-4 w-4 accent-neutral-800"
+    //                                         checked={vm.flipX}
+    //                                         onChange={(e) => vm.setFlipX(e.target.checked)}
+    //                                     />
+    //                                 </label>
+    //                             </Field>
+    //                         </div>
+    //                     </div>
+    //                 </>
+    //             )}
+    //         </div>
+    //     )
+    // }
+
+
+    // function GlyphControls({
+    //     vm,
+    // }: {
+    //     vm: {
+    //         label: string
+    //         options: GlyphOption[]
+    //         id: string; setId: (v: string) => void
+    //         tint: string; setTint: (v: string) => void
+    //         scale: number; setScale: (v: number) => void
+    //         offX: number; setOffX: (updater: (v: number) => number | number) => void
+    //         offY: number; setOffY: (updater: (v: number) => number | number) => void
+    //         blend: GlobalCompositeOperation; setBlend: (v: GlobalCompositeOperation) => void
+    //         rot: number; setRot: (updater: (v: number) => number | number) => void
+    //         flipX: boolean; setFlipX: (v: boolean) => void
+    //     }
+    // }) {
+    //     const hasSelection = vm.id !== 'none'
+
+    //     // 🆕 detect the selected glyph and its tint mode
+    //     const currentGlyph = vm.options.find((g) => g.id === vm.id)
+    //     const tintMode: 'any' | 'brand' | 'none' = currentGlyph?.tintMode ?? 'any'
+
+
+    //     return (
+    //         <div className="space-y-3">
+    //             <OptionsGrid>
+    //                 {vm.options.map((g) => (
+    //                     <OptionTile
+    //                         key={`${vm.label}-${g.id}`}
+    //                         label={g.name}
+    //                         image={g.image}
+    //                         selected={vm.id === g.id}
+    //                         onClick={() => vm.setId(g.id)}
+    //                     />
+    //                 ))}
+    //             </OptionsGrid>
+
+    //             {hasSelection && (
+    //                 <>
+    //                     {/* Tint / Blend / Scale */}
+    //                     <div className="flex items-end gap-3 sm:gap-4 flex-wrap sm:flex-nowrap">
+    //                         <Field labelText="Tint" className="min-w-[120px] shrink-0">
+    //                             {/* 🆕 conditional tint UI */}
+    //                             {tintMode === 'any' && (
+    //                                 <input
+    //                                     type="color"
+    //                                     value={vm.tint}
+    //                                     onChange={(e) => vm.setTint(e.target.value)}
+    //                                     className="h-11 w-[52px] rounded-md border border-neutral-300 p-0 cursor-pointer
+    //                 [&::-webkit-color-swatch-wrapper]:p-0
+    //                 [&::-webkit-color-swatch]:border-0
+    //                 [&::-moz-color-swatch]:border-0"
+    //                                 />
+    //                             )}
+
+    //                             {tintMode === 'brand' && (
+    //                                 <div className="flex flex-wrap gap-2">
+    //                                     {BIRB_LOGO_COLORS.map((c) => (
+    //                                         <button
+    //                                             key={c.id}
+    //                                             type="button"
+    //                                             onClick={() => vm.setTint(c.value)}
+    //                                             className={`h-8 w-8 rounded-full border transition-transform
+    //                     ${vm.tint === c.value
+    //                                                     ? 'border-neutral-900 scale-105'
+    //                                                     : 'border-neutral-300'}`}
+    //                                             style={{ backgroundColor: c.value }}
+    //                                             title={c.label}
+    //                                         >
+    //                                             <span className="sr-only">{c.label}</span>
+    //                                         </button>
+    //                                     ))}
+    //                                 </div>
+    //                             )}
+
+    //                             {tintMode === 'none' && (
+    //                                 <p className="text-xs text-neutral-500">
+    //                                     Color fixed by brand guidelines.
+    //                                 </p>
+    //                             )}
+    //                         </Field>
+
+    //                         {/* Blend + Scale (unchanged) */}
+    //                         <Field labelText="Blend Mode" className="flex-1 min-w-0">
+    //                             <select
+    //                                 className="input h-11 w-full truncate"
+    //                                 value={vm.blend}
+    //                                 onChange={(e) =>
+    //                                     vm.setBlend(e.target.value as GlobalCompositeOperation)
+    //                                 }
+    //                             >
+    //                                 {BLEND_MODES.map((m) => (
+    //                                     <option key={m} value={m}>
+    //                                         {m}
+    //                                     </option>
+    //                                 ))}
+    //                             </select>
+    //                         </Field>
+
+    //                         <Field labelText="Scale" className="w-[100px] shrink-0">
+    //                             <input
+    //                                 className="input h-11 w-full"
+    //                                 type="number"
+    //                                 step={0.125}
+    //                                 min={0.125}
+    //                                 max={5}
+    //                                 value={vm.scale}
+    //                                 onChange={(e) =>
+    //                                     vm.setScale(
+    //                                         Math.max(0.125, Math.min(5, Number(e.target.value) || 1))
+    //                                     )
+    //                                 }
+    //                             />
+    //                         </Field>
+    //                     </div>
+
+    //                     {/* rest of your nudge / rotate / mirror controls */}
+    //                 </>
+    //             )}
+    //         </div>
+    //     )
+    // }
+
     function GlyphControls({
         vm,
     }: {
@@ -817,6 +1208,11 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
         }
     }) {
         const hasSelection = vm.id !== 'none'
+
+        // detect the selected glyph and its tint mode
+        const currentGlyph = vm.options.find((g) => g.id === vm.id)
+        const tintMode: 'any' | 'brand' | 'none' = currentGlyph?.tintMode ?? 'any'
+
         return (
             <div className="space-y-3">
                 <OptionsGrid>
@@ -835,62 +1231,149 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                     <>
                         {/* Tint / Blend / Scale */}
                         <div className="flex items-end gap-3 sm:gap-4 flex-wrap sm:flex-nowrap">
-                            <Field labelText="Tint" className="w-[50px] shrink-0">
-                                <input
-                                    type="color"
-                                    value={vm.tint}
-                                    onChange={(e) => vm.setTint(e.target.value)}
-                                    className="h-11 w-full rounded-md border border-neutral-300 p-0 cursor-pointer
-                           [&::-webkit-color-swatch-wrapper]:p-0
-                           [&::-webkit-color-swatch]:border-0
-                           [&::-moz-color-swatch]:border-0"
-                                />
+                            <Field labelText="Tint" className="min-w-[120px] shrink-0">
+                                {/* conditional tint UI */}
+                                {tintMode === 'any' && (
+                                    <input
+                                        type="color"
+                                        value={vm.tint}
+                                        onChange={(e) => vm.setTint(e.target.value)}
+                                        className="h-11 w-[52px] rounded-md border border-neutral-300 p-0 cursor-pointer
+                    [&::-webkit-color-swatch-wrapper]:p-0
+                    [&::-webkit-color-swatch]:border-0
+                    [&::-moz-color-swatch]:border-0"
+                                    />
+                                )}
+
+                                {tintMode === 'brand' && (
+                                    <div className="flex flex-wrap gap-2">
+                                        {BIRB_LOGO_COLORS.map((c) => (
+                                            <button
+                                                key={c.id}
+                                                type="button"
+                                                onClick={() => vm.setTint(c.value)}
+                                                className={`h-8 w-8 rounded-full border transition-transform
+                        ${vm.tint === c.value
+                                                        ? 'border-neutral-900 scale-105'
+                                                        : 'border-neutral-300'}`}
+                                                style={{ backgroundColor: c.value }}
+                                                title={c.label}
+                                            >
+                                                <span className="sr-only">{c.label}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {tintMode === 'none' && (
+                                    <p className="text-xs text-neutral-500">
+                                        Color fixed by brand guidelines.
+                                    </p>
+                                )}
                             </Field>
 
-                            <Field labelText="Blend Mode" className="flex-1 min-w-0">
-                                <select
-                                    className="input h-11 w-full truncate"
-                                    value={vm.blend}
-                                    onChange={(e) => vm.setBlend(e.target.value as GlobalCompositeOperation)}
-                                >
-                                    {BLEND_MODES.map((m) => (
-                                        <option key={m} value={m}>{m}</option>
-                                    ))}
-                                </select>
-                            </Field>
+                            {/* <Field labelText="Blend Mode" className="flex-1 min-w-0">
+              <select
+                className="input h-11 w-full truncate"
+                value={vm.blend}
+                onChange={(e) =>
+                  vm.setBlend(e.target.value as GlobalCompositeOperation)
+                }
+              >
+                {BLEND_MODES.map((m) => (
+                  <option key={m} value={m}>
+                    {m}
+                  </option>
+                ))}
+              </select>
+            </Field> */}
+
+                            {/* Blend + Scale */}
+                            {tintMode !== 'brand' && (
+                                <Field labelText="Blend Mode" className="flex-1 min-w-0">
+                                    <select
+                                        className="input h-11 w-full truncate"
+                                        value={vm.blend}
+                                        onChange={(e) =>
+                                            vm.setBlend(e.target.value as GlobalCompositeOperation)
+                                        }
+                                    >
+                                        {BLEND_MODES.map((m) => (
+                                            <option key={m} value={m}>
+                                                {m}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </Field>
+                            )}
 
                             <Field labelText="Scale" className="w-[100px] shrink-0">
                                 <input
                                     className="input h-11 w-full"
                                     type="number"
-                                    step={0.125} min={0.125} max={5}
+                                    step={0.125}
+                                    min={0.125}
+                                    max={5}
                                     value={vm.scale}
-                                    onChange={(e) => vm.setScale(Math.max(0.125, Math.min(5, Number(e.target.value) || 1)))}
+                                    onChange={(e) =>
+                                        vm.setScale(
+                                            Math.max(0.125, Math.min(5, Number(e.target.value) || 1))
+                                        )
+                                    }
                                 />
                             </Field>
                         </div>
 
-                        {/* Nudge + Rotate/Mirror */}
+                        {/* Nudge + Rotate / Mirror */}
                         <div className="flex items-start gap-6 flex-wrap sm:flex-nowrap">
                             <Field labelText="Nudge" className="shrink-0">
                                 <div className="grid grid-cols-3 gap-2 w-[130px]">
                                     <div />
-                                    <button type="button" className="btn h-10 w-10" onClick={() => vm.setOffX((v: number) => v + nudgeValue)}>↑</button>
+                                    {/* Up */}
+                                    <button
+                                        type="button"
+                                        className="btn h-10 w-10"
+                                        onClick={() => vm.setOffY((v: number) => v - nudgeValue)}
+                                    >
+                                        ↑
+                                    </button>
                                     <div />
-                                    <button type="button" className="btn h-10 w-10" onClick={() => vm.setOffY((v: number) => v - nudgeValue)}>←</button>
+                                    {/* Left */}
+                                    <button
+                                        type="button"
+                                        className="btn h-10 w-10"
+                                        onClick={() => vm.setOffX((v: number) => v - nudgeValue)}
+                                    >
+                                        ←
+                                    </button>
+                                    {/* Center */}
                                     <button
                                         type="button"
                                         className="btn btn-ghost"
                                         onClick={() => {
-                                            vm.setOffX(() => 0);
-                                            vm.setOffY(() => 0);
+                                            vm.setOffX(() => 0)
+                                            vm.setOffY(() => 0)
                                         }}
                                     >
                                         •
                                     </button>
-                                    <button type="button" className="btn h-10 w-10" onClick={() => vm.setOffY((v: number) => v + nudgeValue)}>→</button>
+                                    {/* Right */}
+                                    <button
+                                        type="button"
+                                        className="btn h-10 w-10"
+                                        onClick={() => vm.setOffX((v: number) => v + nudgeValue)}
+                                    >
+                                        →
+                                    </button>
                                     <div />
-                                    <button type="button" className="btn h-10 w-10" onClick={() => vm.setOffX((v: number) => v - nudgeValue)}>↓</button>
+                                    {/* Down */}
+                                    <button
+                                        type="button"
+                                        className="btn h-10 w-10"
+                                        onClick={() => vm.setOffY((v: number) => v + nudgeValue)}
+                                    >
+                                        ↓
+                                    </button>
                                     <div />
                                 </div>
                             </Field>
@@ -899,14 +1382,22 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                 <Field labelText="Rotate" className="w-[220px]">
                                     <div className="flex items-center gap-2">
                                         <button
-                                            type="button" className="btn h-10 w-10" title="Rotate counter-clockwise"
-                                            onClick={() => vm.setRot((r: number) => (r + (vm.flipX ? 15 : -15) + 360) % 360)}
+                                            type="button"
+                                            className="btn h-10 w-10"
+                                            title="Rotate counter-clockwise"
+                                            onClick={() =>
+                                                vm.setRot((r: number) => (r + (vm.flipX ? 15 : -15) + 360) % 360)
+                                            }
                                         >
                                             <RotateCcw className="w-4 h-4" />
                                         </button>
                                         <button
-                                            type="button" className="btn h-10 w-10" title="Rotate clockwise"
-                                            onClick={() => vm.setRot((r: number) => (r + (vm.flipX ? -15 : 15) + 360) % 360)}
+                                            type="button"
+                                            className="btn h-10 w-10"
+                                            title="Rotate clockwise"
+                                            onClick={() =>
+                                                vm.setRot((r: number) => (r + (vm.flipX ? -15 : 15) + 360) % 360)
+                                            }
                                         >
                                             <RotateCw className="w-4 h-4" />
                                         </button>
@@ -921,6 +1412,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                             checked={vm.flipX}
                                             onChange={(e) => vm.setFlipX(e.target.checked)}
                                         />
+                                        <span className="text-sm">Flip horizontally</span>
                                     </label>
                                 </Field>
                             </div>
@@ -930,7 +1422,6 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
             </div>
         )
     }
-
     return (
         <>
             <div className="grid gap-6 sm:grid-cols-[380px_minmax(0,1fr)] items-stretch pb-28 lg:pb-0">
@@ -1003,6 +1494,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                             ))}
                                         </OptionsGrid>
                                     </AccordionSection>
+
                                     <AccordionSection
                                         title="Moonbird Token"
                                         open={openId === 'token'}
@@ -1132,101 +1624,93 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                         <GlyphControls vm={glyphVM[activeGlyphTab]} />
                                     </AccordionSection>
 
-                                    {/* Glyph 4 */}
                                     <AccordionSection
                                         title="Stickers"
-                                        open={openId === 'glyph4'}
-                                        onToggle={(next) => setOpenId(next ? 'glyph4' : '')}
+                                        open={openId === 'stickers'}
+                                        onToggle={(next) => setOpenId(next ? 'stickers' : '')}
                                     >
+                                        {/* Tab toggle like Glyphs 1–3 */}
+                                        <div className="inline-flex rounded-full bg-neutral-200 p-1 mb-4">
+                                            <button
+                                                type="button"
+                                                onClick={() => setStickerTab('g4')}
+                                                className={`px-5 py-2 text-sm font-medium rounded-full transition-all duration-200
+        ${stickerTab === 'g4' ? 'bg-[#d12429] text-white shadow-sm' : 'text-neutral-700 hover:bg-neutral-300'}`}
+                                            >
+                                                Sticker 1
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setStickerTab('g5')}
+                                                className={`px-5 py-2 text-sm font-medium rounded-full transition-all duration-200
+        ${stickerTab === 'g5' ? 'bg-[#d12429] text-white shadow-sm' : 'text-neutral-700 hover:bg-neutral-300'}`}
+                                            >
+                                                Sticker 2
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setStickerTab('g6')}
+                                                className={`px-5 py-2 text-sm font-medium rounded-full transition-all duration-200
+        ${stickerTab === 'g6' ? 'bg-[#d12429] text-white shadow-sm' : 'text-neutral-700 hover:bg-neutral-300'}`}
+                                            >
+                                                Sticker 3
+                                            </button>
+                                        </div>
+
+                                        {/* Options grid for the active sticker layer */}
                                         <div className="space-y-3">
                                             <OptionsGrid>
-                                                {glyphs4WithNone.map((g) => (
+                                                {stickerVM.list.map((g) => (
                                                     <OptionTile
-                                                        key={`g4-${g.id}`}
+                                                        key={`st-${stickerTab}-${g.id}`}
                                                         label={g.name}
                                                         image={g.image}
-                                                        selected={glyphId4 === g.id}
-                                                        // onClick={() => setGlyphId4(g.id)}
+                                                        selected={stickerVM.id === g.id}
                                                         onClick={() => {
-                                                            setGlyphId4(g.id);
-                                                            if (g.id !== 'none') setGlyph4Scale(0.2);
+                                                            stickerVM.setId(g.id)
+                                                            if (g.id !== 'none') stickerVM.setScale(0.25) // default small
                                                         }}
                                                         thumbClassName="w-12 h-12"
                                                     />
                                                 ))}
                                             </OptionsGrid>
 
-                                            {glyphId4 !== 'none' && (
+                                            {stickerVM.id !== 'none' && (
                                                 <>
-                                                    {/* Row: Tint / Blend / Scale */}
+                                                    {/* Scale */}
                                                     <div className="flex items-end gap-3 sm:gap-4 flex-wrap sm:flex-nowrap">
-                                                        {/* <Field labelText="Tint" className="w-[50px] shrink-0">
-                                                            <input
-                                                                type="color"
-                                                                value={glyphTint3}
-                                                                onChange={(e) => setGlyphTint3(e.target.value)}
-                                                                className="
-                h-11 w-full rounded-md border border-neutral-300 p-0 cursor-pointer
-                [&::-webkit-color-swatch-wrapper]:p-0
-                [&::-webkit-color-swatch]:border-0
-                [&::-moz-color-swatch]:border-0
-              "
-                                                                title="Pick tint"
-                                                            />
-                                                        </Field> */}
-                                                        {/* 
-                                                        <Field labelText="Blend Mode" className="flex-1 min-w-0">
-                                                            <select
-                                                                className="input h-11 w-full truncate"
-                                                                value={glyph4Blend}
-                                                                onChange={(e) => setGlyph3Blend(e.target.value as GlobalCompositeOperation)}
-                                                                title="How the tinted glyph mixes with the background"
-                                                            >
-                                                                {BLEND_MODES.map((m) => (
-                                                                    <option key={m} value={m}>{m}</option>
-                                                                ))}
-                                                            </select>
-                                                        </Field> */}
-
                                                         <Field labelText="Scale" className="w-[100px] shrink-0">
                                                             <input
                                                                 className="input h-11 w-full"
-                                                                type="number"
-                                                                step={0.1}
-                                                                min={0.1}
-                                                                max={1}
-                                                                value={glyph4Scale}
-                                                                onChange={(e) =>
-                                                                    setGlyph4Scale(Math.max(0.1, Math.min(5, Number(e.target.value) || 1)))
-                                                                }
+                                                                type="number" step={0.1} min={0.1} max={5}
+                                                                value={stickerVM.scale}
+                                                                onChange={(e) => stickerVM.setScale(Math.max(0.1, Math.min(5, Number(e.target.value) || 1)))}
                                                                 title="Multiply the base size"
                                                             />
                                                         </Field>
                                                     </div>
 
-                                                    {/* Row: Nudge + Rotate/Mirror column */}
+                                                    {/* Nudge + Rotate */}
                                                     <div className="flex items-start gap-6 flex-wrap sm:flex-nowrap">
-                                                        {/* Nudge */}
                                                         <Field labelText="Nudge" className="shrink-0">
                                                             <div className="grid grid-cols-3 gap-2 w-[130px]">
                                                                 <div />
-                                                                <button type="button" className="btn h-10 w-10" onClick={() => setGlyph4OffsetX(v => v + nudgeValue)}>↑</button>
+                                                                <button type="button" className="btn h-10 w-10" onClick={() => stickerVM.setOffX(v => v + nudgeValue)}>↑</button>
                                                                 <div />
-                                                                <button type="button" className="btn h-10 w-10" onClick={() => setGlyph4OffsetY(v => v - nudgeValue)}>←</button>
+                                                                <button type="button" className="btn h-10 w-10" onClick={() => stickerVM.setOffY(v => v - nudgeValue)}>←</button>
                                                                 <button
                                                                     type="button"
                                                                     className="btn btn-ghost"
-                                                                    onClick={() => { setGlyph4OffsetX(0); setGlyph4OffsetY(0) }}
+                                                                    onClick={() => { stickerVM.setOffX(0); stickerVM.setOffY(0); }}
                                                                     title="Center"
                                                                 >•</button>
-                                                                <button type="button" className="btn h-10 w-10" onClick={() => setGlyph4OffsetY(v => v + nudgeValue)}>→</button>
+                                                                <button type="button" className="btn h-10 w-10" onClick={() => stickerVM.setOffY(v => v + nudgeValue)}>→</button>
                                                                 <div />
-                                                                <button type="button" className="btn h-10 w-10" onClick={() => setGlyph4OffsetX(v => v - nudgeValue)}>↓</button>
+                                                                <button type="button" className="btn h-10 w-10" onClick={() => stickerVM.setOffX(v => v - nudgeValue)}>↓</button>
                                                                 <div />
                                                             </div>
                                                         </Field>
 
-                                                        {/* Rotate + Mirror */}
                                                         <div className="flex flex-col gap-2 shrink-0">
                                                             <Field labelText="Rotate" className="w-[220px]">
                                                                 <div className="flex items-center gap-2">
@@ -1234,40 +1718,20 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                                                         type="button"
                                                                         className="btn h-10 w-10"
                                                                         title="Rotate counter-clockwise"
-                                                                        onClick={() =>
-                                                                            setGlyph4Rotation((r) =>
-                                                                                (r + (glyph4FlipX ? 15 : -15) + 360) % 360
-                                                                            )
-                                                                        }
+                                                                        onClick={() => stickerVM.setRotation((r: number) => (r - 15 + 360) % 360)}
                                                                     >
                                                                         <RotateCcw className="w-4 h-4" />
                                                                     </button>
-
                                                                     <button
                                                                         type="button"
                                                                         className="btn h-10 w-10"
                                                                         title="Rotate clockwise"
-                                                                        onClick={() =>
-                                                                            setGlyph4Rotation((r) =>
-                                                                                (r + (glyph4FlipX ? -15 : 15) + 360) % 360
-                                                                            )
-                                                                        }
+                                                                        onClick={() => stickerVM.setRotation((r: number) => (r + 15) % 360)}
                                                                     >
                                                                         <RotateCw className="w-4 h-4" />
                                                                     </button>
                                                                 </div>
                                                             </Field>
-
-                                                            {/* <Field labelText="Mirror" className="w-[220px] mt-4">
-                                                                <label className="inline-flex items-center gap-2 select-none">
-                                                                    <input
-                                                                        type="checkbox"
-                                                                        className="h-4 w-4 accent-neutral-800"
-                                                                        checked={glyph3FlipX}
-                                                                        onChange={(e) => setGlyph3FlipX(e.target.checked)}
-                                                                    />
-                                                                </label>
-                                                            </Field> */}
                                                         </div>
                                                     </div>
                                                 </>
@@ -1502,14 +1966,14 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                 Download PNG
                             </button>
 
-                            <button
+                            {/* <button
                                 type="button"
                                 className="btn btn-primary"
                                 onClick={() => void exportCombinedHorizontal('GenerationalMerch_MB_Deck.jpeg')}
                                 title="Download JPEG (top & bottom combined)"
                             >
                                 Download JPEG
-                            </button>
+                            </button> */}
 
                             {/* Optional mobile-only Share/Save button */}
                             {typeof navigator !== 'undefined' && !!navigator.share && (

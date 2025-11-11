@@ -20,7 +20,7 @@ export type BottomItem = {
   // (We ignore color bottoms here to keep runtime simple/stable.)
 }
 
-export type GlyphItem = { id: string; name?: string; label?: string; image: string }
+export type GlyphItem = { id: string; name?: string; label?: string; image: string; tintMode?: 'any' | 'brand' | 'none'}
 export type JKDesignItem = { id: string; name: string; image: string }
 
 export type UVFix = { rotationFixDeg: number; flipX: boolean; flipY: boolean }
@@ -36,6 +36,8 @@ export type PerCollectionDeckConfig = {
   glyphs2?: GlyphItem[]
   glyphs3?: GlyphItem[]
   glyphs4?: GlyphItem[]
+  glyphs5?: GlyphItem[]
+  glyphs6?: GlyphItem[]
   jkDesigns?: JKDesignItem[]
   defaults?: {
     style?: 'illustrated' | 'pixel' | 'oddity'
@@ -104,21 +106,36 @@ export function buildDeckComposerConfig(collectionKey: string): DeckComposerConf
     id: g.id,
     name: g.name ?? g.label ?? g.id,
     image: g.image,
+    tintMode: g.tintMode ?? 'any',  // ✅ pass tint mode through
   }))
 
   const glyphs2 = (col.glyphs2 ?? []).map((g) => ({
     id: g.id,
     name: g.name ?? g.label ?? g.id,
     image: g.image,
+    tintMode: g.tintMode ?? 'any',  // ✅ pass tint mode through
   }))
 
     const glyphs3 = (col.glyphs3 ?? []).map((g) => ({
     id: g.id,
     name: g.name ?? g.label ?? g.id,
     image: g.image,
+    tintMode: g.tintMode ?? 'any',  // ✅ pass tint mode through
   }))
 
     const glyphs4 = (col.glyphs4 ?? []).map((g) => ({
+    id: g.id,
+    name: g.name ?? g.label ?? g.id,
+    image: g.image,
+  }))
+
+    const glyphs5 = (col.glyphs5 ?? []).map((g) => ({
+    id: g.id,
+    name: g.name ?? g.label ?? g.id,
+    image: g.image,
+  }))
+
+    const glyphs6 = (col.glyphs6 ?? []).map((g) => ({
     id: g.id,
     name: g.name ?? g.label ?? g.id,
     image: g.image,
@@ -138,6 +155,8 @@ export function buildDeckComposerConfig(collectionKey: string): DeckComposerConf
     glyphs2,
     glyphs3,
     glyphs4,
+    glyphs5,
+    glyphs6,
     jkDesigns,
   }
 }

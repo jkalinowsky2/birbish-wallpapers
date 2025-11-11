@@ -49,38 +49,38 @@
       ],
 
       "glyphs": [
-        { "id": "splatter1", "name": "splatter", "image": "/deckAssets/moonbirds/splatter1.png"},
-        { "id": "splatter2", "name": "splatter 2", "image": "/deckAssets/moonbirds/splatter2.png"},
-        { "id": "splatter3", "name": "splatter 3", "image": "/deckAssets/moonbirds/splatter3.png"},
+        { "id": "splatter1", "name": "splatter", "image": "/deckAssets/moonbirds/splatter1.png", "tintMode": "any"}, 
+        { "id": "splatter2", "name": "splatter 2", "image": "/deckAssets/moonbirds/splatter2.png", "tintMode": "any"}, 
+        { "id": "splatter3", "name": "splatter 3", "image": "/deckAssets/moonbirds/splatter3.png", "tintMode": "any"}, 
 
-        { "id": "sunburst", "name": "sunburst", "image": "/deckAssets/moonbirds/sunburst.png"}
+        { "id": "sunburst", "name": "sunburst", "image": "/deckAssets/moonbirds/sunburst.png", "tintMode": "any"}
 
 
 
       ],
 
      "glyphs2": [
-        { "id": "splatter1", "name": "splatter", "image": "/deckAssets/moonbirds/splatter1.png"},
-        { "id": "splatter2", "name": "splatter 2", "image": "/deckAssets/moonbirds/splatter2.png"},
+        { "id": "splatter1", "name": "splatter", "image": "/deckAssets/moonbirds/splatter1.png", "tintMode": "any"}, 
+        { "id": "splatter2", "name": "splatter 2", "image": "/deckAssets/moonbirds/splatter2.png", "tintMode": "any"}, 
         { "id": "splatter3", "name": "splatter 3", "image": "/deckAssets/moonbirds/splatter3.png"},
 
-        { "id": "birbishPaint2", "name": "birbish paint", "image": "/deckAssets/moonbirds/birbishPaint.png"}, 
+        { "id": "birbishPaint2", "name": "birbish paint", "image": "/deckAssets/moonbirds/birbishPaint.png", "tintMode": "any"}, 
 
-        { "id": "moonbirdsh", "name": "moonbirds", "image": "/deckAssets/moonbirds/moonbirds.png"}
+        { "id": "moonbirdsh", "name": "moonbirds", "image": "/deckAssets/moonbirds/moonbirds.png", "tintMode": "any"}
 
 
       ],
 
     "glyphs3": [
-        { "id": "splatter1", "name": "splatter", "image": "/deckAssets/moonbirds/splatter1.png"},
-        { "id": "splatter2", "name": "splatter 2", "image": "/deckAssets/moonbirds/splatter2.png"},
-        { "id": "splatter3", "name": "splatter 3", "image": "/deckAssets/moonbirds/splatter3.png"},
-        { "id": "birbishPaint2", "name": "birbish paint", "image": "/deckAssets/moonbirds/birbishPaint.png"}, 
-        { "id": "moonbirdsh", "name": "moonbirds", "image": "/deckAssets/moonbirds/moonbirds.png"},
-        { "id": "birblogo", "name": "birb logo", "image": "/deckAssets/overlays/birblogo.png"},
-        { "id": "birblogo2", "name": "birb logo 2", "image": "/deckAssets/overlays/birblogo2.png"},
-        { "id": "birbeyes", "name": "birb eyes", "image": "/deckAssets/overlays/birbeyes.png"},
-        { "id": "owlglyph", "name": "owl glyph", "image": "/deckAssets/overlays/owl_glyph.png"}
+        { "id": "splatter1", "name": "splatter", "image": "/deckAssets/moonbirds/splatter1.png", "tintMode": "any"}, 
+        { "id": "splatter2", "name": "splatter 2", "image": "/deckAssets/moonbirds/splatter2.png", "tintMode": "any"}, 
+        { "id": "splatter3", "name": "splatter 3", "image": "/deckAssets/moonbirds/splatter3.png", "tintMode": "any"}, 
+        { "id": "birbishPaint2", "name": "birbish paint", "image": "/deckAssets/moonbirds/birbishPaint.png", "tintMode": "any"},  
+        { "id": "moonbirds", "name": "moonbirds", "image": "/deckAssets/moonbirds/moonbirds.png", "tintMode": "any"}, 
+        { "id": "birblogo", "name": "birb logo", "image": "/deckAssets/overlays/birblogo.png", "tintMode": "brand"}, 
+        { "id": "birblogo2", "name": "birb logo 2", "image": "/deckAssets/overlays/birblogo2.png", "tintMode": "brand"}, 
+        { "id": "birbeyes", "name": "birb eyes", "image": "/deckAssets/overlays/birbeyes.png", "tintMode": "brand"}, 
+        { "id": "owlglyph", "name": "owl glyph", "image": "/deckAssets/overlays/owl_glyph.png", "tintMode": "any"}
 
       ],
 
@@ -91,6 +91,35 @@
         { "id": "birbsticker", "name": "birb oval", "image": "/deckAssets/overlays/birbsticker.png"},
         { "id": "iluvmb", "name": "i❤️mb", "image": "/deckAssets/overlays/iluvmb.png"},
         { "id": "toobinssticker", "name": "toobins", "image": "/deckAssets/overlays/toobinssticker.png"},
+        { "id": "toobinssticker2", "name": "don't toob", "image": "/deckAssets/overlays/toobinssticker2.png"},
+        { "id": "gmsticker", "name": "gm", "image": "/deckAssets/overlays/gm.png"},
+        { "id": "spencersticker", "name": "spencer", "image": "/deckAssets/overlays/spencer.png"}
+
+
+      ],
+
+      "glyphs5": [
+        { "id": "ogsticker", "name": "OG sticker", "image": "/deckAssets/overlays/OGsticker.png"},
+        { "id": "tomatobird", "name": "tomato bird", "image": "/deckAssets/overlays/tomatobird.png"},
+        { "id": "birblogosticker", "name": "birb logo", "image": "/deckAssets/overlays/birblogosticker.png"},
+        { "id": "birbsticker", "name": "birb oval", "image": "/deckAssets/overlays/birbsticker.png"},
+        { "id": "iluvmb", "name": "i❤️mb", "image": "/deckAssets/overlays/iluvmb.png"},
+        { "id": "toobinssticker", "name": "toobins", "image": "/deckAssets/overlays/toobinssticker.png"},
+                { "id": "toobinssticker2", "name": "don't toob", "image": "/deckAssets/overlays/toobinssticker2.png"},
+
+        { "id": "gmsticker", "name": "gm", "image": "/deckAssets/overlays/gm.png"}
+
+      ],
+
+      "glyphs6": [
+        { "id": "ogsticker", "name": "OG sticker", "image": "/deckAssets/overlays/OGsticker.png"},
+        { "id": "tomatobird", "name": "tomato bird", "image": "/deckAssets/overlays/tomatobird.png"},
+        { "id": "birblogosticker", "name": "birb logo", "image": "/deckAssets/overlays/birblogosticker.png"},
+        { "id": "birbsticker", "name": "birb oval", "image": "/deckAssets/overlays/birbsticker.png"},
+        { "id": "iluvmb", "name": "i❤️mb", "image": "/deckAssets/overlays/iluvmb.png"},
+        { "id": "toobinssticker", "name": "toobins", "image": "/deckAssets/overlays/toobinssticker.png"},
+                { "id": "toobinssticker2", "name": "don't toob", "image": "/deckAssets/overlays/toobinssticker2.png"},
+
         { "id": "gmsticker", "name": "gm", "image": "/deckAssets/overlays/gm.png"}
 
       ],
