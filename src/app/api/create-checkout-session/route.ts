@@ -55,12 +55,15 @@ export async function POST(request: Request) {
         })
 
         return NextResponse.json({ url: session.url })
-    } catch (err: any) {
-        console.error('Stripe checkout error:', err)
-        return NextResponse.json(
-            { error: err.message ?? 'Something went wrong creating checkout session' },
-            { status: 500 },
-        )
+    } catch (err: unknown) {
+        console.error(err)
+
+        const message =
+            err instanceof Error
+                ? err.message
+                : 'Unexpected error creating checkout session'
+
+        return NextResponse.json({ error: message }, { status: 500 })
     }
 }
 // // src/app/api/create-checkout-session/route.ts
