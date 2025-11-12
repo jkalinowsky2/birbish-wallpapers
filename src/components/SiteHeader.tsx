@@ -83,9 +83,9 @@ export default function Header() {
           </Link>
 
           {/* 🔌 Connect Wallet – desktop only */}
-          {/* <div className="ml-2">
+          <div className="ml-2">
             <ConnectButton />
-          </div> */}
+          </div>
         </nav>
 
         {/* MOBILE TOGGLE */}

@@ -3,13 +3,48 @@
 'use client'
 
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { PRODUCTS, type Product } from "./products";
+import { useAccount } from 'wagmi'
 
 export default function ShopPage() {
     // cart maps priceId -> quantity
     const [cart, setCart] = useState<Record<string, number>>({})
     const [isCheckingOut, setIsCheckingOut] = useState(false)
+
+    // wallet
+    const { address } = useAccount()            // address will be undefined if not connected
+
+    // moonbird holder flag
+    const [isHolder, setIsHolder] = useState(false)
+
+
+    //) Call the API to check holder status 
+    useEffect(() => {
+        let cancelled = false
+
+        async function check() {
+            if (!address) {
+                setIsHolder(false)
+                return
+            }
+            try {
+                const r = await fetch('/api/holder-status', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ address }),
+                })
+                const data = await r.json()
+                if (!cancelled) setIsHolder(!!data?.isHolder)
+            } catch {
+                if (!cancelled) setIsHolder(false)
+            }
+        }
+
+        check()
+        return () => { cancelled = true }
+    }, [address])
+    ////
 
     const setQuantity = (priceId: string, qty: number) => {
         setCart((prev) => {
@@ -33,8 +68,14 @@ export default function ShopPage() {
         return sum + numeric * qty
     }, 0)
 
+    // Compute eligibility for free sticker
+    const REQ_MIN = 10
+    const isGiftEligible = isHolder && totalPrice >= REQ_MIN
+
+
     const handleCheckout = async () => {
         if (!totalItems || isCheckingOut) return
+
 
         setIsCheckingOut(true)
         try {
@@ -46,7 +87,11 @@ export default function ShopPage() {
             const res = await fetch('/api/create-checkout-session', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ items }),
+                body: JSON.stringify({
+                    items,
+                    giftEligible: isGiftEligible,
+                    walletAddress: address ?? '',
+                }),
             })
 
             const data = await res.json()
@@ -62,6 +107,7 @@ export default function ShopPage() {
         } finally {
             setIsCheckingOut(false)
         }
+
     }
 
     return (
@@ -74,9 +120,10 @@ export default function ShopPage() {
             </header>
 
             {/* Product grid */}
-            <div className="grid gap-6 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-6 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4">
                 {PRODUCTS.map((product) => {
                     const qty = cart[product.priceId] ?? 0
+                    const isGiftOnly = product.giftOnly === true
 
                     return (
                         <article
@@ -106,35 +153,47 @@ export default function ShopPage() {
                                         {product.priceLabel}
                                     </span>
 
-                                    {/* Quantity controls */}
-                                    <div className="inline-flex items-center gap-2">
-                                        <button
-                                            type="button"
-                                            className="h-8 w-8 rounded-full border border-neutral-300 text-sm leading-none"
-                                            onClick={() => setQuantity(product.priceId, Math.max(0, qty - 1))}
-                                        >
-                                            –
-                                        </button>
-                                        <input
-                                            type="number"
-                                            min={0}
-                                            value={qty}
-                                            onChange={(e) =>
-                                                setQuantity(
-                                                    product.priceId,
-                                                    Math.max(0, Number(e.target.value) || 0),
-                                                )
-                                            }
-                                            className="w-10 h-8 text-center text-sm border border-neutral-300 rounded-md"
-                                        />
-                                        <button
-                                            type="button"
-                                            className="h-8 w-8 rounded-full border border-neutral-900 bg-neutral-900 text-white text-sm leading-none"
-                                            onClick={() => setQuantity(product.priceId, qty + 1)}
-                                        >
-                                            +
-                                        </button>
-                                    </div>
+                                    {isGiftOnly ? (
+                                        // 👇 No controls – just a little “perk” message
+                                        <div className="text-right text-xs leading-tight">
+                                            <div className="font-semibold text-[#d12429]">
+                                                Moonbirds holder perk
+                                            </div>
+                                            <div className="text-[11px] text-neutral-600">
+                                                Auto-added for eligible carts
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        // Normal quantity controls for buyable products
+                                        <div className="inline-flex items-center gap-2">
+                                            <button
+                                                type="button"
+                                                className="h-8 w-8 rounded-full border border-neutral-300 text-sm leading-none"
+                                                onClick={() => setQuantity(product.priceId, Math.max(0, qty - 1))}
+                                            >
+                                                –
+                                            </button>
+                                            <input
+                                                type="number"
+                                                min={0}
+                                                value={qty}
+                                                onChange={(e) =>
+                                                    setQuantity(
+                                                        product.priceId,
+                                                        Math.max(0, Number(e.target.value) || 0),
+                                                    )
+                                                }
+                                                className="w-10 h-8 text-center text-sm border border-neutral-300 rounded-md"
+                                            />
+                                            <button
+                                                type="button"
+                                                className="h-8 w-8 rounded-full border border-neutral-900 bg-neutral-900 text-white text-sm leading-none"
+                                                onClick={() => setQuantity(product.priceId, qty + 1)}
+                                            >
+                                                +
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </article>
@@ -158,13 +217,22 @@ export default function ShopPage() {
                                         (~${totalPrice.toFixed(2)})
                                     </span>
                                 )}
+                                {isGiftEligible ? (
+                                    <div className="text-sm font-medium text-[#d12429]">
+                                        🎁 Congrats, birb! You're getting a free <span className="font-semibold">Holographic Logo Sticker</span> (Moonbirds holder perk).
+                                    </div>
+                                ) : (
+                                    <div className="text-xs text-neutral-600">
+                                        Connect a wallet with a Moonbird and spend ${REQ_MIN}+ to unlock a free holographic sticker (limited run).
+                                    </div>
+                                )}
                             </>
                         ) : (
                             <span>No stickers selected yet.</span>
                         )}
                     </div>
 
-      {/* DISABLE CHECKOUT */}
+                    {/* DISABLE CHECKOUT */}
                     <button
                         type="button"
                         // onClick={handleCheckout}
@@ -179,8 +247,8 @@ export default function ShopPage() {
                                 : 'Checkout Disabled'}
                     </button>
 
-                          
-                                        {/* <button
+
+                    {/* <button
                         type="button"
                         onClick={handleCheckout}
                         disabled={!totalItems || isCheckingOut}
@@ -193,9 +261,9 @@ export default function ShopPage() {
                                 : 'Checkout'}
                     </button> */}
                 </div>
-                            <p className="text-sm text-neutral-600 ml-2 py-2">
-            Note: Checkout will bring you to our Stripe checkout page. Crypto payments are not accepted at this time. US & Canada only at this time.
-            </p>
+                <p className="text-sm text-neutral-600 ml-2 py-2">
+                    Note: Checkout will bring you to our Stripe checkout page. Crypto payments are not accepted at this time. US & Canada only at this time.
+                </p>
             </div>
 
         </div>
