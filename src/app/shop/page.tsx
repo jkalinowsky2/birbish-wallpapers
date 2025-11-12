@@ -4,7 +4,7 @@
 
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
-import { PRODUCTS, type Product } from "./products";
+import { PRODUCTS } from "./products";
 import { useAccount } from 'wagmi'
 
 export default function ShopPage() {
@@ -72,7 +72,7 @@ export default function ShopPage() {
     const REQ_MIN = 10
     const isGiftEligible = isHolder && totalPrice >= REQ_MIN
 
-
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleCheckout = async () => {
         if (!totalItems || isCheckingOut) return
 
@@ -209,7 +209,7 @@ export default function ShopPage() {
                         {totalItems ? (
                             <>
                                 <span>
-                                    You’ve selected {totalItems} sticker
+                                    You&apos;ve selected {totalItems} sticker
                                     {totalItems > 1 ? 's' : ''}.
                                 </span>
                                 {totalPrice > 0 && (
@@ -219,7 +219,7 @@ export default function ShopPage() {
                                 )}
                                 {isGiftEligible ? (
                                     <div className="text-sm font-medium text-[#d12429]">
-                                        🎁 Congrats, birb! You're getting a free <span className="font-semibold">Holographic Logo Sticker</span> (Moonbirds holder perk).
+                                        🎁 Congrats, birb! You&apos;re getting a free <span className="font-semibold">Holographic Logo Sticker</span> (Moonbirds holder perk).
                                     </div>
                                 ) : (
                                     <div className="text-xs text-neutral-600">
