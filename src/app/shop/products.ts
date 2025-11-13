@@ -76,7 +76,7 @@ export const PRODUCTS: Product[] = [
         id: "birb-sticker-holo",
         name: "Holographic Logo Sticker",
         priceLabel: "$5.00",
-        description: "Free with minimum purchse for Moonbirds holders.",
+        description: "Free for Moonbirds holders w/ $10 purchase *",
         image: "/assets/store/stickers/birblogosticker-holo.png",
         priceId: "price_1SSifY14Mz115JiadL5lXegX", //price_1SSNvz0n54kwZghJvhG7TsVC
         giftOnly: true,

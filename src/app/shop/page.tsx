@@ -111,8 +111,8 @@ export default function ShopPage() {
     }
 
     return (
-        <div className="space-y-8">
-            <header>
+        <div className="space-y-6">
+            <header className="mb-2">
                 <h1 className="text-3xl font-bold mb-2">Sticker Shop - Coming Soon!</h1>
                 <p className="text-sm text-neutral-600">
                     Physical stickers, shipped the old-fashioned way. Stickers are die-cut vinyl and perfect for water bottles, laptops, or anywhere else you want to rep the birbs.
@@ -120,7 +120,7 @@ export default function ShopPage() {
             </header>
 
             {/* Product grid */}
-            <div className="grid gap-6 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 py-4">
                 {PRODUCTS.map((product) => {
                     const qty = cart[product.priceId] ?? 0
                     const isGiftOnly = product.giftOnly === true
@@ -128,9 +128,9 @@ export default function ShopPage() {
                     return (
                         <article
                             key={product.id}
-                            className="flex flex-col rounded-2xl border bg-white shadow-sm overflow-hidden"
+                            className="flex flex-col rounded-xl border bg-white shadow-sm overflow-hidden"
                         >
-                            <div className="relative aspect-square bg-neutral-100">
+                            <div className="relative aspect-[3/2] sm:aspect-[4/3] bg-neutral-100">
                                 <Image
                                     src={product.image}
                                     alt={product.name}
@@ -140,7 +140,7 @@ export default function ShopPage() {
                                 />
                             </div>
 
-                            <div className="p-4 flex flex-col gap-3 flex-1">
+                            <div className="p-3 flex flex-col gap-2 flex-1">
                                 <div>
                                     <h2 className="text-sm font-semibold">{product.name}</h2>
                                     <p className="text-xs text-neutral-600 mt-1">
@@ -149,19 +149,26 @@ export default function ShopPage() {
                                 </div>
 
                                 <div className="mt-auto flex items-center justify-between">
-                                    <span className="text-sm font-semibold">
-                                        {product.priceLabel}
-                                    </span>
+                                    {product.giftOnly ? (
+                                        <span className="text-sm font-semibold flex items-center gap-2">
+                                            <span className="line-through text-[#d12429]">{product.priceLabel}</span>
+                                            {/* <span className="text-[#d12429] font-semibold">Moonbirds holder perk</span> */}
+                                        </span>
+                                    ) : (
+                                        <span className="text-sm font-semibold">
+                                            {product.priceLabel}
+                                        </span>
+                                    )}
 
                                     {isGiftOnly ? (
                                         // 👇 No controls – just a little “perk” message
-                                        <div className="text-right text-xs leading-tight">
+                                        <div className="text-right text-sm leading-tight">
                                             <div className="font-semibold text-[#d12429]">
-                                                Moonbirds holder perk
+                                                One per wallet
                                             </div>
-                                            <div className="text-[11px] text-neutral-600">
+                                            {/* <div className="text-[11px] text-neutral-600">
                                                 Auto-added for eligible carts
-                                            </div>
+                                            </div> */}
                                         </div>
                                     ) : (
                                         // Normal quantity controls for buyable products
@@ -203,13 +210,14 @@ export default function ShopPage() {
 
 
             {/* Cart / checkout bar */}
-            <div className="sticky bottom-0 py-4 bg-gradient-to-t from-[#f7f7f7] to-transparent">
+            {/* <div className="sticky bottom-0 py-4 bg-gradient-to-t from-[#f7f7f7] to-transparent"> */}
+            <div className="sticky bottom-0 py-4 bg-[#f7f7f7] border-t z-40">
                 <div className="max-w-6xl mx-auto flex items-center justify-between rounded-full border bg-white px-4 py-2 shadow-sm">
                     <div className="text-sm text-neutral-700">
                         {totalItems ? (
                             <>
                                 <span>
-                                    You&apos;ve selected {totalItems} sticker
+                                    You&apos;ve added {totalItems} item
                                     {totalItems > 1 ? 's' : ''}.
                                 </span>
                                 {totalPrice > 0 && (
@@ -218,12 +226,12 @@ export default function ShopPage() {
                                     </span>
                                 )}
                                 {isGiftEligible ? (
-                                    <div className="text-sm font-medium text-[#d12429]">
-                                        🎁 Congrats, birb! You&apos;re getting a free <span className="font-semibold">Holographic Logo Sticker</span> (Moonbirds holder perk).
+                                    <div className="text-xs font-medium text-[#34781f]">
+                                        🎁 Congrats, birb! You&apos;re getting a free <span className="font-semibold">Holographic Logo Sticker</span>. Sticker will be automatically added at checkout.
                                     </div>
                                 ) : (
-                                    <div className="text-xs text-neutral-600">
-                                        Connect a wallet with a Moonbird and spend ${REQ_MIN}+ to unlock a free holographic sticker (limited run).
+                                    <div className="text-xs text-[#d12429]">
+                                        *Connect a wallet with a Moonbird and spend ${REQ_MIN} to be eligible. One per wallet. 
                                     </div>
                                 )}
                             </>
@@ -261,7 +269,7 @@ export default function ShopPage() {
                                 : 'Checkout'}
                     </button> */}
                 </div>
-                <p className="text-sm text-neutral-600 ml-2 py-2">
+                <p className="text-xs text-neutral-600 ml-2 py-2">
                     Note: Checkout will bring you to our Stripe checkout page. Crypto payments are not accepted at this time. US & Canada only at this time.
                 </p>
             </div>
