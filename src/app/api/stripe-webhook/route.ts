@@ -41,8 +41,8 @@ export async function POST(req: NextRequest) {
         console.log('🎁 Would record gift for wallet:', wallet)
 
         // ⬇️ comment KV out for a moment
-        // await kv.set(`gift_claimed:${wallet}`, '1')
-        // await kv.incr('gift_count')
+        await kv.set(`gift_claimed:${wallet}`, '1')
+        await kv.incr('gift_count')
       }
     }
 
