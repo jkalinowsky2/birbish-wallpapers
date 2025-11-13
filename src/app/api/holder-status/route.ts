@@ -1,78 +1,103 @@
 // src/app/api/holder-status/route.ts
 import { NextResponse } from 'next/server'
-import { JsonRpcProvider, Contract } from 'ethers'
+import { ethers } from 'ethers'
+import { kv } from '@vercel/kv'
 
 const MOONBIRDS = '0x23581767a106ae21c074b2276d25e5c3e136a68b' as const
 const ABI = ['function balanceOf(address owner) view returns (uint256)']
 const RPC = process.env.ETH_MAINNET_RPC
 
+const GIFT_CAP = 50 // total holo stickers
+
 export async function POST(req: Request) {
   try {
     const { address } = (await req.json()) as { address?: string }
+    const addr = address?.toLowerCase()
 
-    if (process.env.FORCE_HOLDER === 'true')
-      return NextResponse.json({ isHolder: true, reason: 'forced' })
+    // Default response shape
+    let isHolder = false
 
-    if (!address || !/^0x[a-fA-F0-9]{40}$/.test(address))
-      return NextResponse.json({ isHolder: false, reason: 'bad_address' })
+    // ---- DEV override (still works) ----
+    if (process.env.FORCE_HOLDER === 'true') {
+      isHolder = true
+    } else {
+      if (!addr || !/^0x[a-fA-F0-9]{40}$/.test(addr)) {
+        return NextResponse.json({
+          isHolder: false,
+          hasClaimedGift: false,
+          remainingGifts: GIFT_CAP,
+        })
+      }
 
-    if (!RPC)
-      return NextResponse.json({ isHolder: false, reason: 'no_rpc_env' })
+      if (!RPC) throw new Error('ETH_MAINNET_RPC is not set')
 
-    const provider = new JsonRpcProvider(RPC)
-    const contract = new Contract(MOONBIRDS, ABI, provider)
+      const provider = new ethers.JsonRpcProvider(RPC)
+      const c = new ethers.Contract(MOONBIRDS, ABI, provider)
+      const bal: bigint = await c.balanceOf(addr)
+      isHolder = bal > 0n
+    }
 
-    const bal = (await contract.balanceOf(address)) as bigint
+    // Read KV for claim status & count (non-blocking-ish)
+    let hasClaimedGift = false
+    let remainingGifts = GIFT_CAP
+
+    if (addr) {
+      const [claimed, countRaw] = await Promise.all([
+        kv.get<string | null>(`gift_claimed:${addr}`),
+        kv.get<number | null>('gift_count'),
+      ])
+
+      hasClaimedGift = !!claimed
+      const count = typeof countRaw === 'number' ? countRaw : 0
+      remainingGifts = Math.max(0, GIFT_CAP - count)
+    }
+
     return NextResponse.json({
-      isHolder: bal > 0n,
-      balance: bal.toString(),
-      reason: bal > 0n ? 'owns_token' : 'zero_balance',
+      isHolder,
+      hasClaimedGift,
+      remainingGifts,
     })
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err)
-    return NextResponse.json({ isHolder: false, error: msg })
+    console.error('[holder-status] error:', err)
+    // Fail closed: not holder, no gift info
+    return NextResponse.json(
+      { isHolder: false, hasClaimedGift: false, remainingGifts: 0 },
+      { status: 200 },
+    )
   }
 }
-
+// // src/app/api/holder-status/route.ts
 // import { NextResponse } from 'next/server'
-// import { ethers } from 'ethers'
+// import { JsonRpcProvider, Contract } from 'ethers'
 
-// // Moonbirds ERC-721 contract
-// const MOONBIRDS_CONTRACT = '0x23581767a106ae21c074b2276d25e5c3e136a68b' as const
+// const MOONBIRDS = '0x23581767a106ae21c074b2276d25e5c3e136a68b' as const
 // const ABI = ['function balanceOf(address owner) view returns (uint256)']
-
-// // Expected: set this in .env.local → ETH_MAINNET_RPC=<your Alchemy or Infura HTTPS URL>
-// const RPC_URL = process.env.ETH_MAINNET_RPC
+// const RPC = process.env.ETH_MAINNET_RPC
 
 // export async function POST(req: Request) {
-//     try {
-//         const { address } = (await req.json()) as { address?: string }
+//   try {
+//     const { address } = (await req.json()) as { address?: string }
 
-//         // ✅ Optional override for testing — add FORCE_HOLDER=true in .env.local
-//         if (process.env.FORCE_HOLDER === 'true') {
-//             return NextResponse.json({ isHolder: true })
-//         }
+//     if (process.env.FORCE_HOLDER === 'true')
+//       return NextResponse.json({ isHolder: true, reason: 'forced' })
 
-//         if (!address || !/^0x[a-fA-F0-9]{40}$/.test(address)) {
-//             return NextResponse.json({ isHolder: false }, { status: 200 })
-//         }
+//     if (!address || !/^0x[a-fA-F0-9]{40}$/.test(address))
+//       return NextResponse.json({ isHolder: false, reason: 'bad_address' })
 
-//         if (!RPC_URL) {
-//             throw new Error('ETH_MAINNET_RPC is not set in environment variables')
-//         }
+//     if (!RPC)
+//       return NextResponse.json({ isHolder: false, reason: 'no_rpc_env' })
 
-//         // ✅ ethers v5 syntax
-//         const provider = new ethers.providers.JsonRpcProvider(RPC_URL)
-//         const contract = new ethers.Contract(MOONBIRDS_CONTRACT, ABI, provider)
-//         const balance = await contract.balanceOf(address)
+//     const provider = new JsonRpcProvider(RPC)
+//     const contract = new Contract(MOONBIRDS, ABI, provider)
 
-//         // ethers v5 returns a BigNumber → use .gt(0)
-//         const isHolder = balance.gt(0)
-
-//         return NextResponse.json({ isHolder })
-//     } catch (err) {
-//         console.error('Holder check error:', err)
-//         // fail closed
-//         return NextResponse.json({ isHolder: false }, { status: 200 })
-//     }
+//     const bal = (await contract.balanceOf(address)) as bigint
+//     return NextResponse.json({
+//       isHolder: bal > 0n,
+//       balance: bal.toString(),
+//       reason: bal > 0n ? 'owns_token' : 'zero_balance',
+//     })
+//   } catch (err) {
+//     const msg = err instanceof Error ? err.message : String(err)
+//     return NextResponse.json({ isHolder: false, error: msg })
+//   }
 // }

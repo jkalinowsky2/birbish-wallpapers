@@ -17,6 +17,8 @@ export default function ShopPage() {
 
     // moonbird holder flag
     const [isHolder, setIsHolder] = useState(false)
+    const [hasClaimedGift, setHasClaimedGift] = useState(false)
+    const [remainingGifts, setRemainingGifts] = useState<number | null>(null)
 
 
     //) Call the API to check holder status 
@@ -26,6 +28,8 @@ export default function ShopPage() {
         async function check() {
             if (!address) {
                 setIsHolder(false)
+                setHasClaimedGift(false)
+                setRemainingGifts(null)
                 return
             }
             try {
@@ -35,9 +39,20 @@ export default function ShopPage() {
                     body: JSON.stringify({ address }),
                 })
                 const data = await r.json()
-                if (!cancelled) setIsHolder(!!data?.isHolder)
+
+                if (cancelled) return
+
+                setIsHolder(!!data?.isHolder)
+                setHasClaimedGift(!!data?.hasClaimedGift)
+                setRemainingGifts(
+                    typeof data?.remainingGifts === 'number' ? data.remainingGifts : null,
+                )
             } catch {
-                if (!cancelled) setIsHolder(false)
+                if (!cancelled) {
+                    setIsHolder(false)
+                    setHasClaimedGift(false)
+                    setRemainingGifts(null)
+                }
             }
         }
 
@@ -70,7 +85,11 @@ export default function ShopPage() {
 
     // Compute eligibility for free sticker
     const REQ_MIN = 10
-    const isGiftEligible = isHolder && totalPrice >= REQ_MIN
+    const isGiftEligible =
+        isHolder &&
+        !hasClaimedGift &&
+        totalPrice >= REQ_MIN &&
+        (remainingGifts === null || remainingGifts > 0)
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleCheckout = async () => {
@@ -151,7 +170,7 @@ export default function ShopPage() {
                                 <div className="mt-auto flex items-center justify-between">
                                     {product.giftOnly ? (
                                         <span className="text-sm font-semibold flex items-center gap-2">
-                                            <span className="line-through text-[#d12429]">{product.priceLabel}</span>
+                                            <span className="line-through text-gray-400">{product.priceLabel}</span>
                                             {/* <span className="text-[#d12429] font-semibold">Moonbirds holder perk</span> */}
                                         </span>
                                     ) : (
@@ -164,7 +183,8 @@ export default function ShopPage() {
                                         // 👇 No controls – just a little “perk” message
                                         <div className="text-right text-sm leading-tight">
                                             <div className="font-semibold text-[#d12429]">
-                                                One per wallet
+                                                {/* insert  text for gift item here*/}
+                                                {/* One per wallet */} 
                                             </div>
                                             {/* <div className="text-[11px] text-neutral-600">
                                                 Auto-added for eligible carts
@@ -217,23 +237,42 @@ export default function ShopPage() {
                         {totalItems ? (
                             <>
                                 <span>
-                                    You&apos;ve added {totalItems} item
-                                    {totalItems > 1 ? 's' : ''}.
+                                    You&apos;ve selected {totalItems} sticker{totalItems > 1 ? 's' : ''}.
                                 </span>
                                 {totalPrice > 0 && (
                                     <span className="ml-2 font-semibold">
                                         (~${totalPrice.toFixed(2)})
                                     </span>
                                 )}
-                                {isGiftEligible ? (
-                                    <div className="text-xs font-medium text-[#34781f]">
-                                        🎁 Congrats, birb! You&apos;re getting a free <span className="font-semibold">Holographic Logo Sticker</span>. Sticker will be automatically added at checkout.
-                                    </div>
-                                ) : (
-                                    <div className="text-xs text-[#d12429]">
-                                        *Connect a wallet with a Moonbird and spend ${REQ_MIN} to be eligible. One per wallet. 
+
+                                {isHolder && hasClaimedGift && (
+                                    <div className="text-xs text-neutral-600 mt-1">
+                                        You&apos;ve already claimed your free holographic sticker on a previous
+                                        order. 🦉
                                     </div>
                                 )}
+
+                                {isHolder && !hasClaimedGift && (remainingGifts ?? 1) <= 0 && (
+                                    <div className="text-xs text-neutral-600 mt-1">
+                                        This round of holographic stickers have all been claimed. Thanks, birbs! ❤️
+                                    </div>
+                                )}
+
+                                {isGiftEligible && (remainingGifts ?? 1) > 0 && (
+                                    <div className="text-xs font-medium text-green-700 mt-1"> 
+                                        🎁 Congrats, birb! You&apos;re getting a free sticker
+                                        with this order for holding a Moonbird. 
+                                    </div>
+                                )}
+
+                                {!isGiftEligible &&
+                                    isHolder &&
+                                    !hasClaimedGift &&
+                                    totalPrice < REQ_MIN && (
+                                        <div className="text-xs text-neutral-600 mt-1">
+                                            *Connect a wallet with a Moonbird and spend ${REQ_MIN} to be eligible.
+                                        </div>
+                                    )}
                             </>
                         ) : (
                             <span>No stickers selected yet.</span>
