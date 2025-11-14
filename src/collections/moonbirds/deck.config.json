@@ -118,7 +118,15 @@
         { "id": "birbsticker", "name": "birb oval", "image": "/deckAssets/overlays/birbsticker.png"},
         { "id": "iluvmb", "name": "i❤️mb", "image": "/deckAssets/overlays/iluvmb.png"},
         { "id": "toobinssticker", "name": "toobins", "image": "/deckAssets/overlays/toobinssticker.png"},
-                { "id": "toobinssticker2", "name": "don't toob", "image": "/deckAssets/overlays/toobinssticker2.png"},
+        
+        { "id": "beastiebirbs", "name": "beastie birbs 1", "image": "/deckAssets/overlays/beastiebirbs.png"},
+        { "id": "beastiebirbs2", "name": "beastie birbs 2", "image": "/deckAssets/overlays/beastiebirbs2.png"},
+        { "id": "birbish", "name": "birbish", "image": "/deckAssets/overlays/birbishsticker.png"},
+        { "id": "birbtang_yel", "name": "moon-tang yellow", "image": "/deckAssets/overlays/birbtang1_yel.png"},
+        { "id": "birbtang_red", "name": "moon-tang red", "image": "/deckAssets/overlays/birbtang1_red.png"},
+        { "id": "birbtang2", "name": "moon-tang 2", "image": "/deckAssets/overlays/birbtang2.png"},
+        { "id": "oddity", "name": "oddity", "image": "/deckAssets/overlays/odditysticker.png"},
+
 
         { "id": "gmsticker", "name": "gm", "image": "/deckAssets/overlays/gm.png"}
 

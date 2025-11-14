@@ -1,0 +1,16 @@
+Vars to add to Vercel:
+NEXT_PUBLIC_R2_BASE - DONE
+NEXT_PUBLIC_SITE_URL - DONE
+NEXT_PUBLIC_BASE_URL - DONE
+MOONBIRDS_CONTRACT - DONE
+ETH_MAINNET_RPC - DONE
+FREE_GIFT_MIN_USD - DONE
+STRIPE_WEBHOOK_SECRET - DONE
+STRIPE_GIFT_PRICE_ID -  DONE
+STRIPE_GIFT_COUPON_ID - DONE
+
+Things to do:
+Update products on live Stripe site - Double check images
+Update website product price IDs - DONE
+Add free gift on live stripe site and update Vars - DONE
+Create/check webhook on live stripe site - done?
