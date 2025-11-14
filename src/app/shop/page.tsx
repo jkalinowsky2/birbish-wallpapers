@@ -184,7 +184,7 @@ export default function ShopPage() {
                                         <div className="text-right text-sm leading-tight">
                                             <div className="font-semibold text-[#d12429]">
                                                 {/* insert  text for gift item here*/}
-                                                {/* One per wallet */} 
+                                                {/* One per wallet */}
                                             </div>
                                             {/* <div className="text-[11px] text-neutral-600">
                                                 Auto-added for eligible carts
@@ -259,20 +259,19 @@ export default function ShopPage() {
                                 )}
 
                                 {isGiftEligible && (remainingGifts ?? 1) > 0 && (
-                                    <div className="text-xs font-medium text-green-700 mt-1"> 
+                                    <div className="text-xs font-medium text-green-700 mt-1">
                                         🎁 Congrats, birb! You&apos;re getting a free sticker
-                                        with this order for holding a Moonbird. 
+                                        with this order for holding a Moonbird.
                                     </div>
                                 )}
 
-                                {!isGiftEligible &&
-                                    isHolder &&
-                                    !hasClaimedGift &&
-                                    totalPrice < REQ_MIN && (
-                                        <div className="text-xs text-neutral-600 mt-1">
-                                            *Connect a wallet with a Moonbird and spend ${REQ_MIN} to be eligible.
-                                        </div>
-                                    )}
+                                {/* Show instructions to *anyone* not eligible */}
+                                {!isGiftEligible && totalItems > 0 && (
+                                    <div className="text-xs text-neutral-600 mt-1">
+                                        Connect a wallet that holds a Moonbird and spend ${REQ_MIN}+
+                                        to unlock a free holographic sticker.
+                                    </div>
+                                )}
                             </>
                         ) : (
                             <span>No stickers selected yet.</span>
