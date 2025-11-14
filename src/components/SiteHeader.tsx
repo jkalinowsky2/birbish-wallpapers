@@ -75,28 +75,36 @@ export default function Header() {
             className="px-3 py-2 rounded-lg text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100"
           >
             Gallery
-          </Link><Link
+          </Link>
+          <Link
             href="/tip-jar"
             className="px-3 py-2 rounded-lg text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100"
           >
             Tip Jar
           </Link>
 
-          {/* 🔌 Connect Wallet – desktop only */}
+          {/* 🔌 Connect Wallet – desktop */}
           <div className="ml-2">
             <ConnectButton />
           </div>
         </nav>
 
-        {/* MOBILE TOGGLE */}
-        <button
-          className="md:hidden inline-flex items-center justify-center rounded-md p-2 hover:bg-neutral-100"
-          onClick={() => setMobileOpen((v) => !v)}
-          aria-expanded={mobileOpen}
-          aria-label="Toggle navigation"
-        >
-          <span className="text-2xl">☰</span>
-        </button>
+        {/* MOBILE RIGHT SIDE: Connect + Hamburger */}
+        <div className="flex items-center gap-2 md:hidden">
+          <ConnectButton
+            chainStatus="icon"
+            showBalance={false}
+            accountStatus="address"
+          />
+          <button
+            className="inline-flex items-center justify-center rounded-md p-2 hover:bg-neutral-100"
+            onClick={() => setMobileOpen((v) => !v)}
+            aria-expanded={mobileOpen}
+            aria-label="Toggle navigation"
+          >
+            <span className="text-2xl">☰</span>
+          </button>
+        </div>
       </div>
 
       {/* MOBILE MENU */}
@@ -206,6 +214,7 @@ export default function Header() {
             </Link>
 
           </div>
+
         </div>
       )}
     </header>

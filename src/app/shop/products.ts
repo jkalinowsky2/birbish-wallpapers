@@ -66,8 +66,8 @@ export const PRODUCTS: Product[] = [
     {
         id: "birb-euro-sticker",
         name: "birb.  Euro Sticker",
-        priceLabel: "$7.00",
-        description: "Classic birb. Euro sticker. 6 x 3.5 inches.",
+        priceLabel: "$5.00",
+        description: "Classic birb. Euro sticker. 5 x 3 inches.",
         image: "/assets/store/stickers/birbeurosticker.png",
         priceId: "price_1SSOMa14Mz115JiaaYaEHJDB", //price_1SRxuC0n54kwZghJqVLWMmbI
 

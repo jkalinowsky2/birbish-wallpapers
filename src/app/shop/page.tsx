@@ -147,7 +147,7 @@ export default function ShopPage() {
                     return (
                         <article
                             key={product.id}
-                            className="flex flex-col rounded-xl border bg-white shadow-sm overflow-hidden"
+                            className="flex flex-col rounded-lg border bg-white shadow-sm overflow-hidden"
                         >
                             <div className="relative aspect-[3/2] sm:aspect-[4/3] bg-neutral-100">
                                 <Image
@@ -232,7 +232,7 @@ export default function ShopPage() {
             {/* Cart / checkout bar */}
             {/* <div className="sticky bottom-0 py-4 bg-gradient-to-t from-[#f7f7f7] to-transparent"> */}
             <div className="sticky bottom-0 py-4 bg-[#f7f7f7] border-t z-40">
-                <div className="max-w-6xl mx-auto flex items-center justify-between rounded-full border bg-white px-4 py-2 shadow-sm">
+                <div className="max-w-6xl mx-auto flex items-center justify-between rounded-lg border bg-white px-4 py-2 shadow-sm">
                     <div className="text-sm text-neutral-700">
                         {totalItems ? (
                             <>
@@ -284,14 +284,14 @@ export default function ShopPage() {
                         type="button"
                         // onClick={handleCheckout}
                         disabled={!totalItems || isCheckingOut}
-                        className="px-5 py-2 rounded-full text-sm font-medium bg-black text-white disabled:bg-neutral-300 disabled:cursor-not-allowed"
+                        className="px-5 py-2 rounded-md text-sm font-medium bg-black text-white disabled:bg-neutral-300 disabled:cursor-not-allowed"
                     >
                         {isCheckingOut
                             ? 'Starting checkout…'
                             : totalItems
-                                ? `Checkout Disabled`
+                                ? `Disabled`
                                 // ? `Checkout (${totalItems})`
-                                : 'Checkout Disabled'}
+                                : 'Disabled'}
                     </button>
 
 
