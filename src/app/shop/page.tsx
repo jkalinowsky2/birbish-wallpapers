@@ -294,7 +294,7 @@ export default function ShopPage() {
                     </button>
 
 
-                    <button
+                    {/* <button
                         type="button"
                         onClick={handleCheckout}
                         disabled={!totalItems || isCheckingOut}
@@ -305,7 +305,7 @@ export default function ShopPage() {
                             : totalItems
                                 ? `Checkout (${totalItems})`
                                 : 'Checkout'}
-                    </button>
+                    </button> */}
                 </div>
                 <p className="text-xs text-neutral-600 ml-2 py-2">
                     Note: Checkout will bring you to our Stripe checkout page. Crypto payments are not accepted at this time. US & Canada only at this time.
