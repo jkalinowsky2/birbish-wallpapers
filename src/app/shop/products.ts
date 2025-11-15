@@ -17,7 +17,8 @@ export const PRODUCTS: Product[] = [
         priceLabel: "$3.50",
         description: "Logo Sticker. 3 x 3 inches",
         image: "/assets/store/stickers/birblogosticker.png",
-        priceId: "price_1SSNvA0n54kwZghJiTSORDLI", //
+        // priceId: "price_1SSNvA0n54kwZghJiTSORDLI", //
+        priceId: "price_1SSKdr14Mz115Jiaesv22eeK", //test
 
     },
     {
@@ -26,7 +27,8 @@ export const PRODUCTS: Product[] = [
         priceLabel: "$3.50",
         description: "birb. Sticker. 2 x 4 inches",
         image: "/assets/store/stickers/birbsticker.png",
-        priceId: "price_1SSNvz0n54kwZghJvhG7TsVC", //price_1SSNvz0n54kwZghJvhG7TsVC
+        // priceId: "price_1SSNvz0n54kwZghJvhG7TsVC", //
+        priceId: "price_1SSOKI14Mz115Jias8p53AYV", //test
     },
 
     {
@@ -35,7 +37,8 @@ export const PRODUCTS: Product[] = [
         priceLabel: "$3.50",
         description: "Head birb sticker in mustard. 2 x 3 inches.",
         image: "/assets/store/stickers/headbirbsticker-must.png",
-        priceId: "price_1SRz6I0n54kwZghJv7x2zRyo", //price_1SRz6I0n54kwZghJv7x2zRyo
+        // priceId: "price_1SRz6I0n54kwZghJv7x2zRyo", //
+        priceId: "price_1SSOML14Mz115JiaLy6zZA5a", //test
     },
     {
         id: "i-love-mb-sticker",
@@ -43,7 +46,8 @@ export const PRODUCTS: Product[] = [
         priceLabel: "$3.50",
         description: "I ❤️ MB sticker. 3 x 3 inches.",
         image: "/assets/store/stickers/ilovembsticker.png",
-        priceId: "price_1SSNuf0n54kwZghJrl0bQDHP", //price_1SSNuf0n54kwZghJrl0bQDHP
+        // priceId: "price_1SSNuf0n54kwZghJrl0bQDHP", //
+        priceId: "price_1SSOM914Mz115JiaQ6FwT8Lh", //test
     },
     {
         id: "toobins-sticker",
@@ -51,7 +55,8 @@ export const PRODUCTS: Product[] = [
         priceLabel: "$3.50",
         description: "Toobins sticker. 2 x 3 inches",
         image: "/assets/store/stickers/toobinssticker.png",
-        priceId: "price_1SSNva0n54kwZghJPTofWD8J", //price_1SSNva0n54kwZghJPTofWD8J
+        // priceId: "price_1SSNva0n54kwZghJPTofWD8J", //
+        priceId: "price_1SSOLi14Mz115JiaUs96IXlh", //test
     },
     {
         id: "gm-stickerpack",
@@ -59,7 +64,8 @@ export const PRODUCTS: Product[] = [
         priceLabel: "$15.00",
         description: "Birbs sticker sack - 5 birbish stickers",
         image: "/assets/store/stickers/stickerpack1.png",
-        priceId: "price_1SSO0a0n54kwZghJjM2dgJBA", //price_1SSO0a0n54kwZghJjM2dgJBA
+        // priceId: "price_1SSO0a0n54kwZghJjM2dgJBA", //price_1SSOIE14Mz115JiaVt3sskqi
+        priceId: "price_1SSOIE14Mz115JiaVt3sskqi", //testing price ID
     },
 
     {
@@ -68,7 +74,8 @@ export const PRODUCTS: Product[] = [
         priceLabel: "$5.00",
         description: "Classic birb. Euro sticker. 5 x 3 inches.",
         image: "/assets/store/stickers/birbeurosticker.png",
-        priceId: "price_1SRxuC0n54kwZghJqVLWMmbI", //price_1SRxuC0n54kwZghJqVLWMmbI
+        // priceId: "price_1SRxuC0n54kwZghJqVLWMmbI", //
+        priceId: "price_1STXcv14Mz115JiauynzDoBI", //test
 
     },
     {
@@ -77,7 +84,8 @@ export const PRODUCTS: Product[] = [
         priceLabel: "$5.00",
         description: "Free for Moonbirds holders w/ $10 purchase *",
         image: "/assets/store/stickers/birblogosticker-holo.png",
-        priceId: "price_1STSql0n54kwZghJct2G53rB", //price_1SSNvz0n54kwZghJvhG7TsVC
+        // priceId: "price_1STSql0n54kwZghJct2G53rB", //
+        priceId: "price_1SSifY14Mz115JiadL5lXegX", // testing price ID
         giftOnly: true,
     },
 ];

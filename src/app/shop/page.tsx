@@ -266,12 +266,14 @@ export default function ShopPage() {
                                 )}
 
                                 {/* Show instructions to *anyone* not eligible */}
-                                {!isGiftEligible && totalItems > 0 && (
-                                    <div className="text-xs text-neutral-600 mt-1">
-                                        Connect a wallet that holds a Moonbird and spend ${REQ_MIN}+
-                                        to unlock a free holographic sticker.
-                                    </div>
-                                )}
+                                {!isGiftEligible &&
+                                    !hasClaimedGift &&          // ← NEW: don't show if already claimed
+                                    totalItems > 0 && (
+                                        <div className="text-xs text-neutral-600 mt-1">
+                                            Connect a wallet that holds a Moonbird and spend ${REQ_MIN}+
+                                            to unlock a free holographic sticker.
+                                        </div>
+                                    )}
                             </>
                         ) : (
                             <span>No stickers selected yet.</span>

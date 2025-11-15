@@ -14,3 +14,5 @@ Update products on live Stripe site - Double check images
 Update website product price IDs - DONE
 Add free gift on live stripe site and update Vars - DONE
 Create/check webhook on live stripe site - done?
+
+CHECK SHIPPING RATE ID IN LIVE STRIPE IS CORREXCT IN VERCEL
