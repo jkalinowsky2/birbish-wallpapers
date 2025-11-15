@@ -162,6 +162,14 @@ export default function ShopPage() {
                 </div>
 
             </div>
+            <h1 className="text-3xl font-bold mb-2">How it works...</h1>
+            <p className="text-sm text-neutral-600">
+                Pre-orders for szn 1 stickers will be open for a limited time. When pre-order closes, stickers will be printed and orders will be filled. When all orders are filled, season 2 will open with a new set of stickers (with flagship stickers still available), so some of the stickers will be availalbe only for this season. <br />
+                
+            </p>
+            <p className="text-sm text-neutral-600">
+                <span className="font-bold">A limited supply of free gifts is available for Moonbird holders who meet the minimum purcahse! </span> Connect your wallet to verify (no transaction will be initiated, delegate not supported at this time.)
+            </p>
 
             {/* Product grid */}
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 py-4">
