@@ -3,10 +3,10 @@ import Link from "next/link";
 import Image from "next/image";
 
 const heroImages = [
-  "/hero/birbish-2.jpg",
-  "/hero/birbish-5.jpg",
-  "/hero/birbish-4.jpg",
-  "/hero/birbish-3.jpg", // remove if you want only 3
+  "/assets//images/hero/birbish-2.jpg",
+  "/assets//images/hero/birbish-5.jpg",
+  "/assets//images/hero/birbish-4.jpg",
+  "/assets//images/hero/birbish-3.jpg", // remove if you want only 3
 ];
 
 const collections = [
@@ -42,8 +42,8 @@ export default function HomePage() {
           </div>
 
           {/* Grid of 4 square images */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            {["/hero/birbish5.jpg", "/hero/birbish2.jpg", "/hero/birbish3.jpg", "/hero/birbish4.jpg"].map(
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+            {["/assets/images/hero/birbish5.jpg", "/assets/images/MacBook-Office.png","/assets/images/hero/birbish2.jpg", "/assets/images/Yeti-Office.png", "/assets/images/hero/birbish4.jpg"].map(
               (src, i) => (
                 <div key={i} className="relative aspect-square rounded-md overflow-hidden border shadow-sm">
                   <Image

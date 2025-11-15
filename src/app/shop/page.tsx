@@ -134,7 +134,7 @@ export default function ShopPage() {
             <header className="mb-2">
                 <h1 className="text-3xl font-bold mb-2">Sticker Shop Szn 1</h1>
                 <p className="text-sm text-neutral-600">
-                    Physical stickers, shipped the old-fashioned way. Stickers are die-cut vinyl and perfect for water bottles, laptops, or anywhere else you want to rep the birbs.
+                     Premium die-cut vinyl stickers, perfect for water bottles, laptops, or anywhere else you want to rep the birbs.
                 </p>
             </header>
 
