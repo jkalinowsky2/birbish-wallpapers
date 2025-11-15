@@ -137,9 +137,9 @@ export default function ShopPage() {
                     Premium die-cut vinyl stickers, perfect for water bottles, laptops, or anywhere else you want to rep the birbs.
                 </p>
             </header>
+            <div className="grid grid-cols-2 w-full gap-2 aspect-[16/6] md:aspect-[16/5] lg:h-[380px]">
 
-            <div className="grid grid-cols-2 w-full gap-2 aspect-[16/6] md:aspect-[16/5] lg:h-[380px] gap-0">
-                <div className="relative w-full">
+                <div className="relative w-full h-full rounded-lg overflow-hidden">
                     <Image
                         src="/assets/images/MacBook-Office.png"
                         alt="Birbish Left"
@@ -150,7 +150,7 @@ export default function ShopPage() {
                     />
                 </div>
 
-                <div className="relative w-full h-full">
+                <div className="relative w-full h-full rounded-lg overflow-hidden">
                     <Image
                         src="/assets/images/Yeti-Office.png"
                         alt="Birbish Right"
@@ -160,6 +160,7 @@ export default function ShopPage() {
                         priority
                     />
                 </div>
+
             </div>
 
             {/* Product grid */}
