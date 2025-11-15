@@ -31,7 +31,7 @@ export default function HomePage() {
           <div className="relative w-full rounded-md overflow-hidden border shadow-sm mb-2">
             <div className="relative w-full aspect-[16/6] md:aspect-[16/5] lg:h-[380px]">
               <Image
-                src="/hero/birbish-wide.jpg"
+                src="/assets/images/hero/birbish-wide.jpg"
                 alt="Birbish Hero"
                 fill
                 className="object-cover"
