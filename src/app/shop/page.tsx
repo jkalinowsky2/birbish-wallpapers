@@ -134,9 +134,33 @@ export default function ShopPage() {
             <header className="mb-2">
                 <h1 className="text-3xl font-bold mb-2">Sticker Shop Szn 1</h1>
                 <p className="text-sm text-neutral-600">
-                     Premium die-cut vinyl stickers, perfect for water bottles, laptops, or anywhere else you want to rep the birbs.
+                    Premium die-cut vinyl stickers, perfect for water bottles, laptops, or anywhere else you want to rep the birbs.
                 </p>
             </header>
+
+            <div className="grid grid-cols-2 w-full gap-2 aspect-[16/6] md:aspect-[16/5] lg:h-[380px] gap-0">
+                <div className="relative w-full">
+                    <Image
+                        src="/assets/images/MacBook-Office.png"
+                        alt="Birbish Left"
+                        fill
+                        className="object-cover"
+                        sizes="50vw"
+                        priority
+                    />
+                </div>
+
+                <div className="relative w-full h-full">
+                    <Image
+                        src="/assets/images/Yeti-Office.png"
+                        alt="Birbish Right"
+                        fill
+                        className="object-cover"
+                        sizes="50vw"
+                        priority
+                    />
+                </div>
+            </div>
 
             {/* Product grid */}
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 py-4">
