@@ -132,7 +132,7 @@ export default function ShopPage() {
     return (
         <div className="space-y-6">
             <header className="mb-2">
-                <h1 className="text-3xl font-bold mb-2">Sticker Shop Szn 1</h1>
+                <h1 className="text-3xl font-bold mb-2">Sticker Shop</h1>
                 <p className="text-sm text-neutral-600">
                     Premium die-cut vinyl stickers, perfect for water bottles, laptops, or anywhere else you want to rep the birbs.
                 </p>
@@ -162,13 +162,10 @@ export default function ShopPage() {
                 </div>
 
             </div>
-            <h1 className="text-3xl font-bold mb-2">How it works...</h1>
+            <h1 className="text-3xl font-bold mb-2"></h1>
             <p className="text-sm text-neutral-600">
-                Pre-orders for szn 1 stickers will be open for a limited time. When pre-order closes, stickers will be printed and orders will be filled. When all orders are filled, season 2 will open with a new set of stickers (with flagship stickers still available), so some of the stickers will be availalbe only for this season. <br />
-                
-            </p>
-            <p className="text-sm text-neutral-600">
-                <span className="font-bold">A limited supply of free gifts is available for Moonbird holders who meet the minimum purcahse! </span> Connect your wallet to verify (no transaction will be initiated, delegate not supported at this time.)
+                Pre-orders for stickers will be open for a limited time. When pre-order closes, stickers will be printed and orders will be filled. Some stickers will be available for this run only.
+                <span className="font-bold text-red-700"> A limited supply of free gifts are available for Moonbird holders who meet the minimum purchase! </span> Connect your wallet to verify (no transaction will be initiated, delegate not supported at this time.)
             </p>
 
             {/* Product grid */}
