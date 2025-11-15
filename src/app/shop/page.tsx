@@ -170,7 +170,7 @@ export default function ShopPage() {
                                 <div className="mt-auto flex items-center justify-between">
                                     {product.giftOnly ? (
                                         <span className="text-sm font-semibold flex items-center gap-2">
-                                            <span className="line-through text-gray-400">{product.priceLabel}</span>
+                                            <span className="line-through text-neutral-400">{product.priceLabel}</span>
                                             {/* <span className="text-[#d12429] font-semibold">Moonbirds holder perk</span> */}
                                         </span>
                                     ) : (
@@ -180,15 +180,16 @@ export default function ShopPage() {
                                     )}
 
                                     {isGiftOnly ? (
-                                        // 👇 No controls – just a little “perk” message
                                         <div className="text-right text-sm leading-tight">
-                                            <div className="font-semibold text-[#d12429]">
-                                                {/* insert  text for gift item here*/}
-                                                {/* One per wallet */}
-                                            </div>
-                                            {/* <div className="text-[11px] text-neutral-600">
-                                                Auto-added for eligible carts
+                                            {/* <div className="font-semibold text-[#d12429]">
+                                                Moonbirds holder perk
                                             </div> */}
+
+                                            {typeof remainingGifts === 'number' && (
+                                                <div className="text-sm font-semibold text-neutral-400">
+                                                    {remainingGifts} stickers left
+                                                </div>
+                                            )}
                                         </div>
                                     ) : (
                                         // Normal quantity controls for buyable products

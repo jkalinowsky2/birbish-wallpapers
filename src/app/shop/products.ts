@@ -25,7 +25,7 @@ export const PRODUCTS: Product[] = [
         id: "birb-sticker",
         name: "birb. Sticker",
         priceLabel: "$3.50",
-        description: "birb. Sticker. 2 x 4 inches",
+        description: "birb. Sticker. 4 x 2 inches",
         image: "/assets/store/stickers/birbsticker.png",
         // priceId: "price_1SSNvz0n54kwZghJvhG7TsVC", //
         priceId: "price_1SSOKI14Mz115Jias8p53AYV", //test
@@ -62,7 +62,7 @@ export const PRODUCTS: Product[] = [
         id: "gm-stickerpack",
         name: "Sticker Pack 1",
         priceLabel: "$15.00",
-        description: "Birbs sticker sack - 5 birbish stickers",
+        description: "Birbs sticker pack - 5 birbish stickers",
         image: "/assets/store/stickers/stickerpack1.png",
         // priceId: "price_1SSO0a0n54kwZghJjM2dgJBA", //price_1SSOIE14Mz115JiaVt3sskqi
         priceId: "price_1SSOIE14Mz115JiaVt3sskqi", //testing price ID
@@ -72,7 +72,7 @@ export const PRODUCTS: Product[] = [
         id: "birb-euro-sticker",
         name: "birb.  Euro Sticker",
         priceLabel: "$5.00",
-        description: "Classic birb. Euro sticker. 5 x 3 inches.",
+        description: "birb. Euro sticker. 5 x 3 inches.",
         image: "/assets/store/stickers/birbeurosticker.png",
         // priceId: "price_1SRxuC0n54kwZghJqVLWMmbI", //
         priceId: "price_1STXcv14Mz115JiauynzDoBI", //test
