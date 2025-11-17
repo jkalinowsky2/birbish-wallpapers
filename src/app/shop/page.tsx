@@ -137,30 +137,30 @@ export default function ShopPage() {
                 {/* <section className="w-full bg-[#b20b2b] text-white border-b border-neutral-900 m-0 p-0"> */}
 
 
-<section className="w-full bg-gradient-to-b from-[#ce0000] to-[#b20000] text-white border-b border-neutral-900">
-  <div className="px-4 md:px-8 lg:px-10 pt-8 pb-10 md:pt-10 md:pb-12 lg:pt-16 lg:pb-16">
+                <section className="w-full bg-gradient-to-b from-[#ce0000] to-[#b20000] text-white border-b border-neutral-900">
+                    <div className="px-4 md:px-8 lg:px-10 pt-8 pb-10 md:pt-10 md:pb-12 lg:pt-16 lg:pb-16">
 
-    <h1 className="text-4xl md:text-5xl font-black tracking-tight">
-      Sticker Shop
-    </h1>
+                        <h1 className="text-4xl md:text-5xl font-black tracking-tight">
+                            Sticker Shop
+                        </h1>
 
-    <p className="mt-3 text-sm md:text-base text-white">
-      Premium die-cut vinyl stickers for water bottles, laptops, and everywhere you rep the birbs.
-    </p>
+                        <p className="mt-3 text-sm md:text-base text-white">
+                            Premium die-cut vinyl stickers for water bottles, laptops, and everywhere you rep the birbs.
+                        </p>
 
-    <div className="inline-flex items-center gap-3 rounded-full bg-black/60 border border-white/10
+                        <div className="inline-flex items-center gap-3 rounded-full bg-black/60 border border-white/10
                     px-4 py-1.5 text-xs md:text-sm text-neutral-100 mt-8">
-      <span className="font-semibold uppercase tracking-[0.18em] text-[11px] text-[#ffd28f]">
-        PRE-ORDER COMING SOON
-      </span>
+                            <span className="font-semibold uppercase tracking-[0.18em] text-[11px] text-[#ffd28f]">
+                                PRE-ORDER COMING SOON
+                            </span>
 
-      <span className="text-[11px] md:text-xs">
-        Free Moonbird-exclusive holographic sticker with $10+ order.
-      </span>
-    </div>
+                            <span className="text-[11px] md:text-xs">
+                                Free Moonbird-exclusive holographic sticker with $10+ order.
+                            </span>
+                        </div>
 
-  </div>
-</section>
+                    </div>
+                </section>
 
             </div>
 
@@ -217,11 +217,12 @@ export default function ShopPage() {
 
                             return (
                                 <article
+                                    key={product.id}
                                     className={`relative flex flex-col rounded-lg overflow-hidden shadow-sm border border-neutral-200/60
-    bg-white transition duration-150 ease-out
-    hover:shadow-md hover:brightness-[1.03] hover:border-neutral-300
-    ${isGiftOnly ? 'bg-[#fffdf7] ring-1 ring-amber-200/60' : ''}
-  `}
+      bg-white transition duration-150 ease-out
+      hover:shadow-md hover:brightness-[1.03] hover:border-neutral-300
+      ${isGiftOnly ? 'bg-[#fffdf7] ring-1 ring-amber-200/60' : ''}
+    `}
                                 >
 
                                     {/* 🔸 Small badge in the top-left for the gift card only */}
