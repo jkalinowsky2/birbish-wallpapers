@@ -130,221 +130,259 @@ export default function ShopPage() {
     }
 
     return (
-        <div className="space-y-6">
-            <header className="mb-2">
-                <h1 className="text-3xl font-bold mb-2">Sticker Shop</h1>
-                <p className="text-sm text-neutral-600">
-                    Premium die-cut vinyl stickers, perfect for water bottles, laptops, or anywhere else you want to rep the birbs.
-                </p>
-            </header>
-            <div className="grid grid-cols-2 w-full gap-2 aspect-[16/6] md:aspect-[16/5] lg:h-[380px]">
+        // Full-width wrapper that breaks out of the centered layout
+        <div className="w-screen relative left-1/2 right-1/2 ml-[-50vw] mr-[-50vw] bg-neutral-50">
+            <div className="bg-[#faf7f2] p-0 m-0">
+                {/* Hero band */}
+                {/* <section className="w-full bg-[#b20b2b] text-white border-b border-neutral-900 m-0 p-0"> */}
 
-                <div className="relative w-full h-full rounded-lg overflow-hidden">
-                    <Image
-                        src="/assets/images/MacBook-Office.png"
-                        alt="Birbish Left"
-                        fill
-                        className="object-cover"
-                        sizes="50vw"
-                        priority
-                    />
-                </div>
 
-                <div className="relative w-full h-full rounded-lg overflow-hidden">
-                    <Image
-                        src="/assets/images/Yeti-Office.png"
-                        alt="Birbish Right"
-                        fill
-                        className="object-cover"
-                        sizes="50vw"
-                        priority
-                    />
-                </div>
+<section className="w-full bg-gradient-to-b from-[#ce0000] to-[#b20000] text-white border-b border-neutral-900">
+  <div className="px-4 md:px-8 lg:px-10 pt-8 pb-10 md:pt-10 md:pb-12 lg:pt-16 lg:pb-16">
+
+    <h1 className="text-4xl md:text-5xl font-black tracking-tight">
+      Sticker Shop
+    </h1>
+
+    <p className="mt-3 text-sm md:text-base text-white">
+      Premium die-cut vinyl stickers for water bottles, laptops, and everywhere you rep the birbs.
+    </p>
+
+    <div className="inline-flex items-center gap-3 rounded-full bg-black/60 border border-white/10
+                    px-4 py-1.5 text-xs md:text-sm text-neutral-100 mt-8">
+      <span className="font-semibold uppercase tracking-[0.18em] text-[11px] text-[#ffd28f]">
+        PRE-ORDER COMING SOON
+      </span>
+
+      <span className="text-[11px] md:text-xs">
+        Free Moonbird-exclusive holographic sticker with $10+ order.
+      </span>
+    </div>
+
+  </div>
+</section>
 
             </div>
-            <h1 className="text-3xl font-bold mb-2"></h1>
-            <p className="text-sm text-neutral-600">
-                Pre-orders for stickers will be open for a limited time. When pre-order closes, stickers will be printed and orders will be filled. Some stickers will be available for this run only.
-                <span className="font-bold text-red-700"> A limited supply of free gifts are available for Moonbird holders who meet the minimum purchase! </span> Connect your wallet to verify (no transaction will be initiated, delegate not supported at this time.)
-            </p>
 
-            {/* Product grid */}
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 py-4">
-                {PRODUCTS.map((product) => {
-                    const qty = cart[product.priceId] ?? 0
-                    const isGiftOnly = product.giftOnly === true
 
-                    return (
-                        <article
-                            key={product.id}
-                            className="flex flex-col rounded-lg border bg-white shadow-sm overflow-hidden"
-                        >
-                            <div className="relative aspect-[3/2] sm:aspect-[4/3] bg-neutral-100">
-                                <Image
-                                    src={product.image}
-                                    alt={product.name}
-                                    fill
-                                    sizes="(min-width: 1024px) 25vw, 50vw"
-                                    style={{ objectFit: 'contain' }}
-                                />
-                            </div>
 
-                            <div className="p-3 flex flex-col gap-2 flex-1">
-                                <div>
-                                    <h2 className="text-sm font-semibold">{product.name}</h2>
-                                    <p className="text-xs text-neutral-600 mt-1">
-                                        {product.description}
-                                    </p>
-                                </div>
+            {/* Inner content with some horizontal padding */}
+            <div className="px-4 md:px-6 lg:px-8 pb-6">
+                <div className="max-w-7xl mx-auto space-y-6">
+                    <header className="mb-2">
+                        {/* <h1 className="text-3xl font-bold mb-2">Sticker Shop</h1>
+        <p className="text-sm text-neutral-600">
+          Premium die-cut vinyl stickers, perfect for water bottles, laptops, or anywhere else you want to rep the birbs.
+        </p> */}
+                    </header>
 
-                                <div className="mt-auto flex items-center justify-between">
-                                    {product.giftOnly ? (
-                                        <span className="text-sm font-semibold flex items-center gap-2">
-                                            <span className="line-through text-neutral-400">{product.priceLabel}</span>
-                                            {/* <span className="text-[#d12429] font-semibold">Moonbirds holder perk</span> */}
-                                        </span>
-                                    ) : (
-                                        <span className="text-sm font-semibold">
-                                            {product.priceLabel}
+                    {/* Hero images – now truly full-width inside our page */}
+                    {/* <div className="grid grid-cols-2 w-full gap-2 aspect-[16/6] md:aspect-[16/5] lg:h-[380px]">
+        <div className="relative w-full h-full rounded-lg overflow-hidden">
+          <Image
+            src="/assets/images/MacBook-Office.png"
+            alt="Birbish Left"
+            fill
+            className="object-cover"
+            sizes="50vw"
+            priority
+          />
+        </div>
+
+        <div className="relative w-full h-full rounded-lg overflow-hidden">
+          <Image
+            src="/assets/images/Yeti-Office.png"
+            alt="Birbish Right"
+            fill
+            className="object-cover"
+            sizes="50vw"
+            priority
+          />
+        </div>
+      </div>
+
+      <p className="text-sm text-neutral-600">
+        Pre-orders for stickers will be open for a limited time. When pre-order closes, stickers will be printed and orders will be filled. Some stickers will be available for this run only.
+        <span className="font-bold text-red-700">
+          {" "}A limited supply of free gifts are available for Moonbird holders who meet the minimum purchase!
+        </span>{" "}
+        Connect your wallet to verify (no transaction will be initiated, delegate not supported at this time.)
+      </p> */}
+
+                    {/* Product grid – now using the full width of the screen container */}
+                    <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 py-4">
+                        {PRODUCTS.map((product) => {
+                            const qty = cart[product.priceId] ?? 0
+                            const isGiftOnly = product.giftOnly === true
+
+                            return (
+                                <article
+                                    className={`relative flex flex-col rounded-lg overflow-hidden shadow-sm border border-neutral-200/60
+    bg-white transition duration-150 ease-out
+    hover:shadow-md hover:brightness-[1.03] hover:border-neutral-300
+    ${isGiftOnly ? 'bg-[#fffdf7] ring-1 ring-amber-200/60' : ''}
+  `}
+                                >
+
+                                    {/* 🔸 Small badge in the top-left for the gift card only */}
+                                    {isGiftOnly && (
+                                        //                     <span className="absolute left-2 top-2 rounded-full bg-amber-100/90 px-2 py-0.5
+                                        //    text-[10px] font-semibold uppercase tracking-wide text-[#b20000] shadow-sm">
+                                        //                         Holder perk
+                                        //                     </span>
+                                        <span className="absolute left-2 top-2 rounded-full bg-amber-100 px-2 py-0.5
+  text-[10px] font-semibold uppercase tracking-wide text-[#b20000] border border-amber-300 shadow-sm">
+                                            Holder perk
                                         </span>
                                     )}
 
-                                    {isGiftOnly ? (
-                                        <div className="text-right text-sm leading-tight">
-                                            {/* <div className="font-semibold text-[#d12429]">
-                                                Moonbirds holder perk
-                                            </div> */}
+                                    {/* image */}
+                                    <div className="relative aspect-[3/2] sm:aspect-[4/3]">
+                                        <Image
+                                            src={product.image}
+                                            alt={product.name}
+                                            fill
+                                            sizes="(min-width: 1024px) 20vw, 50vw"
+                                            style={{ objectFit: 'contain' }}
+                                        />
+                                    </div>
 
-                                            {typeof remainingGifts === 'number' && (
-                                                <div className="text-sm font-semibold text-neutral-400">
-                                                    {remainingGifts} stickers left
+                                    {/* body */}
+                                    <div className="p-3 flex flex-col gap-2 flex-1">
+                                        <div>
+                                            <h2 className="text-sm font-semibold leading-snug">{product.name}</h2>
+                                            <p className="text-xs text-neutral-600 mt-1 leading-relaxed">
+                                                {product.description}
+                                            </p>
+                                        </div>
+
+                                        <div className="mt-auto flex items-center justify-between">
+                                            {product.giftOnly ? (
+                                                <span className="text-sm font-semibold flex items-center gap-2">
+                                                    <span className="line-through text-neutral-400">
+                                                        {product.priceLabel}
+                                                    </span>
+                                                </span>
+                                            ) : (
+                                                <span className="text-sm font-semibold">
+                                                    {product.priceLabel}
+                                                </span>
+                                            )}
+
+                                            {isGiftOnly ? (
+                                                <div className="text-right text-sm leading-tight">
+                                                    {typeof remainingGifts === 'number' && (
+                                                        <div className="text-sm font-semibold text-neutral-400">
+                                                            {remainingGifts} stickers left
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <div className="inline-flex items-center gap-2">
+                                                    <button
+                                                        type="button"
+                                                        className="h-6 w-6 rounded-full border border-neutral-300 text-sm leading-none hover:bg-neutral-200"
+                                                        onClick={() =>
+                                                            setQuantity(product.priceId, Math.max(0, qty - 1))
+                                                        }
+                                                    >
+                                                        –
+                                                    </button>
+                                                    <input
+                                                        type="number"
+                                                        min={0}
+                                                        value={qty}
+                                                        onChange={(e) =>
+                                                            setQuantity(
+                                                                product.priceId,
+                                                                Math.max(0, Number(e.target.value) || 0),
+                                                            )
+                                                        }
+                                                        className="w-10 h-8 text-center text-sm border border-neutral-300 rounded-md bg-neutral-50"
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        className="h-6 w-6 rounded-full border bg-neutral-900 text-white text-sm leading-none hover:bg-[#b20b2b]"
+                                                        onClick={() => setQuantity(product.priceId, qty + 1)}
+                                                    >
+                                                        +
+                                                    </button>
                                                 </div>
                                             )}
                                         </div>
-                                    ) : (
-                                        // Normal quantity controls for buyable products
-                                        <div className="inline-flex items-center gap-2">
-                                            <button
-                                                type="button"
-                                                className="h-8 w-8 rounded-full border border-neutral-300 text-sm leading-none"
-                                                onClick={() => setQuantity(product.priceId, Math.max(0, qty - 1))}
-                                            >
-                                                –
-                                            </button>
-                                            <input
-                                                type="number"
-                                                min={0}
-                                                value={qty}
-                                                onChange={(e) =>
-                                                    setQuantity(
-                                                        product.priceId,
-                                                        Math.max(0, Number(e.target.value) || 0),
-                                                    )
-                                                }
-                                                className="w-10 h-8 text-center text-sm border border-neutral-300 rounded-md"
-                                            />
-                                            <button
-                                                type="button"
-                                                className="h-8 w-8 rounded-full border border-neutral-900 bg-neutral-900 text-white text-sm leading-none"
-                                                onClick={() => setQuantity(product.priceId, qty + 1)}
-                                            >
-                                                +
-                                            </button>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </article>
-                    )
-                })}
-            </div>
-
-
-            {/* Cart / checkout bar */}
-            {/* <div className="sticky bottom-0 py-4 bg-gradient-to-t from-[#f7f7f7] to-transparent"> */}
-            <div className="sticky bottom-0 py-4 bg-[#f7f7f7] border-t z-40">
-                <div className="max-w-6xl mx-auto flex items-center justify-between rounded-lg border bg-white px-4 py-2 shadow-sm">
-                    <div className="text-sm text-neutral-700">
-                        {totalItems ? (
-                            <>
-                                <span>
-                                    You&apos;ve selected {totalItems} sticker{totalItems > 1 ? 's' : ''}.
-                                </span>
-                                {totalPrice > 0 && (
-                                    <span className="ml-2 font-semibold">
-                                        (~${totalPrice.toFixed(2)})
-                                    </span>
-                                )}
-
-                                {isHolder && hasClaimedGift && (
-                                    <div className="text-xs text-neutral-600 mt-1">
-                                        You&apos;ve already claimed your free holographic sticker on a previous
-                                        order. 🦉
                                     </div>
-                                )}
-
-                                {isHolder && !hasClaimedGift && (remainingGifts ?? 1) <= 0 && (
-                                    <div className="text-xs text-neutral-600 mt-1">
-                                        This round of holographic stickers have all been claimed. Thanks, birbs! ❤️
-                                    </div>
-                                )}
-
-                                {isGiftEligible && (remainingGifts ?? 1) > 0 && (
-                                    <div className="text-xs font-medium text-green-700 mt-1">
-                                        🎁 Congrats, birb! You&apos;re getting a free sticker
-                                        with this order for holding a Moonbird.
-                                    </div>
-                                )}
-
-                                {/* Show instructions to *anyone* not eligible */}
-                                {!isGiftEligible &&
-                                    !hasClaimedGift &&          // ← NEW: don't show if already claimed
-                                    totalItems > 0 && (
-                                        <div className="text-xs text-neutral-600 mt-1">
-                                            Connect a wallet that holds a Moonbird and spend ${REQ_MIN}+
-                                            to unlock a free holographic sticker.
-                                        </div>
-                                    )}
-                            </>
-                        ) : (
-                            <span>No stickers selected yet.</span>
-                        )}
+                                </article>
+                            )
+                        })}
                     </div>
-
-                    {/* DISABLE CHECKOUT */}
-                    <button
-                        type="button"
-                        // onClick={handleCheckout}
-                        disabled={!totalItems || isCheckingOut}
-                        className="px-5 py-2 rounded-md text-sm font-medium bg-black text-white disabled:bg-neutral-300 disabled:cursor-not-allowed"
-                    >
-                        {isCheckingOut
-                            ? 'Starting checkout…'
-                            : totalItems
-                                ? `Disabled`
-                                // ? `Checkout (${totalItems})`
-                                : 'Disabled'}
-                    </button>
-
-
-                    {/* <button
-                        type="button"
-                        onClick={handleCheckout}
-                        disabled={!totalItems || isCheckingOut}
-                        className="px-5 py-2 rounded-full text-sm font-medium bg-black text-white disabled:bg-neutral-300 disabled:cursor-not-allowed"
-                    >
-                        {isCheckingOut
-                            ? 'Starting checkout…'
-                            : totalItems
-                                ? `Checkout (${totalItems})`
-                                : 'Checkout'}
-                    </button> */}
                 </div>
-                <p className="text-xs text-neutral-600 ml-2 py-2">
-                    Note: Checkout will bring you to our Stripe checkout page. Crypto payments are not accepted at this time. US & Canada only at this time.
-                </p>
-            </div>
 
+                {/* Cart / checkout bar – now full-width since parent is full-width */}
+                <div className="sticky bottom-0 py-4 bg-[#f7f7f7] border-t z-40">
+                    <div className="mx-auto flex max-w-7xl items-center justify-between rounded-lg border bg-white px-4 py-2 shadow-sm">
+                        <div className="text-sm text-neutral-700">
+                            {totalItems ? (
+                                <>
+                                    <span>
+                                        You&apos;ve selected {totalItems} sticker
+                                        {totalItems > 1 ? 's' : ''}.
+                                    </span>
+                                    {totalPrice > 0 && (
+                                        <span className="ml-2 font-semibold">
+                                            (~${totalPrice.toFixed(2)})
+                                        </span>
+                                    )}
+
+                                    {isHolder && hasClaimedGift && (
+                                        <div className="text-xs text-neutral-600 mt-1">
+                                            You&apos;ve already claimed your free holographic sticker on a previous
+                                            order. 🦉
+                                        </div>
+                                    )}
+
+                                    {isHolder && !hasClaimedGift && (remainingGifts ?? 1) <= 0 && (
+                                        <div className="text-xs text-neutral-600 mt-1">
+                                            This round of holographic stickers have all been claimed. Thanks, birbs! ❤️
+                                        </div>
+                                    )}
+
+                                    {isGiftEligible && (remainingGifts ?? 1) > 0 && (
+                                        <div className="text-xs font-medium text-green-700 mt-1">
+                                            🎁 Congrats, birb! You&apos;re getting a free sticker
+                                            with this order for holding a Moonbird.
+                                        </div>
+                                    )}
+
+                                    {!isGiftEligible &&
+                                        !hasClaimedGift &&
+                                        totalItems > 0 && (
+                                            <div className="text-xs text-neutral-600 mt-1">
+                                                Connect a wallet that holds a Moonbird and spend ${REQ_MIN}+ to unlock a free holographic sticker.
+                                            </div>
+                                        )}
+                                </>
+                            ) : (
+                                <span>No stickers selected yet.</span>
+                            )}
+                        </div>
+
+                        <button
+                            type="button"
+                            disabled={!totalItems || isCheckingOut}
+                            className="px-5 py-2 rounded-md text-sm font-medium bg-black text-white disabled:bg-neutral-300 disabled:cursor-not-allowed"
+                        >
+                            {isCheckingOut
+                                ? 'Starting checkout…'
+                                : totalItems
+                                    ? 'Disabled'
+                                    : 'Disabled'}
+                        </button>
+                    </div>
+                    {/* <p className="text-xs text-neutral-600 ml-4 py-2">
+                        Note: Checkout will bring you to our Stripe checkout page. Crypto payments are not accepted at this time. US & Canada only at this time.
+                    </p> */}
+                </div>
+            </div>
         </div>
     )
 }

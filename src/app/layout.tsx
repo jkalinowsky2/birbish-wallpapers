@@ -25,7 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       >
         <Web3Provider>
           <SiteHeader />
-          <main className="mx-auto max-w-6xl px-4 md:px-6 py-6">{children}</main>
+          <main className="mx-auto max-w-6xl px-4 md:px-6 pt-0 pb-6">{children}</main>
           <SiteFooter />
         </Web3Provider>
       </body>

@@ -45,7 +45,8 @@ export default function Header() {
 
   return (
     <header className="border-b bg-white">
-      <div className="mx-auto max-w-6xl px-4 md:px-6 h-14 flex items-center justify-between">
+      {/* <div className="mx-auto max-w-6xl px-4 md:px-6 h-14 flex items-center justify-between"> */}
+      <div className="w-full px-4 md:px-6 h-14 flex items-center justify-between">
         {/* LOGO LINK */}
         <Link href="/" className="flex items-center">
           <Image
