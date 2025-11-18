@@ -24,6 +24,9 @@ export default function ShopPage() {
     const [hasClaimedGift, setHasClaimedGift] = useState(false)
     const [remainingGifts, setRemainingGifts] = useState<number | null>(null)
 
+    const [shippingRegion, setShippingRegion] =
+        useState<'domestic' | 'international'>('domestic')
+
     // Call the API to check holder status
     useEffect(() => {
         let cancelled = false
@@ -201,7 +204,7 @@ export default function ShopPage() {
             )
         })
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     const handleCheckout = async () => {
         if (!totalItems || isCheckingOut) return
 
@@ -212,6 +215,15 @@ export default function ShopPage() {
                 quantity,
             }))
 
+            // const res = await fetch('/api/create-checkout-session', {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify({
+            //         items,
+            //         giftEligible: isGiftEligible,
+            //         walletAddress: address ?? '',
+            //     }),
+            // })
             const res = await fetch('/api/create-checkout-session', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -219,6 +231,7 @@ export default function ShopPage() {
                     items,
                     giftEligible: isGiftEligible,
                     walletAddress: address ?? '',
+                    shippingRegion,             // 👈 add this
                 }),
             })
 
@@ -297,14 +310,14 @@ export default function ShopPage() {
 
                 {/* Cart / checkout bar – now full-width since parent is full-width */}
                 <div className="sticky bottom-0 py-4 bg-[#f7f7f7] border-t z-40">
-<div
-  className="
+                    <div
+                        className="
     mx-auto max-w-7xl 
     flex flex-col gap-4 
     sm:flex-row sm:items-center sm:justify-between 
     rounded-lg border bg-white px-4 py-3 shadow-sm
   "
->                        <div className="text-sm text-neutral-700">
+                    >                        <div className="text-sm text-neutral-700">
                             {totalItems ? (
                                 <>
                                     <span>
@@ -350,20 +363,77 @@ export default function ShopPage() {
                             )}
                         </div>
 
-                        <button
-                            type="button"
-                            disabled={!totalItems || isCheckingOut}
-                            className="px-5 py-2 rounded-md text-sm font-medium bg-black text-white disabled:bg-neutral-300 disabled:cursor-not-allowed"
-                        >
-                            {isCheckingOut
-                                ? 'Starting checkout…'
-                                : totalItems
-                                    ? 'Checkout Disabled'
-                                    : 'Checkout Disabled'}
-                        </button>
-                    </div>
+{/* Right: region selector + checkout buttons aligned right */}
+<div className="flex flex-col items-end gap-2 flex-shrink-0">
+
+  {/* Region selector aligned to the right */}
+  <div className="inline-flex items-center gap-2 text-xs md:text-sm justify-end">
+    <span className="text-neutral-600">Select shipping region:</span>
+
+    <div className="inline-flex rounded-full border border-neutral-200 bg-neutral-50 p-0.5">
+      <button
+        type="button"
+        onClick={() => setShippingRegion('domestic')}
+        className={`px-2 py-0.5 text-[11px] rounded-full
+        ${shippingRegion === 'domestic'
+          ? 'bg-neutral-900 text-white'
+          : 'text-neutral-700'}
+      `}
+      >
+        US / Canada
+      </button>
+
+      <button
+        type="button"
+        onClick={() => setShippingRegion('international')}
+        className={`px-2 py-0.5 text-[11px] rounded-full
+        ${shippingRegion === 'international'
+          ? 'bg-neutral-900 text-white'
+          : 'text-neutral-700'}
+      `}
+      >
+        International
+      </button>
+    </div>
+  </div>
+
+  {/* Buttons (you keep both versions) */}
+  <div className="flex flex-col items-end gap-2 w-full sm:w-auto">
+
+    {/* Main checkout button */}
+    {/* <button
+      type="button"
+      onClick={handleCheckout}
+      disabled={!totalItems || isCheckingOut}
+      className="px-5 py-2 rounded-full text-sm font-medium bg-black text-white 
+                 disabled:bg-neutral-300 disabled:cursor-not-allowed w-full sm:w-auto"
+    >
+      {isCheckingOut
+        ? 'Starting checkout…'
+        : totalItems
+          ? `Checkout (${totalItems})`
+          : 'Checkout'}
+    </button> */}
+
+    {/* The alternate/disabled button you want to keep */}
+    <button
+      type="button"
+      disabled={!totalItems || isCheckingOut}
+      className="px-5 py-2 rounded-md text-sm font-medium bg-black text-white 
+                 disabled:bg-neutral-300 disabled:cursor-not-allowed w-full sm:w-auto"
+    >
+      {isCheckingOut
+        ? 'Starting checkout…'
+        : totalItems
+          ? 'Checkout Disabled'
+          : 'Checkout Disabled'}
+    </button>
+
+  </div>
+</div>
                 </div>
             </div>
+        </div>
         </div>
     )
 }
