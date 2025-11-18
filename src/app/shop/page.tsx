@@ -297,8 +297,14 @@ export default function ShopPage() {
 
                 {/* Cart / checkout bar – now full-width since parent is full-width */}
                 <div className="sticky bottom-0 py-4 bg-[#f7f7f7] border-t z-40">
-                    <div className="mx-auto flex max-w-7xl items-center justify-between rounded-lg border bg-white px-4 py-2 shadow-sm">
-                        <div className="text-sm text-neutral-700">
+<div
+  className="
+    mx-auto max-w-7xl 
+    flex flex-col gap-4 
+    sm:flex-row sm:items-center sm:justify-between 
+    rounded-lg border bg-white px-4 py-3 shadow-sm
+  "
+>                        <div className="text-sm text-neutral-700">
                             {totalItems ? (
                                 <>
                                     <span>
@@ -352,8 +358,8 @@ export default function ShopPage() {
                             {isCheckingOut
                                 ? 'Starting checkout…'
                                 : totalItems
-                                    ? 'Disabled'
-                                    : 'Disabled'}
+                                    ? 'Checkout Disabled'
+                                    : 'Checkout Disabled'}
                         </button>
                     </div>
                 </div>
