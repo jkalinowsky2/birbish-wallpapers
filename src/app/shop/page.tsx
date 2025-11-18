@@ -245,7 +245,7 @@ export default function ShopPage() {
                 <section className="w-full bg-gradient-to-b from-[#ce0000] to-[#b20000] text-white border-b border-neutral-900">
                     <div className="px-4 md:px-8 lg:px-10 pt-8 pb-10 md:pt-10 md:pb-12 lg:pt-16 lg:pb-16">
                         <h1 className="text-4xl md:text-5xl font-black tracking-tight">
-                            Moonbirds Merch Shop
+                            Merch Shop
                         </h1>
 
                         <p className="mt-3 text-sm md:text-base text-white">
