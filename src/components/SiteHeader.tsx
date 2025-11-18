@@ -65,7 +65,7 @@ export default function Header() {
             href="/shop"
             className="px-3 py-2 rounded-lg text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100"
           >
-            Sticker Shop
+            Shop
           </Link>
           <Dropdown label="Wallpapers" items={WALLPAPER_ITEMS} pathname={pathname} />
           <Dropdown label="Banners" items={BANNER_ITEMS} pathname={pathname} />
@@ -116,7 +116,7 @@ export default function Header() {
             className={linkClasses("/shop")}
             onClick={() => setMobileOpen(false)}
           >
-            Sticker Shop
+            Shop
           </Link>
           <div className="mx-auto max-w-6xl px-2 py-2">
             {/* Wallpapers section */}

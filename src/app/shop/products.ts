@@ -10,7 +10,7 @@ export type Product = {
     giftOnly?: boolean
 };
 
-export const PRODUCTS: Product[] = [
+export const STICKER_PRODUCTS: Product[] = [
     {
         id: "logo-sticker",
         name: "Logo Sticker",
@@ -124,4 +124,31 @@ export const PRODUCTS: Product[] = [
 //     image: "/assets/store/stickers/gmsticker.png",
 //     priceId: "price8",
 // },
+
+// 🔹 New transfer decals
+export const DECAL_PRODUCTS: Product[] = [
+  {
+    id: 'birblogodecal',
+    name: 'birb logo transfer',
+    // priceId: 'price_1SUpO80n54kwZghJuaX7XhLx',        // Live
+    priceId: 'price_1SUpEv14Mz115JiaLjZ5awBJ',        // Testing price ID
+    priceLabel: '$6.50',
+    image: '/assets/store/decals/birblogodecal.png',
+    description: 'Cream logo transfer sticker. 3 x 3 inches',
+  },
+//   {
+//     id: 'decal-logo-large',
+//     name: 'Logo Transfer Decal – Large',
+//     priceId: 'price_xxx',        // Stripe price for this decal
+//     priceLabel: '$15.00',
+//     image: '/assets/images/decals/logo-decal-large.png',
+//     description: 'Large transfer decal for laptops, cars, or cases. Approx 8" wide.',
+//   },
+]
+
+// 🔹 Helper that includes *everything* for totals, etc.
+export const ALL_PRODUCTS: Product[] = [
+  ...STICKER_PRODUCTS,
+  ...DECAL_PRODUCTS,
+]
 
