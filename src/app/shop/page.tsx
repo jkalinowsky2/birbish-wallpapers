@@ -4,7 +4,7 @@
 
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
-import { STICKER_PRODUCTS, DECAL_PRODUCTS, ALL_PRODUCTS, type Product,} from "./products";
+import { STICKER_PRODUCTS, DECAL_PRODUCTS, ALL_PRODUCTS, type Product, } from "./products";
 import { useAccount } from 'wagmi'
 
 export default function ShopPage() {
@@ -91,10 +91,115 @@ export default function ShopPage() {
         totalPrice >= REQ_MIN &&
         (remainingGifts === null || remainingGifts > 0)
 
+    // 🔹 helper to render products for a given category
+    const renderProducts = (items: Product[]) =>
+        items.map((product) => {
+            const qty = cart[product.priceId] ?? 0
+            const isGiftOnly = product.giftOnly === true
+
+            return (
+                <article
+                    key={product.id}
+                    className={`relative flex flex-col rounded-lg overflow-hidden shadow-sm border border-neutral-200/60
+      bg-white transition duration-150 ease-out
+      hover:shadow-md hover:brightness-[1.03] hover:border-neutral-300
+      ${isGiftOnly ? 'bg-[#fffdf7] ring-1 ring-amber-200/60' : ''}
+    `}
+                >
+                    {/* 🔸 Small badge in the top-left for the gift card only */}
+                    {isGiftOnly && (
+                        <span
+                            className="absolute left-2 top-2 rounded-full bg-amber-100 px-2 py-0.5
+  text-[10px] font-semibold uppercase tracking-wide text-[#b20000] border border-amber-300 shadow-sm"
+                        >
+                            Holder perk
+                        </span>
+                    )}
+
+                    {/* image */}
+                    <div className="relative aspect-[3/2] sm:aspect-[4/3]">
+                        <Image
+                            src={product.image}
+                            alt={product.name}
+                            fill
+                            sizes="(min-width: 1024px) 20vw, 50vw"
+                            style={{ objectFit: 'contain' }}
+                        />
+                    </div>
+
+                    {/* body */}
+                    <div className="p-3 flex flex-col gap-2 flex-1">
+                        <div>
+                            <h2 className="text-sm font-semibold leading-snug">
+                                {product.name}
+                            </h2>
+                            <p className="text-xs text-neutral-600 mt-1 leading-relaxed">
+                                {product.description}
+                            </p>
+                        </div>
+
+                        <div className="mt-auto flex items-center justify-between">
+                            {product.giftOnly ? (
+                                <span className="text-sm font-semibold flex items-center gap-2">
+                                    <span className="line-through text-neutral-400">
+                                        {product.priceLabel}
+                                    </span>
+                                </span>
+                            ) : (
+                                <span className="text-sm font-semibold">
+                                    {product.priceLabel}
+                                </span>
+                            )}
+
+                            {isGiftOnly ? (
+                                <div className="text-right text-sm leading-tight">
+                                    {typeof remainingGifts === 'number' && (
+                                        <div className="text-sm font-semibold text-neutral-400">
+                                            {remainingGifts} stickers left
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (
+                                <div className="inline-flex items-center gap-2">
+                                    <button
+                                        type="button"
+                                        className="h-6 w-6 rounded-full border border-neutral-300 text-sm leading-none hover:bg-neutral-200"
+                                        onClick={() =>
+                                            setQuantity(product.priceId, Math.max(0, qty - 1))
+                                        }
+                                    >
+                                        –
+                                    </button>
+                                    <input
+                                        type="number"
+                                        min={0}
+                                        value={qty}
+                                        onChange={(e) =>
+                                            setQuantity(
+                                                product.priceId,
+                                                Math.max(0, Number(e.target.value) || 0),
+                                            )
+                                        }
+                                        className="w-10 h-8 text-center text-sm border border-neutral-300 rounded-md bg-neutral-50"
+                                    />
+                                    <button
+                                        type="button"
+                                        className="h-6 w-6 rounded-full border bg-neutral-900 text-white text-sm leading-none hover:bg-[#b20b2b]"
+                                        onClick={() => setQuantity(product.priceId, qty + 1)}
+                                    >
+                                        +
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </article>
+            )
+        })
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleCheckout = async () => {
         if (!totalItems || isCheckingOut) return
-
 
         setIsCheckingOut(true)
         try {
@@ -126,115 +231,7 @@ export default function ShopPage() {
         } finally {
             setIsCheckingOut(false)
         }
-
     }
-
-
-        ///NEW
-        const renderProducts = (items: Product[]) =>
-            items.map((product) => {
-                const qty = cart[product.priceId] ?? 0
-                const isGiftOnly = product.giftOnly === true
-
-                return (
-                    <article
-                        key={product.id}
-                        className={`relative flex flex-col rounded-lg overflow-hidden shadow-sm border border-neutral-200/60
-      bg-white transition duration-150 ease-out
-      hover:shadow-md hover:brightness-[1.03] hover:border-neutral-300
-      ${isGiftOnly ? 'bg-[#fffdf7] ring-1 ring-amber-200/60' : ''}
-    `}
-                    >
-                        {/* 🔸 Small badge in the top-left for the gift card only */}
-                        {isGiftOnly && (
-                            <span
-                                className="absolute left-2 top-2 rounded-full bg-amber-100 px-2 py-0.5
-  text-[10px] font-semibold uppercase tracking-wide text-[#b20000] border border-amber-300 shadow-sm"
-                            >
-                                Holder perk
-                            </span>
-                        )}
-
-                        {/* image */}
-                        <div className="relative aspect-[3/2] sm:aspect-[4/3]">
-                            <Image
-                                src={product.image}
-                                alt={product.name}
-                                fill
-                                sizes="(min-width: 1024px) 20vw, 50vw"
-                                style={{ objectFit: 'contain' }}
-                            />
-                        </div>
-
-                        {/* body */}
-                        <div className="p-3 flex flex-col gap-2 flex-1">
-                            <div>
-                                <h2 className="text-sm font-semibold leading-snug">
-                                    {product.name}
-                                </h2>
-                                <p className="text-xs text-neutral-600 mt-1 leading-relaxed">
-                                    {product.description}
-                                </p>
-                            </div>
-
-                            <div className="mt-auto flex items-center justify-between">
-                                {product.giftOnly ? (
-                                    <span className="text-sm font-semibold flex items-center gap-2">
-                                        <span className="line-through text-neutral-400">
-                                            {product.priceLabel}
-                                        </span>
-                                    </span>
-                                ) : (
-                                    <span className="text-sm font-semibold">
-                                        {product.priceLabel}
-                                    </span>
-                                )}
-
-                                {isGiftOnly ? (
-                                    <div className="text-right text-sm leading-tight">
-                                        {typeof remainingGifts === 'number' && (
-                                            <div className="text-sm font-semibold text-neutral-400">
-                                                {remainingGifts} stickers left
-                                            </div>
-                                        )}
-                                    </div>
-                                ) : (
-                                    <div className="inline-flex items-center gap-2">
-                                        <button
-                                            type="button"
-                                            className="h-6 w-6 rounded-full border border-neutral-300 text-sm leading-none hover:bg-neutral-200"
-                                            onClick={() =>
-                                                setQuantity(product.priceId, Math.max(0, qty - 1))
-                                            }
-                                        >
-                                            –
-                                        </button>
-                                        <input
-                                            type="number"
-                                            min={0}
-                                            value={qty}
-                                            onChange={(e) =>
-                                                setQuantity(
-                                                    product.priceId,
-                                                    Math.max(0, Number(e.target.value) || 0),
-                                                )
-                                            }
-                                            className="w-10 h-8 text-center text-sm border border-neutral-300 rounded-md bg-neutral-50"
-                                        />
-                                        <button
-                                            type="button"
-                                            className="h-6 w-6 rounded-full border bg-neutral-900 text-white text-sm leading-none hover:bg-[#b20b2b]"
-                                            onClick={() => setQuantity(product.priceId, qty + 1)}
-                                        >
-                                            +
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </article>
-                )
-            })
 
 
     return (
@@ -249,7 +246,7 @@ export default function ShopPage() {
                     <div className="px-4 md:px-8 lg:px-10 pt-8 pb-10 md:pt-10 md:pb-12 lg:pt-16 lg:pb-16">
 
                         <h1 className="text-4xl md:text-5xl font-black tracking-tight">
-                           Moonbirds Merch Shop
+                            Moonbirds Merch Shop
                         </h1>
 
                         <p className="mt-3 text-sm md:text-base text-white">
@@ -286,27 +283,9 @@ export default function ShopPage() {
 
                     {/* Hero images – now truly full-width inside our page */}
                     {/* <div className="grid grid-cols-2 w-full gap-2 aspect-[16/6] md:aspect-[16/5] lg:h-[380px]">
-        <div className="relative w-full h-full rounded-lg overflow-hidden">
-          <Image
-            src="/assets/images/MacBook-Office.png"
-            alt="Birbish Left"
-            fill
-            className="object-cover"
-            sizes="50vw"
-            priority
-          />
-        </div>
 
-        <div className="relative w-full h-full rounded-lg overflow-hidden">
-          <Image
-            src="/assets/images/Yeti-Office.png"
-            alt="Birbish Right"
-            fill
-            className="object-cover"
-            sizes="50vw"
-            priority
-          />
-        </div>
+
+
       </div>
 
       <p className="text-sm text-neutral-600">
