@@ -180,13 +180,13 @@ export default function ShopPage() {
                                     <input
                                         type="number"
                                         min={0}
+                                        step={1}                       // 👈 blocks decimals in the browser UI
                                         value={qty}
-                                        onChange={(e) =>
-                                            setQuantity(
-                                                product.priceId,
-                                                Math.max(0, Number(e.target.value) || 0),
-                                            )
-                                        }
+                                        onChange={(e) => {
+                                            const raw = Number(e.target.value);
+                                            const clean = Math.max(0, Math.floor(raw) || 0);  // 👈 ensures integer only
+                                            setQuantity(product.priceId, clean);
+                                        }}
                                         className="w-10 h-8 text-center text-sm border border-neutral-300 rounded-md bg-neutral-50"
                                     />
                                     <button
@@ -379,45 +379,45 @@ export default function ShopPage() {
                             )}
                         </div>
 
-{/* Right: region selector + checkout buttons aligned right */}
-<div className="flex flex-col items-end gap-2 flex-shrink-0">
+                        {/* Right: region selector + checkout buttons aligned right */}
+                        <div className="flex flex-col items-end gap-2 flex-shrink-0">
 
-  {/* Region selector aligned to the right */}
-  <div className="inline-flex items-center gap-2 text-xs md:text-sm justify-end">
-    <span className="text-neutral-600">Select shipping region:</span>
+                            {/* Region selector aligned to the right */}
+                            <div className="inline-flex items-center gap-2 text-xs md:text-sm justify-end">
+                                <span className="text-neutral-600">Select shipping region:</span>
 
-    <div className="inline-flex rounded-md border border-neutral-200 bg-neutral-50 p-0.5">
-      <button
-        type="button"
-        onClick={() => setShippingRegion('domestic')}
-        className={`px-2 py-0.5 text-[11px] rounded-md
+                                <div className="inline-flex rounded-md border border-neutral-200 bg-neutral-50 p-0.5">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShippingRegion('domestic')}
+                                        className={`px-2 py-0.5 text-[11px] rounded-md
         ${shippingRegion === 'domestic'
-          ? 'bg-neutral-900 text-white'
-          : 'text-neutral-700'}
+                                                ? 'bg-neutral-900 text-white'
+                                                : 'text-neutral-700'}
       `}
-      >
-        US / Canada
-      </button>
+                                    >
+                                        US / Canada
+                                    </button>
 
-      <button
-        type="button"
-        onClick={() => setShippingRegion('international')}
-        className={`px-2 py-0.5 text-[11px] rounded-md
+                                    <button
+                                        type="button"
+                                        onClick={() => setShippingRegion('international')}
+                                        className={`px-2 py-0.5 text-[11px] rounded-md
         ${shippingRegion === 'international'
-          ? 'bg-neutral-900 text-white'
-          : 'text-neutral-700'}
+                                                ? 'bg-neutral-900 text-white'
+                                                : 'text-neutral-700'}
       `}
-      >
-        International
-      </button>
-    </div>
-  </div>
+                                    >
+                                        International
+                                    </button>
+                                </div>
+                            </div>
 
-  {/* Buttons (you keep both versions) */}
-  <div className="flex flex-col items-end gap-2 w-full sm:w-auto">
+                            {/* Buttons (you keep both versions) */}
+                            <div className="flex flex-col items-end gap-2 w-full sm:w-auto">
 
-    {/* Main checkout button */}
-    {/* <button
+                                {/* Main checkout button */}
+                                {/* <button
       type="button"
       onClick={handleCheckout}
       disabled={!totalItems || isCheckingOut}
@@ -431,25 +431,25 @@ export default function ShopPage() {
           : 'Checkout'}
     </button> */}
 
-    {/* The alternate/disabled button you want to keep */}
-    <button
-      type="button"
-      disabled={!totalItems || isCheckingOut}
-      className="px-5 py-2 rounded-md text-sm font-medium bg-black text-white 
+                                {/* The alternate/disabled button you want to keep */}
+                                <button
+                                    type="button"
+                                    disabled={!totalItems || isCheckingOut}
+                                    className="px-5 py-2 rounded-md text-sm font-medium bg-black text-white 
                  disabled:bg-neutral-300 disabled:cursor-not-allowed w-full sm:w-auto"
-    >
-      {isCheckingOut
-        ? 'Starting checkout…'
-        : totalItems
-          ? 'Checkout Disabled'
-          : 'Checkout Disabled'}
-    </button>
+                                >
+                                    {isCheckingOut
+                                        ? 'Starting checkout…'
+                                        : totalItems
+                                            ? 'Checkout Disabled'
+                                            : 'Checkout Disabled'}
+                                </button>
 
-  </div>
-</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
         </div>
     )
 }
