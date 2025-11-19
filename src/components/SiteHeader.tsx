@@ -77,12 +77,12 @@ export default function Header() {
           >
             Gallery
           </Link>
-          <Link
+          {/* <Link
             href="/tip-jar"
             className="px-3 py-2 rounded-lg text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100"
           >
             Tip Jar
-          </Link>
+          </Link> */}
 
           {/* 🔌 Connect Wallet – desktop */}
           <div className="ml-2">
@@ -206,13 +206,13 @@ export default function Header() {
               Gallery
             </Link>
 
-            <Link
+            {/* <Link
               href="/tip-jar"
               className={linkClasses("/tip-jar")}
               onClick={() => setMobileOpen(false)}
             >
               Tip Jar
-            </Link>
+            </Link> */}
 
           </div>
 

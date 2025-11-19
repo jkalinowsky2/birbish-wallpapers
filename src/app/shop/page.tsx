@@ -278,6 +278,22 @@ export default function ShopPage() {
                                 Free Moonbird-exclusive holographic sticker with $10+ order.
                             </span>
                         </div>
+
+                        {/* Paused Message */}
+                        {/* <div
+                            className="inline-flex items-center gap-3 rounded-full bg-black/60 border border-white/10
+                    px-4 py-1.5 text-xs md:text-sm text-neutral-100 mt-8"
+                        >
+                            <span className="font-semibold uppercase tracking-[0.18em] text-[11px] text-[#ffd28f]">
+                                CHECKOUT TEMPORARILY PAUSED. 
+                            </span>
+
+                            <span className="text-[11px] md:text-xs">
+                                We're currently filling orders. Please check back soon!
+                            </span>
+                        </div> */}
+                        {/* End Paused Message */}
+
                     </div>
                 </section>
             </div>
@@ -370,11 +386,11 @@ export default function ShopPage() {
   <div className="inline-flex items-center gap-2 text-xs md:text-sm justify-end">
     <span className="text-neutral-600">Select shipping region:</span>
 
-    <div className="inline-flex rounded-full border border-neutral-200 bg-neutral-50 p-0.5">
+    <div className="inline-flex rounded-md border border-neutral-200 bg-neutral-50 p-0.5">
       <button
         type="button"
         onClick={() => setShippingRegion('domestic')}
-        className={`px-2 py-0.5 text-[11px] rounded-full
+        className={`px-2 py-0.5 text-[11px] rounded-md
         ${shippingRegion === 'domestic'
           ? 'bg-neutral-900 text-white'
           : 'text-neutral-700'}
@@ -386,7 +402,7 @@ export default function ShopPage() {
       <button
         type="button"
         onClick={() => setShippingRegion('international')}
-        className={`px-2 py-0.5 text-[11px] rounded-full
+        className={`px-2 py-0.5 text-[11px] rounded-md
         ${shippingRegion === 'international'
           ? 'bg-neutral-900 text-white'
           : 'text-neutral-700'}
@@ -405,7 +421,7 @@ export default function ShopPage() {
       type="button"
       onClick={handleCheckout}
       disabled={!totalItems || isCheckingOut}
-      className="px-5 py-2 rounded-full text-sm font-medium bg-black text-white 
+      className="px-5 py-2 rounded-md text-sm font-medium bg-black text-white 
                  disabled:bg-neutral-300 disabled:cursor-not-allowed w-full sm:w-auto"
     >
       {isCheckingOut
