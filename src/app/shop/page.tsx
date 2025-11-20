@@ -431,7 +431,7 @@ export default function ShopPage() {
           : 'Checkout'}
     </button>
 
-                                {/* The alternate/disabled button you want to keep */}
+                                {/* This is the alternate/disabled button you want to keep */}
                                 {/* <button
                                     type="button"
                                     disabled={!totalItems || isCheckingOut}
