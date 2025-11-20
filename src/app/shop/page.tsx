@@ -396,7 +396,7 @@ export default function ShopPage() {
                                                 : 'text-neutral-700'}
       `}
                                     >
-                                        US / Canada
+                                        United States
                                     </button>
 
                                     <button
@@ -448,7 +448,14 @@ export default function ShopPage() {
                             </div>
                         </div>
                     </div>
+                    <div className="text-xs text-neutral-500 text-right mx-10 my-1">
+                        <p> Now shipping to the following countries: US, Canada, Mexico, Australia, UK, Germany, South Korea, Japan</p>
+                        Contact JK if you are outside of these regions and would like to order. 
+
+                    </div>
+
                 </div>
+
             </div>
         </div>
     )

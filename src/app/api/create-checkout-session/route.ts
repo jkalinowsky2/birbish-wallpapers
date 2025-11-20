@@ -134,15 +134,21 @@ export async function POST(request: Request) {
         // Allowed countries based on region
         // -------------------------------
         const domesticCountries: Stripe.Checkout.SessionCreateParams.ShippingAddressCollection.AllowedCountry[] =
-            ['US', 'CA']
+            ['US']
 
         const internationalCountries: Stripe.Checkout.SessionCreateParams.ShippingAddressCollection.AllowedCountry[] = [
             // add/remove as you like
-            'GB',
-            'DE',
+            'CA', //Canada
+            'AU', //Australia
+            'GB', //United Kingdom
+            'DE', //Germany
+            'KR', //South Korea
+            'JP', //Japan
+            'MX', //Mexico
+
+             // 'NZ', //New Zealand
             // 'FR',
-            'AU',
-            'NZ',
+            // 'NZ', 
             // 'IE',
             // 'NL',
             // 'SE',
