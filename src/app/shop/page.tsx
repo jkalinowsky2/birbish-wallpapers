@@ -336,15 +336,18 @@ export default function ShopPage() {
                 </div>
 
                 {/* Cart / checkout bar – now full-width since parent is full-width */}
-                <div className="bg-[#f7f7f7] border-t z-40 sm:sticky sm:bottom-0 sm:py-4 py-2">
-                    <div
-                        className="
-    mx-auto max-w-7xl 
-    flex flex-col gap-3 
-    sm:flex-row sm:items-center sm:justify-between 
-    rounded-lg border bg-white px-3 py-2 sm:px-4 sm:py-3 shadow-sm
-  "
-                    >
+<div className="bg-[#f7f7f7] border-t z-40 sm:sticky sm:bottom-0 sm:py-4 py-2">
+  <div
+    className="
+      mx-auto max-w-7xl 
+      flex flex-col gap-2 sm:gap-4
+      sm:flex-row sm:items-center sm:justify-between 
+      rounded-lg border bg-white 
+      px-3 py-2 sm:px-4 sm:py-3 
+      shadow-sm 
+      text-[12px] sm:text-sm    /* smaller text on mobile */
+    "
+  >
                         <div className="text-xs sm:text-sm text-neutral-700">
                             {totalItems ? (
                                 <>
