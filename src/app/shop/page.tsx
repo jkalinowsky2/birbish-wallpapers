@@ -336,8 +336,8 @@ export default function ShopPage() {
                 </div>
 
                 {/* Cart / checkout bar – now full-width since parent is full-width */}
-<div className="bg-[#f7f7f7] border-t z-40 sm:sticky sm:bottom-0 sm:py-4 py-2">
-{/* <div className="bg-[#f7f7f7] border-t z-40 sm:py-4 py-2"> */}
+{/* <div className="bg-[#f7f7f7] border-t z-40 sm:sticky sm:bottom-0 sm:py-4 py-2"> */}
+<div className="bg-[#f7f7f7] border-t z-40 sm:py-4 py-2">
   <div
     className="
       mx-auto max-w-7xl 
