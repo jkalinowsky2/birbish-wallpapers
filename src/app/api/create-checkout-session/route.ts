@@ -176,6 +176,7 @@ export async function POST(request: Request) {
             line_items: lineItems,
             success_url: `${origin}/success`,
             cancel_url: `${origin}/shop`,
+            allow_promotion_codes: true,   // 👈 THIS LINE
             shipping_address_collection: {
                 allowed_countries: allowedCountries,
             },

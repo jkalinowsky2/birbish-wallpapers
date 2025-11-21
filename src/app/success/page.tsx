@@ -2,7 +2,7 @@
 export default function CheckoutSuccessPage() {
   return (
     <main className="mx-auto max-w-2xl px-4 py-16 text-center">
-      <h1 className="text-2xl font-semibold mb-4">Thank you! 🐦✨</h1>
+      <h1 className="text-2xl font-semibold mb-4">Thank you, birb! 🦉✨</h1>
       <p className="text-sm text-neutral-600 mb-6">
         Your order was received. You’ll get a confirmation email from Stripe with the details.
       </p>
