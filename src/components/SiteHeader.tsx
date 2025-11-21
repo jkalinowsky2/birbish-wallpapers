@@ -49,14 +49,27 @@ export default function Header() {
       <div className="w-full px-4 md:px-6 h-16 flex items-center justify-between">
         {/* LOGO LINK */}
         <Link href="/" className="flex items-center">
+
+          {/* MOBILE LOGO (shown on screens < md) */}
           <Image
-            src="/assets/gmlong.png"
-            alt="Birbish Logo"
-            width={200} // adjust as needed
-            height={300}
-            className="w-auto relative -top-[2px]"
+            src="/assets/gmshort.png"
+            alt="Birbish Short Logo"
+            width={140}
+            height={200}
+            className="w-auto relative -top-[1px] md:hidden"
             priority
           />
+
+          {/* DESKTOP LOGO (shown on screens ≥ md) */}
+          <Image
+            src="/assets/gmlong.png"
+            alt="Birbish Full Logo"
+            width={200}
+            height={300}
+            className="w-auto relative -top-[2px] hidden md:block"
+            priority
+          />
+
         </Link>
 
         {/* DESKTOP NAV */}

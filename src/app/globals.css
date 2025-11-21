@@ -66,11 +66,47 @@
 
   }
 
-    .font-oscine {
+  .font-oscine {
     font-family: var(--font-oscine);
   }
 }
 
+
+/* --- RainbowKit mobile Connect Button improvements --- */
+@media (max-width: 480px) {
+
+  /* Target the main connect button */
+  .rainbowkit-connect-button {
+    padding: 10px 14px !important;
+    min-width: 110px;
+    text-align: center !important;
+    justify-content: center !important;
+    line-height: 1.2 !important;
+  }
+
+  /* Button text wrapper */
+  .rainbowkit-connect-button__text {
+    text-align: center !important;
+    display: block !important;
+    width: 100%;
+  }
+
+  /* Make the two-line text NOT squished */
+  .rainbowkit-connect-button__label {
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-size: 13px !important;
+    line-height: 1.25 !important;
+    white-space: normal !important;
+  }
+}
+@media (max-width: 480px) {
+  .rainbowkit-connect-button__label {
+    white-space: nowrap !important;
+    font-size: 14px !important;
+  }
+}
 
 
 
