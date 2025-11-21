@@ -5,7 +5,7 @@ import { kv } from '@vercel/kv'
 
 const secretKey = process.env.STRIPE_SECRET_KEY!
 const stripe = new Stripe(secretKey, {
-  apiVersion: '2025-10-29.clover',
+    apiVersion: '2025-10-29.clover',
 })
 
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET
@@ -15,156 +15,156 @@ const SHEETS_WEBHOOK_URL = process.env.GOOGLE_SHEETS_WEBHOOK_URL
 const SHEETS_SHARED_SECRET = process.env.GOOGLE_SHEETS_SHARED_SECRET
 
 export async function POST(req: NextRequest) {
-  const sig = req.headers.get('stripe-signature')
-  const rawBody = await req.text()
+    const sig = req.headers.get('stripe-signature')
+    const rawBody = await req.text()
 
-  let event: Stripe.Event
+    let event: Stripe.Event
 
-  try {
-    if (!endpointSecret || !sig) {
-      // Local dev fallback – in production we *should* always have a secret
-      event = JSON.parse(rawBody)
-    } else {
-      event = stripe.webhooks.constructEvent(rawBody, sig, endpointSecret)
-    }
-  } catch (err) {
-    console.error('Webhook signature verification failed:', err)
-    return NextResponse.json({ error: 'Bad signature' }, { status: 400 })
-  }
-
-  try {
-    console.log('Webhook event type:', event.type)
-
-    if (event.type === 'checkout.session.completed') {
-      const session = event.data.object as Stripe.Checkout.Session
-
-      const giftIntent = session.metadata?.giftIntent === 'true'
-      const wallet = (session.metadata?.walletAddress || '').toLowerCase()
-
-      console.log('Gift metadata from session:', { giftIntent, wallet })
-
-      // ----------------------------
-      // 1) Gift KV logic (existing)
-      // ----------------------------
-      if (giftIntent && wallet) {
-        const claimKey = `gift_claimed:${wallet}`
-        const alreadyClaimed = await kv.get<string | null>(claimKey)
-
-        if (alreadyClaimed) {
-          console.log(
-            'Gift already recorded for wallet, skipping increment',
-            wallet,
-          )
+    try {
+        if (!endpointSecret || !sig) {
+            // Local dev fallback – in production we *should* always have a secret
+            event = JSON.parse(rawBody)
         } else {
-          const [, newCount] = await Promise.all([
-            kv.set(claimKey, '1'),
-            kv.incr('gift_count'),
-          ])
-          console.log('KV updated:', { wallet, newCount })
+            event = stripe.webhooks.constructEvent(rawBody, sig, endpointSecret)
         }
-      }
+    } catch (err) {
+        console.error('Webhook signature verification failed:', err)
+        return NextResponse.json({ error: 'Bad signature' }, { status: 400 })
+    }
 
-      // -----------------------------------
-      // 2) Push order to Google Sheets
-      // -----------------------------------
-      if (!SHEETS_WEBHOOK_URL) {
-        console.warn(
-          'GOOGLE_SHEETS_WEBHOOK_URL not set – skipping Google Sheets logging',
-        )
-      } else {
-        try {
-          // Get line items for this session
-          const lineItems = await stripe.checkout.sessions.listLineItems(
-            session.id,
-            { limit: 100 },
-          )
+    try {
+        console.log('Webhook event type:', event.type)
 
-          const items: { name: string; quantity: number }[] = []
+        if (event.type === 'checkout.session.completed') {
+            const session = event.data.object as Stripe.Checkout.Session
 
-          for (const li of lineItems.data) {
-            const qty = li.quantity ?? 0
-            let name = 'Unknown item'
+            const giftIntent = session.metadata?.giftIntent === 'true'
+            const wallet = (session.metadata?.walletAddress || '').toLowerCase()
 
-            if (li.description) {
-              // Often Stripe already gives us a nice description
-              name = li.description
-            } else if (li.price?.product) {
-              // If we only have a product id, fetch the product
-              if (typeof li.price.product === 'string') {
-                const productRef = await stripe.products.retrieve(
-                  li.price.product,
-                )
-                if (!('deleted' in productRef) || productRef.deleted === false) {
-                  name = (productRef as Stripe.Product).name
+            console.log('Gift metadata from session:', { giftIntent, wallet })
+
+            // ----------------------------
+            // 1) Gift KV logic (existing)
+            // ----------------------------
+            if (giftIntent && wallet) {
+                const claimKey = `gift_claimed:${wallet}`
+                const alreadyClaimed = await kv.get<string | null>(claimKey)
+
+                if (alreadyClaimed) {
+                    console.log(
+                        'Gift already recorded for wallet, skipping increment',
+                        wallet,
+                    )
+                } else {
+                    const [, newCount] = await Promise.all([
+                        kv.set(claimKey, '1'),
+                        kv.incr('gift_count'),
+                    ])
+                    console.log('KV updated:', { wallet, newCount })
                 }
-              } else {
-                const productRef = li.price.product
-                if (!('deleted' in productRef) || productRef.deleted === false) {
-                  name = (productRef as Stripe.Product).name
-                }
-              }
             }
 
-            items.push({ name, quantity: qty })
-          }
+            // -----------------------------------
+            // 2) Push order to Google Sheets
+            // -----------------------------------
+            if (!SHEETS_WEBHOOK_URL) {
+                console.warn(
+                    'GOOGLE_SHEETS_WEBHOOK_URL not set – skipping Google Sheets logging',
+                )
+            } else {
+                try {
+                    // Get line items for this session
+                    const lineItems = await stripe.checkout.sessions.listLineItems(
+                        session.id,
+                        { limit: 100 },
+                    )
 
-          // Address + customer info
-          const customerDetails = session.customer_details ?? null
-          const address = customerDetails?.address ?? null
+                    const items: { name: string; quantity: number }[] = []
 
-          // Region heuristic: domestic vs international if you ever need it
-          const country = address?.country ?? ''
-          const region =
-            country === 'US' || country === 'CA' ? 'domestic' : 'international'
+                    for (const li of lineItems.data) {
+                        const qty = li.quantity ?? 0
+                        let name = 'Unknown item'
 
-          const payload = {
-            secret: SHEETS_SHARED_SECRET,
-            orderId: session.id,
-            email: customerDetails?.email ?? session.customer_email ?? '',
-            name: customerDetails?.name ?? '',
-            address: {
-              line1: address?.line1 ?? '',
-              line2: address?.line2 ?? '',
-              city: address?.city ?? '',
-              state: address?.state ?? '',
-              postal_code: address?.postal_code ?? '',
-              country: address?.country ?? '',
-            },
-            items,
-            total: session.amount_total != null ? session.amount_total / 100 : '',
-            currency: session.currency ?? 'usd',
-            wallet,
-            region,
-          }
+                        if (li.description) {
+                            name = li.description
+                        } else if (li.price?.product) {
+                            if (typeof li.price.product === 'string') {
+                                const productRef = await stripe.products.retrieve(li.price.product)
 
-          console.log(
-            'Sending order to Google Sheets:',
-            JSON.stringify(payload, null, 2),
-          )
+                                // ✅ if there's no `deleted` flag, it's a normal Product
+                                if (!('deleted' in productRef)) {
+                                    name = productRef.name
+                                }
+                            } else {
+                                const productRef = li.price.product
 
-          const res = await fetch(SHEETS_WEBHOOK_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-          })
+                                // ✅ same logic here
+                                if (!('deleted' in productRef)) {
+                                    name = productRef.name
+                                }
+                            }
+                        }
 
-          const text = await res.text()
-          console.log(
-            'Google Sheets webhook response:',
-            res.status,
-            text.slice(0, 200),
-          )
-        } catch (err) {
-          console.error('Error sending order to Google Sheets:', err)
+                        items.push({ name, quantity: qty })
+                    }
+
+                    // Address + customer info
+                    const customerDetails = session.customer_details ?? null
+                    const address = customerDetails?.address ?? null
+
+                    // Region heuristic: domestic vs international if you ever need it
+                    const country = address?.country ?? ''
+                    const region =
+                        country === 'US' || country === 'CA' ? 'domestic' : 'international'
+
+                    const payload = {
+                        secret: SHEETS_SHARED_SECRET,
+                        orderId: session.id,
+                        email: customerDetails?.email ?? session.customer_email ?? '',
+                        name: customerDetails?.name ?? '',
+                        address: {
+                            line1: address?.line1 ?? '',
+                            line2: address?.line2 ?? '',
+                            city: address?.city ?? '',
+                            state: address?.state ?? '',
+                            postal_code: address?.postal_code ?? '',
+                            country: address?.country ?? '',
+                        },
+                        items,
+                        total: session.amount_total != null ? session.amount_total / 100 : '',
+                        currency: session.currency ?? 'usd',
+                        wallet,
+                        region,
+                    }
+
+                    console.log(
+                        'Sending order to Google Sheets:',
+                        JSON.stringify(payload, null, 2),
+                    )
+
+                    const res = await fetch(SHEETS_WEBHOOK_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload),
+                    })
+
+                    const text = await res.text()
+                    console.log(
+                        'Google Sheets webhook response:',
+                        res.status,
+                        text.slice(0, 200),
+                    )
+                } catch (err) {
+                    console.error('Error sending order to Google Sheets:', err)
+                }
+            }
         }
-      }
-    }
 
-    return NextResponse.json({ received: true })
-  } catch (err) {
-    console.error('Webhook handler error:', err)
-    return NextResponse.json({ received: true }, { status: 500 })
-  }
+        return NextResponse.json({ received: true })
+    } catch (err) {
+        console.error('Webhook handler error:', err)
+        return NextResponse.json({ received: true }, { status: 500 })
+    }
 }
 
 
