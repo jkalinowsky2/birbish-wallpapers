@@ -256,20 +256,29 @@ export default function ShopPage() {
             <div className="bg-[#faf7f2] p-0 m-0">
                 {/* Hero band */}
                 <section className="w-full bg-gradient-to-b from-[#ce0000] to-[#b20000] text-white border-b border-neutral-900">
-                    <div className="px-4 md:px-8 lg:px-10 pt-8 pb-10 md:pt-10 md:pb-12 lg:pt-16 lg:pb-16">
-                        <h1 className="text-4xl md:text-5xl font-black tracking-tight">
+                    <div className="
+    px-4 md:px-8 lg:px-10
+    pt-4 pb-5          /* tighter on mobile */
+    sm:pt-6 sm:pb-8
+    md:pt-10 md:pb-12
+    lg:pt-16 lg:pb-16
+  ">
+                        <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight">
                             Merch Shop
                         </h1>
 
-                        <p className="mt-3 text-sm md:text-base text-white">
+                        <p className="mt-2 text-xs sm:text-sm md:text-base text-white">
                             Premium die-cut vinyl stickers and decals for water bottles,
                             laptops, and everywhere you rep the birbs.
                         </p>
-
                         <div
-                            className="inline-flex items-center gap-3 rounded-full bg-black/60 border border-white/10
-                    px-4 py-1.5 text-xs md:text-sm text-neutral-100 mt-8"
+                            className="
+    hidden xs:inline-flex   /* hide on the tiniest phones if you like */
+    items-center gap-3 rounded-full bg-black/60 border border-white/10
+    px-3 py-1 text-[11px] sm:text-xs text-neutral-100 mt-4 sm:mt-6
+  "
                         >
+                            ...
                             <span className="font-semibold uppercase tracking-[0.18em] text-[11px] text-[#ffd28f]">
                                 PRE-ORDER COMING SOON
                             </span>
@@ -325,15 +334,16 @@ export default function ShopPage() {
                 </div>
 
                 {/* Cart / checkout bar – now full-width since parent is full-width */}
-                <div className="sticky bottom-0 py-4 bg-[#f7f7f7] border-t z-40">
+                <div className="bg-[#f7f7f7] border-t z-40 sm:sticky sm:bottom-0 sm:py-4 py-2">
                     <div
                         className="
     mx-auto max-w-7xl 
-    flex flex-col gap-4 
+    flex flex-col gap-3 
     sm:flex-row sm:items-center sm:justify-between 
-    rounded-lg border bg-white px-4 py-3 shadow-sm
+    rounded-lg border bg-white px-3 py-2 sm:px-4 sm:py-3 shadow-sm
   "
-                    >                        <div className="text-sm text-neutral-700">
+                    >
+                        <div className="text-xs sm:text-sm text-neutral-700">
                             {totalItems ? (
                                 <>
                                     <span>
@@ -448,9 +458,9 @@ export default function ShopPage() {
                             </div>
                         </div>
                     </div>
-                    <div className="text-xs text-neutral-500 text-right mx-10 my-1">
+                    <div className="text-xs text-neutral-500 text-right mx-10 my-1 sm:mx-0">
                         <p> Now shipping to the following countries: US, Canada, Mexico, Australia, UK, Germany, South Korea, Japan</p>
-                        
+
 
                     </div>
 
