@@ -467,7 +467,7 @@ export default function ShopPage() {
 
 
                 </div>
-                    <div className="text-xs text-neutral-500 text-right mx-10 my-1 sm:mx-0">
+                    <div className="text-xs text-neutral-500 text-center md:text-right mx-10 my-1 sm:mx-0">
                         <p> Now shipping to the following countries: US, Canada, Mexico, Australia, UK, Germany, South Korea, Japan</p>
 
 
