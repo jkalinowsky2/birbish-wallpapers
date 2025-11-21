@@ -273,12 +273,14 @@ export default function ShopPage() {
                         </p>
                         <div
                             className="
-    hidden xs:inline-flex   /* hide on the tiniest phones if you like */
-    items-center gap-3 rounded-full bg-black/60 border border-white/10
-    px-3 py-1 text-[11px] sm:text-xs text-neutral-100 mt-4 sm:mt-6
+    inline-flex items-center gap-2 
+    rounded-full bg-black/60 border border-white/10
+    px-3 py-[4px]          /* tighter padding on mobile */
+    text-[10px] sm:text-xs text-neutral-100 
+    mt-4 sm:mt-6
   "
                         >
-                            ...
+
                             <span className="font-semibold uppercase tracking-[0.18em] text-[11px] text-[#ffd28f]">
                                 PRE-ORDER COMING SOON
                             </span>
