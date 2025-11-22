@@ -146,7 +146,7 @@ export async function POST(request: Request) {
             'JP', //Japan
             'MX', //Mexico
 
-             // 'NZ', //New Zealand
+            // 'NZ', //New Zealand
             // 'FR',
             // 'NZ', 
             // 'IE',
@@ -171,12 +171,12 @@ export async function POST(request: Request) {
         // -------------------------------
         // Base params
         // -------------------------------
+        // Base params (no allow_promotion_codes here)
         const params: Stripe.Checkout.SessionCreateParams = {
             mode: 'payment',
             line_items: lineItems,
             success_url: `${origin}/success`,
             cancel_url: `${origin}/shop`,
-            allow_promotion_codes: true,   // 👈 THIS LINE
             shipping_address_collection: {
                 allowed_countries: allowedCountries,
             },
@@ -208,11 +208,56 @@ export async function POST(request: Request) {
                 giftIntent: 'true',
             }
         } else {
+            // Only allow promotion codes when we're *not* auto-applying a discount
+            params.allow_promotion_codes = true
+
             params.metadata = {
                 ...params.metadata,
                 giftIntent: 'false',
             }
         }
+        // const params: Stripe.Checkout.SessionCreateParams = {
+        //     mode: 'payment',
+        //     line_items: lineItems,
+        //     success_url: `${origin}/success`,
+        //     cancel_url: `${origin}/shop`,
+        //     allow_promotion_codes: true,   // 👈 THIS LINE
+        //     shipping_address_collection: {
+        //         allowed_countries: allowedCountries,
+        //     },
+        //     shipping_options: shippingRateId
+        //         ? [{ shipping_rate: shippingRateId }]
+        //         : undefined,
+        //     metadata: {},
+        // }
+
+        // // Attach wallet for reconciliation
+        // if (wallet) {
+        //     params.metadata = {
+        //         ...params.metadata,
+        //         walletAddress: wallet,
+        //     }
+        // }
+
+        // // Gift add-on
+        // if (canGrantGift) {
+        //     params.line_items!.push({
+        //         price: GIFT_PRICE_ID!,
+        //         quantity: 1,
+        //     })
+
+        //     params.discounts = [{ coupon: GIFT_COUPON_ID! }]
+
+        //     params.metadata = {
+        //         ...params.metadata,
+        //         giftIntent: 'true',
+        //     }
+        // } else {
+        //     params.metadata = {
+        //         ...params.metadata,
+        //         giftIntent: 'false',
+        //     }
+        // }
 
         const session = await stripe.checkout.sessions.create(params)
         return NextResponse.json({ url: session.url })
