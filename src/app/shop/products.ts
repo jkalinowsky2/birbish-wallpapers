@@ -13,7 +13,7 @@ export type Product = {
 export const STICKER_PRODUCTS: Product[] = [
     {
         id: "logo-sticker",
-        name: "Logo Sticker",
+        name: "birb Logo Sticker",
         priceLabel: "$3.50",
         description: "Logo Sticker. 3 x 3 inches",
         image: "/assets/store/stickers/birblogosticker.png",
@@ -33,7 +33,7 @@ export const STICKER_PRODUCTS: Product[] = [
 
     {
         id: "head-birb-sticker-must",
-        name: "Head Birb Sticker - Mustard",
+        name: "Head birb Sticker - Mustard",
         priceLabel: "$3.50",
         description: "Head birb sticker in mustard. 2 x 3 inches.",
         image: "/assets/store/stickers/headbirbsticker-must.png",
@@ -68,7 +68,7 @@ export const STICKER_PRODUCTS: Product[] = [
     },
 {
     id: "gm-stickerpack",
-        name: "Sticker Pack 1",
+        name: "birb Sticker Pack 1",
             priceLabel: "$15.00",
                 description: "Birbs sticker pack - 5 birbish stickers",
                     image: "/assets/store/stickers/stickerpack1.png",
@@ -78,7 +78,7 @@ export const STICKER_PRODUCTS: Product[] = [
 
 {
     id: "birb-euro-sticker",
-        name: "birb.  Euro Sticker",
+        name: "birb. Euro Sticker",
             priceLabel: "$5.00",
                 description: "birb. Euro sticker. 5 x 3 inches.",
                     image: "/assets/store/stickers/birbeurosticker.png",
@@ -88,7 +88,7 @@ export const STICKER_PRODUCTS: Product[] = [
     },
 {
     id: "birb-sticker-holo",
-        name: "Holographic Logo Sticker",
+        name: "Holographic birb Logo Sticker",
             priceLabel: "$5.00",
                 description: "Free for Moonbirds holders w/ $10 purchase *",
                     image: "/assets/store/stickers/birblogosticker-holo.png",
@@ -103,7 +103,7 @@ export const STICKER_PRODUCTS: Product[] = [
 export const DECAL_PRODUCTS: Product[] = [
     {
         id: 'birblogodecal',
-        name: 'birb logo transfer',
+        name: 'birb Logo Transfer Sticker',
         priceId: 'price_1SUpO80n54kwZghJuaX7XhLx',        // Live
         priceLabel: '$6.50',
         image: '/assets/store/decals/birblogodecal.png',
