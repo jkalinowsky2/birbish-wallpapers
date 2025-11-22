@@ -282,7 +282,7 @@ export default function ShopPage() {
                         >
 
                             <span className="font-semibold uppercase tracking-[0.18em] text-[11px] text-[#ffd28f]">
-                                PRE-ORDER COMING SOON
+                                NOW OPEN!
                             </span>
 
                             <span className="text-[11px] md:text-xs">
