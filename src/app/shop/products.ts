@@ -212,6 +212,7 @@ export const STICKER_PRODUCTS: Product[] = [
         image: "/assets/store/stickers/birblogosticker-holo.png",
         // priceId: "price_1STSql0n54kwZghJct2G53rB", //
         priceId: "price_1SSifY14Mz115JiadL5lXegX", // testing price ID
+        
         giftOnly: true,
     },
 ];
