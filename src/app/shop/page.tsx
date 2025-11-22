@@ -432,8 +432,8 @@ export default function ShopPage() {
                             {/* Buttons (you keep both versions) */}
                             <div className="flex flex-col items-end gap-2 w-full sm:w-auto">
 
-                                {/* Main checkout button */}
-                                <button
+                                {/* Main checkout button Enable*/}
+                                {/* <button
       type="button"
       onClick={handleCheckout}
       disabled={!totalItems || isCheckingOut}
@@ -445,10 +445,10 @@ export default function ShopPage() {
         : totalItems
           ? `Checkout (${totalItems})`
           : 'Checkout'}
-    </button>
+    </button> */}
 
                                 {/* This is the alternate/disabled button you want to keep */}
-                                {/* <button
+                                <button
                                     type="button"
                                     disabled={!totalItems || isCheckingOut}
                                     className="px-5 py-2 rounded-md text-sm font-medium bg-black text-white 
@@ -459,7 +459,7 @@ export default function ShopPage() {
                                         : totalItems
                                             ? 'Checkout Disabled'
                                             : 'Checkout Disabled'}
-                                </button> */}
+                                </button>
 
                             </div>
                         </div>
