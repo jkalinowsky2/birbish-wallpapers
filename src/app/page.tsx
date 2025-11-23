@@ -1,6 +1,7 @@
 // src/app/page.tsx
 import Link from "next/link";
 import Image from "next/image";
+import { ShopAnnouncement } from "@/components/ShopAnnouncement";
 
 const heroImages = [
   "/assets/images/hero/birbish2.jpg",
@@ -19,6 +20,7 @@ export default function HomePage() {
   return (
     <main className="min-h-dvh text-neutral-900">
       {/* Full-width wrapper, same as shop page */}
+       <ShopAnnouncement />
       <div className="w-screen relative left-1/2 right-1/2 ml-[-50vw] mr-[-50vw] bg-neutral-50">
         <div className="bg-[#faf7f2] p-0 m-0">
           {/* Hero band */}
