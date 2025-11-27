@@ -649,7 +649,8 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
         out.width = BOX_W;
         out.height = BOX_H * 2 + GAP + 140; // leave space for branding
         const ctx = out.getContext('2d')!;
-        ctx.fillStyle = '#f7f7f7';
+        // ctx.fillStyle = '#f7f7f7';
+        ctx.fillStyle = '#fafafa';
         ctx.fillRect(0, 0, out.width, out.height);
 
         // --- Centered gray strip (whole canvas center) ---

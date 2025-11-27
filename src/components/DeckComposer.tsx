@@ -369,12 +369,16 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
     ];
 
     const BIRB_LOGO_COLORS = [
-        { id: 'birb-red', label: 'Birb Red', value: '#D12429' },
-        { id: 'birb-black', label: 'Black', value: '#111111' },
-        { id: 'birb-white', label: 'White', value: '#FFFFFF' },
-        { id: 'birb-cream', label: 'Cream', value: '#F6EBDD' },
-        { id: 'birb-gold', label: 'Gold', value: '#C79B3B' },
-        { id: 'birb-navy', label: 'Navy', value: '#20263A' },
+        { id: 'birb-red', label: 'Dark Red', value: '#7d050d' },
+        { id: 'birb-black', label: 'Red', value: '#d12429' },
+        { id: 'birb-white', label: 'Black', value: '#000000' },
+        { id: 'birb-cream', label: 'Cream', value: '#ecd9ba' },
+        { id: 'birb-gold', label: 'Dark Blue', value: '#1e1e34' },
+        { id: 'birb-navy', label: 'Light Blue', value: '#1a265e' },
+        { id: 'birb-navy', label: 'Cornflower', value: '#616b96' },
+        { id: 'birb-navy', label: 'Bright Pink', value: '#e84294' },
+        { id: 'birb-navy', label: 'Plum', value: '#783859' },
+        { id: 'birb-navy', label: 'Light Pink', value: '#ed7abd' },
         // …whatever your guidelines say
     ];
 
@@ -927,270 +931,6 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
         );
     }
 
-    // function GlyphControls({
-    //     vm,
-    // }: {
-    //     vm: {
-    //         label: string
-    //         options: GlyphOption[]
-    //         id: string; setId: (v: string) => void
-    //         tint: string; setTint: (v: string) => void
-    //         scale: number; setScale: (v: number) => void
-    //         offX: number; setOffX: (updater: (v: number) => number | number) => void
-    //         offY: number; setOffY: (updater: (v: number) => number | number) => void
-    //         blend: GlobalCompositeOperation; setBlend: (v: GlobalCompositeOperation) => void
-    //         rot: number; setRot: (updater: (v: number) => number | number) => void
-    //         flipX: boolean; setFlipX: (v: boolean) => void
-    //     }
-    // }) {
-    //     const hasSelection = vm.id !== 'none'
-    //     return (
-    //         <div className="space-y-3">
-    //             <OptionsGrid>
-    //                 {vm.options.map((g) => (
-    //                     <OptionTile
-    //                         key={`${vm.label}-${g.id}`}
-    //                         label={g.name}
-    //                         image={g.image}
-    //                         selected={vm.id === g.id}
-    //                         onClick={() => vm.setId(g.id)}
-    //                     />
-    //                 ))}
-    //             </OptionsGrid>
-
-    //             {hasSelection && (
-    //                 <>
-    //                     {/* Tint / Blend / Scale */}
-    //                     <div className="flex items-end gap-3 sm:gap-4 flex-wrap sm:flex-nowrap">
-    //                         <Field labelText="Tint" className="w-[50px] shrink-0">
-    //                             <input
-    //                                 type="color"
-    //                                 value={vm.tint}
-    //                                 onChange={(e) => vm.setTint(e.target.value)}
-    //                                 className="h-11 w-full rounded-md border border-neutral-300 p-0 cursor-pointer
-    //                        [&::-webkit-color-swatch-wrapper]:p-0
-    //                        [&::-webkit-color-swatch]:border-0
-    //                        [&::-moz-color-swatch]:border-0"
-    //                             />
-    //                         </Field>
-
-    //                         <Field labelText="Blend Mode" className="flex-1 min-w-0">
-    //                             <select
-    //                                 className="input h-11 w-full truncate"
-    //                                 value={vm.blend}
-    //                                 onChange={(e) => vm.setBlend(e.target.value as GlobalCompositeOperation)}
-    //                             >
-    //                                 {BLEND_MODES.map((m) => (
-    //                                     <option key={m} value={m}>{m}</option>
-    //                                 ))}
-    //                             </select>
-    //                         </Field>
-
-    //                         <Field labelText="Scale" className="w-[100px] shrink-0">
-    //                             <input
-    //                                 className="input h-11 w-full"
-    //                                 type="number"
-    //                                 step={0.125} min={0.125} max={5}
-    //                                 value={vm.scale}
-    //                                 onChange={(e) => vm.setScale(Math.max(0.125, Math.min(5, Number(e.target.value) || 1)))}
-    //                             />
-    //                         </Field>
-    //                     </div>
-
-    //                     {/* Nudge + Rotate/Mirror */}
-    //                     <div className="flex items-start gap-6 flex-wrap sm:flex-nowrap">
-    //                         <Field labelText="Nudge" className="shrink-0">
-    //                             <div className="grid grid-cols-3 gap-2 w-[130px]">
-    //                                 <div />
-    //                                 <button type="button" className="btn h-10 w-10" onClick={() => vm.setOffX((v: number) => v + nudgeValue)}>↑</button>
-    //                                 <div />
-    //                                 <button type="button" className="btn h-10 w-10" onClick={() => vm.setOffY((v: number) => v - nudgeValue)}>←</button>
-    //                                 <button
-    //                                     type="button"
-    //                                     className="btn btn-ghost"
-    //                                     onClick={() => {
-    //                                         vm.setOffX(() => 0);
-    //                                         vm.setOffY(() => 0);
-    //                                     }}
-    //                                 >
-    //                                     •
-    //                                 </button>
-    //                                 <button type="button" className="btn h-10 w-10" onClick={() => vm.setOffY((v: number) => v + nudgeValue)}>→</button>
-    //                                 <div />
-    //                                 <button type="button" className="btn h-10 w-10" onClick={() => vm.setOffX((v: number) => v - nudgeValue)}>↓</button>
-    //                                 <div />
-    //                             </div>
-    //                         </Field>
-
-    //                         {/* Rotate + Mirror — identical behavior to Glyphs */}
-    //                         <div className="flex flex-col gap-2 shrink-0">
-    //                             <Field labelText="Rotate" className="w-[220px]">
-    //                                 <div className="flex items-center gap-2">
-    //                                     <button
-    //                                         type="button"
-    //                                         className="btn h-10 w-10"
-    //                                         title="Rotate counter-clockwise"
-    //                                         onClick={() =>
-    //                                             vm.setRot((r: number) => (r + (vm.flipX ? 15 : -15) + 360) % 360)
-    //                                         }
-    //                                     >
-    //                                         <RotateCcw className="w-4 h-4" />
-    //                                     </button>
-    //                                     <button
-    //                                         type="button"
-    //                                         className="btn h-10 w-10"
-    //                                         title="Rotate clockwise"
-    //                                         onClick={() =>
-    //                                             vm.setRot((r: number) => (r + (vm.flipX ? -15 : 15) + 360) % 360)
-    //                                         }
-    //                                     >
-    //                                         <RotateCw className="w-4 h-4" />
-    //                                     </button>
-    //                                 </div>
-    //                             </Field>
-
-    //                             <Field labelText="Mirror" className="w-[220px] mt-4">
-    //                                 <label className="inline-flex items-center gap-2 select-none">
-    //                                     <input
-    //                                         type="checkbox"
-    //                                         className="h-4 w-4 accent-neutral-800"
-    //                                         checked={vm.flipX}
-    //                                         onChange={(e) => vm.setFlipX(e.target.checked)}
-    //                                     />
-    //                                 </label>
-    //                             </Field>
-    //                         </div>
-    //                     </div>
-    //                 </>
-    //             )}
-    //         </div>
-    //     )
-    // }
-
-
-    // function GlyphControls({
-    //     vm,
-    // }: {
-    //     vm: {
-    //         label: string
-    //         options: GlyphOption[]
-    //         id: string; setId: (v: string) => void
-    //         tint: string; setTint: (v: string) => void
-    //         scale: number; setScale: (v: number) => void
-    //         offX: number; setOffX: (updater: (v: number) => number | number) => void
-    //         offY: number; setOffY: (updater: (v: number) => number | number) => void
-    //         blend: GlobalCompositeOperation; setBlend: (v: GlobalCompositeOperation) => void
-    //         rot: number; setRot: (updater: (v: number) => number | number) => void
-    //         flipX: boolean; setFlipX: (v: boolean) => void
-    //     }
-    // }) {
-    //     const hasSelection = vm.id !== 'none'
-
-    //     // 🆕 detect the selected glyph and its tint mode
-    //     const currentGlyph = vm.options.find((g) => g.id === vm.id)
-    //     const tintMode: 'any' | 'brand' | 'none' = currentGlyph?.tintMode ?? 'any'
-
-
-    //     return (
-    //         <div className="space-y-3">
-    //             <OptionsGrid>
-    //                 {vm.options.map((g) => (
-    //                     <OptionTile
-    //                         key={`${vm.label}-${g.id}`}
-    //                         label={g.name}
-    //                         image={g.image}
-    //                         selected={vm.id === g.id}
-    //                         onClick={() => vm.setId(g.id)}
-    //                     />
-    //                 ))}
-    //             </OptionsGrid>
-
-    //             {hasSelection && (
-    //                 <>
-    //                     {/* Tint / Blend / Scale */}
-    //                     <div className="flex items-end gap-3 sm:gap-4 flex-wrap sm:flex-nowrap">
-    //                         <Field labelText="Tint" className="min-w-[120px] shrink-0">
-    //                             {/* 🆕 conditional tint UI */}
-    //                             {tintMode === 'any' && (
-    //                                 <input
-    //                                     type="color"
-    //                                     value={vm.tint}
-    //                                     onChange={(e) => vm.setTint(e.target.value)}
-    //                                     className="h-11 w-[52px] rounded-md border border-neutral-300 p-0 cursor-pointer
-    //                 [&::-webkit-color-swatch-wrapper]:p-0
-    //                 [&::-webkit-color-swatch]:border-0
-    //                 [&::-moz-color-swatch]:border-0"
-    //                                 />
-    //                             )}
-
-    //                             {tintMode === 'brand' && (
-    //                                 <div className="flex flex-wrap gap-2">
-    //                                     {BIRB_LOGO_COLORS.map((c) => (
-    //                                         <button
-    //                                             key={c.id}
-    //                                             type="button"
-    //                                             onClick={() => vm.setTint(c.value)}
-    //                                             className={`h-8 w-8 rounded-full border transition-transform
-    //                     ${vm.tint === c.value
-    //                                                     ? 'border-neutral-900 scale-105'
-    //                                                     : 'border-neutral-300'}`}
-    //                                             style={{ backgroundColor: c.value }}
-    //                                             title={c.label}
-    //                                         >
-    //                                             <span className="sr-only">{c.label}</span>
-    //                                         </button>
-    //                                     ))}
-    //                                 </div>
-    //                             )}
-
-    //                             {tintMode === 'none' && (
-    //                                 <p className="text-xs text-neutral-500">
-    //                                     Color fixed by brand guidelines.
-    //                                 </p>
-    //                             )}
-    //                         </Field>
-
-    //                         {/* Blend + Scale (unchanged) */}
-    //                         <Field labelText="Blend Mode" className="flex-1 min-w-0">
-    //                             <select
-    //                                 className="input h-11 w-full truncate"
-    //                                 value={vm.blend}
-    //                                 onChange={(e) =>
-    //                                     vm.setBlend(e.target.value as GlobalCompositeOperation)
-    //                                 }
-    //                             >
-    //                                 {BLEND_MODES.map((m) => (
-    //                                     <option key={m} value={m}>
-    //                                         {m}
-    //                                     </option>
-    //                                 ))}
-    //                             </select>
-    //                         </Field>
-
-    //                         <Field labelText="Scale" className="w-[100px] shrink-0">
-    //                             <input
-    //                                 className="input h-11 w-full"
-    //                                 type="number"
-    //                                 step={0.125}
-    //                                 min={0.125}
-    //                                 max={5}
-    //                                 value={vm.scale}
-    //                                 onChange={(e) =>
-    //                                     vm.setScale(
-    //                                         Math.max(0.125, Math.min(5, Number(e.target.value) || 1))
-    //                                     )
-    //                                 }
-    //                             />
-    //                         </Field>
-    //                     </div>
-
-    //                     {/* rest of your nudge / rotate / mirror controls */}
-    //                 </>
-    //             )}
-    //         </div>
-    //     )
-    // }
-
     function GlyphControls({
         vm,
     }: {
@@ -1230,7 +970,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                 {hasSelection && (
                     <>
                         {/* Tint / Blend / Scale */}
-                        <div className="flex items-end gap-3 sm:gap-4 flex-wrap sm:flex-nowrap">
+                        <div className="flex items-start gap-3 sm:gap-4 flex-wrap sm:flex-nowrap">
                             <Field labelText="Tint" className="min-w-[120px] shrink-0">
                                 {/* conditional tint UI */}
                                 {tintMode === 'any' && (
@@ -1246,16 +986,14 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                 )}
 
                                 {tintMode === 'brand' && (
-                                    <div className="flex flex-wrap gap-2">
+                                    <div className="flex flex-wrap gap-2 w-full max-w-[220px]">
                                         {BIRB_LOGO_COLORS.map((c) => (
                                             <button
                                                 key={c.id}
                                                 type="button"
                                                 onClick={() => vm.setTint(c.value)}
                                                 className={`h-8 w-8 rounded-full border transition-transform
-                        ${vm.tint === c.value
-                                                        ? 'border-neutral-900 scale-105'
-                                                        : 'border-neutral-300'}`}
+          ${vm.tint === c.value ? 'border-neutral-900 scale-105' : 'border-neutral-300'}`}
                                                 style={{ backgroundColor: c.value }}
                                                 title={c.label}
                                             >
@@ -1307,7 +1045,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                 </Field>
                             )}
 
-                            <Field labelText="Scale" className="w-[100px] shrink-0">
+                            <Field labelText="Scale" className="w-[80px] shrink-0">
                                 <input
                                     className="input h-11 w-full"
                                     type="number"
@@ -1333,7 +1071,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                     <button
                                         type="button"
                                         className="btn h-10 w-10"
-                                        onClick={() => vm.setOffY((v: number) => v - nudgeValue)}
+                                        onClick={() => vm.setOffX((v: number) => v + nudgeValue)}
                                     >
                                         ↑
                                     </button>
@@ -1342,7 +1080,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                     <button
                                         type="button"
                                         className="btn h-10 w-10"
-                                        onClick={() => vm.setOffX((v: number) => v - nudgeValue)}
+                                        onClick={() => vm.setOffY((v: number) => v - nudgeValue)}
                                     >
                                         ←
                                     </button>
@@ -1361,7 +1099,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                     <button
                                         type="button"
                                         className="btn h-10 w-10"
-                                        onClick={() => vm.setOffX((v: number) => v + nudgeValue)}
+                                        onClick={() => vm.setOffY((v: number) => v + nudgeValue)}
                                     >
                                         →
                                     </button>
@@ -1370,7 +1108,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                     <button
                                         type="button"
                                         className="btn h-10 w-10"
-                                        onClick={() => vm.setOffY((v: number) => v + nudgeValue)}
+                                        onClick={() => vm.setOffX((v: number) => v - nudgeValue)}
                                     >
                                         ↓
                                     </button>
@@ -1423,550 +1161,572 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
         )
     }
     return (
-        <>
-            <div className="grid gap-6 sm:grid-cols-[380px_minmax(0,1fr)] items-stretch pb-28 lg:pb-0">
+        // Full-width wrapper to match shop layout
+        <div className="w-screen relative left-1/2 right-1/2 ml-[-50vw] mr-[-50vw] bg-neutral-50">
+            <div className="px-4 md:px-6 lg:px-8">
+                <div className="max-w-7xl mx-auto">
+                    <div className="grid gap-6 sm:grid-cols-[380px_minmax(0,1fr)] items-stretch pb-28 lg:pb-0">
 
-                {/* Settings */}
-                <aside className="h-full lg:sticky lg:top-6 h-fit p-2 lg:p-4">
-                    <div className="space-y-3">
-                        {hasJK && (
-                            <div className="inline-flex rounded-full bg-neutral-200 p-1">
-                                <button
-                                    type="button"
-                                    onClick={() => setMode('jk')}
-                                    className={`px-5 py-2 text-sm font-medium rounded-full transition-all duration-200
+                        {/* Settings */}
+                        <aside
+                            className="
+              h-full h-fit p-2 lg:p-4
+              lg:max-h-[calc(100vh-6rem)]
+              lg:overflow-y-auto
+            "
+                        >
+                            <div className="space-y-3">
+                                {hasJK && (
+                                    <div className="inline-flex rounded-full bg-neutral-200 p-1">
+                                        <button
+                                            type="button"
+                                            onClick={() => setMode('jk')}
+                                            className={`px-5 py-2 text-sm font-medium rounded-full transition-all duration-200
                   ${mode === 'jk' ? 'bg-[#d12429] text-white shadow-sm' : 'text-neutral-700 hover:bg-neutral-300'}
                 `}
-                                >
-                                    JK Designs
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setMode('custom')}
-                                    className={`px-5 py-2 text-sm font-medium rounded-full transition-all duration-200
+                                        >
+                                            JK Designs
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setMode('custom')}
+                                            className={`px-5 py-2 text-sm font-medium rounded-full transition-all duration-200
                   ${mode === 'custom' ? 'bg-[#d12429] text-white shadow-sm' : 'text-neutral-700 hover:bg-neutral-300'}
                 `}
-                                >
-                                    Custom
-                                </button>
-                            </div>
+                                        >
+                                            Custom
+                                        </button>
+                                    </div>
 
-                        )}
-                        <p className="text-xs text-neutral-500 mt-0"> Choose a JK Design or custom design your own deck. </p>
+                                )}
+                                <p className="text-xs text-neutral-500 mt-0"> Choose a JK Design or custom design your own deck. </p>
 
-                        <div key={`accordion-stack-${mode}`}>
-                            {/* Grip */}
-                            <AccordionSection
-                                title="Grip Tape"
-                                open={openId === 'grip'}
-                                onToggle={(next) => setOpenId(next ? 'grip' : '')}
-                            >
-                                <OptionsGrid>
-                                    {grips.map((g) => (
-                                        <OptionTile
-                                            key={g.id}
-                                            label={g.name}
-                                            image={g.image}
-                                            selected={gripId === g.id}
-                                            onClick={() => setGripId(g.id)}
-                                        />
-                                    ))}
-                                </OptionsGrid>
-                            </AccordionSection>
-
-                            {/* Custom-only */}
-                            {mode === 'custom' && (
-                                <>
+                                <div key={`accordion-stack-${mode}`}>
+                                    {/* Grip */}
                                     <AccordionSection
-                                        title="Bottom Background"
-                                        open={openId === 'bg'}
-                                        onToggle={(next) => setOpenId(next ? 'bg' : '')}
+                                        title="Grip Tape"
+                                        open={openId === 'grip'}
+                                        onToggle={(next) => setOpenId(next ? 'grip' : '')}
                                     >
                                         <OptionsGrid>
-                                            {bottoms.map((b) => (
+                                            {grips.map((g) => (
                                                 <OptionTile
-                                                    key={b.id}
-                                                    label={b.name}
-                                                    image={b.image}
-                                                    selected={bottomBgId === b.id}
-                                                    onClick={() => setBottomBgId(b.id)}
+                                                    key={g.id}
+                                                    label={g.name}
+                                                    image={g.image}
+                                                    selected={gripId === g.id}
+                                                    onClick={() => setGripId(g.id)}
                                                 />
                                             ))}
                                         </OptionsGrid>
                                     </AccordionSection>
 
-                                    <AccordionSection
-                                        title="Moonbird Token"
-                                        open={openId === 'token'}
-                                        onToggle={(next) => setOpenId(next ? 'token' : '')}
-                                    >
-                                        <div className="space-y-4">
-                                            <Field labelText="Token ID">
-                                                <div className="flex flex-wrap items-center gap-2">
-                                                    <input
-                                                        className="input w-36"
-                                                        type="number"
-                                                        placeholder="e.g. 8209"
-                                                        min={1}
-                                                        value={tokenId}
-                                                        onChange={(e) => setTokenId(e.target.value.trim())}
-                                                        disabled={controlsDisabled}
-                                                    />
-                                                    <div className="flex gap-1">
-                                                        <button
-                                                            type="button"
-                                                            className={`btn ${style === 'illustrated' ? 'btn-primary' : 'btn-ghost'}`}
-                                                            onClick={() => setStyle('illustrated')}
-                                                            disabled={!ILLU_BASE || controlsDisabled}
-                                                            title={ILLU_BASE ? 'Use illustrated' : 'Set NEXT_PUBLIC_MOONBIRDS_ILLU_BASE'}
-                                                        >
-                                                            Illustrated
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            className={`btn ${style === 'pixel' ? 'btn-primary' : 'btn-ghost'}`}
-                                                            onClick={() => setStyle('pixel')}
-                                                            disabled={!PIXEL_BASE || controlsDisabled}
-                                                            title={PIXEL_BASE ? 'Use pixel' : 'Set NEXT_PUBLIC_MOONBIRDS_PIXEL_BASE'}
-                                                        >
-                                                            Pixel
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <p className="text-xs text-neutral-500">Token is composited onto the selected background.</p>
-                                            </Field>
-
-                                            <Field labelText="Token Scale">
-                                                <div className="flex items-center gap-2">
-                                                    <input
-                                                        className="input w-28"
-                                                        type="number"
-                                                        step={0.25}
-                                                        min={0.25}
-                                                        max={10}
-                                                        value={tokenScale}
-                                                        onChange={(e) => {
-                                                            const n = Number(e.target.value)
-                                                            setTokenScale(Number.isFinite(n) ? Math.max(0.05, Math.min(10, n)) : 1)
-                                                        }}
-                                                        title="Multiply the base size"
-                                                    />
-                                                    <input
-                                                        className="w-full accent-neutral-800"
-                                                        type="range"
-                                                        min={0.25}
-                                                        max={5}
-                                                        step={0.25}
-                                                        value={tokenScale}
-                                                        onChange={(e) => setTokenScale(Number(e.target.value))}
-                                                        title="Drag to scale"
-                                                    />
-                                                    <button type="button" className="btn btn-ghost" onClick={() => setTokenScale(1)} title="Reset">
-                                                        Reset
-                                                    </button>
-                                                </div>
-                                            </Field>
-
-                                            <Field labelText="Nudge Position">
-                                                <div className="grid grid-cols-3 gap-2 w-[220px]">
-                                                    <div />
-                                                    <button type="button" className="btn" onClick={() => setOffsetX(v => v + nudgeValue)} title="Up">↑</button>
-                                                    <div />
-                                                    <button type="button" className="btn" onClick={() => setOffsetY(v => v - nudgeValue)} title="Left">←</button>
-                                                    <button
-                                                        type="button"
-                                                        className="btn btn-ghost"
-                                                        onClick={() => { setOffsetX(0); setOffsetY(0) }}
-                                                        title="Center"
-                                                    >•</button>
-                                                    <button type="button" className="btn" onClick={() => setOffsetY(v => v + nudgeValue)} title="Right">→</button>
-                                                    <div />
-                                                    <button type="button" className="btn" onClick={() => setOffsetX(v => v - nudgeValue)} title="Down">↓</button>
-                                                    <div />
-                                                </div>
-                                                <div className="flex items-center gap-3 pt-2 text-xs text-neutral-600">
-                                                    <span>X: {offsetX}px</span>
-                                                    <span>Y: {offsetY}px</span>
-                                                    <button
-                                                        type="button"
-                                                        className="btn btn-ghost btn-sm"
-                                                        onClick={() => { setOffsetX(0); setOffsetY(0) }}
-                                                    >
-                                                        Reset
-                                                    </button>
-                                                </div>
-                                            </Field>
-                                        </div>
-                                    </AccordionSection>
-
-                                    <AccordionSection
-                                        title="Glyphs"
-                                        open={openId === 'glyphs'}
-                                        onToggle={(next) => setOpenId(next ? 'glyphs' : '')}
-                                    >
-                                        {/* Tab/segment switcher */}
-                                        <div className="inline-flex rounded-full bg-neutral-200 p-1 mb-3">
-                                            {(['g1', 'g2', 'g3'] as const).map((key) => (
-                                                <button
-                                                    key={key}
-                                                    type="button"
-                                                    onClick={() => setActiveGlyphTab(key)}
-                                                    className={`px-5 py-2 text-sm font-medium rounded-full transition-all duration-200
-          ${activeGlyphTab === key ? 'bg-[#d12429] text-white shadow-sm' : 'text-neutral-700 hover:bg-neutral-300'}
-        `}
-                                                >
-                                                    {glyphVM[key].label}
-                                                </button>
-                                            ))}
-                                        </div>
-
-                                        {/* Controls for the selected glyph */}
-                                        <GlyphControls vm={glyphVM[activeGlyphTab]} />
-                                    </AccordionSection>
-
-                                    <AccordionSection
-                                        title="Stickers"
-                                        open={openId === 'stickers'}
-                                        onToggle={(next) => setOpenId(next ? 'stickers' : '')}
-                                    >
-                                        {/* Tab toggle like Glyphs 1–3 */}
-                                        <div className="inline-flex rounded-full bg-neutral-200 p-1 mb-4">
-                                            <button
-                                                type="button"
-                                                onClick={() => setStickerTab('g4')}
-                                                className={`px-5 py-2 text-sm font-medium rounded-full transition-all duration-200
-        ${stickerTab === 'g4' ? 'bg-[#d12429] text-white shadow-sm' : 'text-neutral-700 hover:bg-neutral-300'}`}
+                                    {/* Custom-only */}
+                                    {mode === 'custom' && (
+                                        <>
+                                            <AccordionSection
+                                                title="Bottom Background"
+                                                open={openId === 'bg'}
+                                                onToggle={(next) => setOpenId(next ? 'bg' : '')}
                                             >
-                                                Sticker 1
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={() => setStickerTab('g5')}
-                                                className={`px-5 py-2 text-sm font-medium rounded-full transition-all duration-200
-        ${stickerTab === 'g5' ? 'bg-[#d12429] text-white shadow-sm' : 'text-neutral-700 hover:bg-neutral-300'}`}
-                                            >
-                                                Sticker 2
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={() => setStickerTab('g6')}
-                                                className={`px-5 py-2 text-sm font-medium rounded-full transition-all duration-200
-        ${stickerTab === 'g6' ? 'bg-[#d12429] text-white shadow-sm' : 'text-neutral-700 hover:bg-neutral-300'}`}
-                                            >
-                                                Sticker 3
-                                            </button>
-                                        </div>
+                                                <OptionsGrid>
+                                                    {bottoms.map((b) => (
+                                                        <OptionTile
+                                                            key={b.id}
+                                                            label={b.name}
+                                                            image={b.image}
+                                                            selected={bottomBgId === b.id}
+                                                            onClick={() => setBottomBgId(b.id)}
+                                                        />
+                                                    ))}
+                                                </OptionsGrid>
+                                            </AccordionSection>
 
-                                        {/* Options grid for the active sticker layer */}
-                                        <div className="space-y-3">
-                                            <OptionsGrid>
-                                                {stickerVM.list.map((g) => (
-                                                    <OptionTile
-                                                        key={`st-${stickerTab}-${g.id}`}
-                                                        label={g.name}
-                                                        image={g.image}
-                                                        selected={stickerVM.id === g.id}
-                                                        onClick={() => {
-                                                            stickerVM.setId(g.id)
-                                                            if (g.id !== 'none') stickerVM.setScale(0.25) // default small
-                                                        }}
-                                                        thumbClassName="w-12 h-12"
-                                                    />
-                                                ))}
-                                            </OptionsGrid>
-
-                                            {stickerVM.id !== 'none' && (
-                                                <>
-                                                    {/* Scale */}
-                                                    <div className="flex items-end gap-3 sm:gap-4 flex-wrap sm:flex-nowrap">
-                                                        <Field labelText="Scale" className="w-[100px] shrink-0">
+                                            <AccordionSection
+                                                title="Moonbird Token"
+                                                open={openId === 'token'}
+                                                onToggle={(next) => setOpenId(next ? 'token' : '')}
+                                            >
+                                                <div className="space-y-4">
+                                                    <Field labelText="Token ID">
+                                                        <div className="flex flex-wrap items-center gap-2">
                                                             <input
-                                                                className="input h-11 w-full"
-                                                                type="number" step={0.1} min={0.1} max={5}
-                                                                value={stickerVM.scale}
-                                                                onChange={(e) => stickerVM.setScale(Math.max(0.1, Math.min(5, Number(e.target.value) || 1)))}
-                                                                title="Multiply the base size"
+                                                                className="input w-36"
+                                                                type="number"
+                                                                placeholder="e.g. 8209"
+                                                                min={1}
+                                                                value={tokenId}
+                                                                onChange={(e) => setTokenId(e.target.value.trim())}
+                                                                disabled={controlsDisabled}
                                                             />
-                                                        </Field>
-                                                    </div>
-
-                                                    {/* Nudge + Rotate */}
-                                                    <div className="flex items-start gap-6 flex-wrap sm:flex-nowrap">
-                                                        <Field labelText="Nudge" className="shrink-0">
-                                                            <div className="grid grid-cols-3 gap-2 w-[130px]">
-                                                                <div />
-                                                                <button type="button" className="btn h-10 w-10" onClick={() => stickerVM.setOffX(v => v + nudgeValue)}>↑</button>
-                                                                <div />
-                                                                <button type="button" className="btn h-10 w-10" onClick={() => stickerVM.setOffY(v => v - nudgeValue)}>←</button>
+                                                            <div className="flex gap-1">
                                                                 <button
                                                                     type="button"
-                                                                    className="btn btn-ghost"
-                                                                    onClick={() => { stickerVM.setOffX(0); stickerVM.setOffY(0); }}
-                                                                    title="Center"
-                                                                >•</button>
-                                                                <button type="button" className="btn h-10 w-10" onClick={() => stickerVM.setOffY(v => v + nudgeValue)}>→</button>
-                                                                <div />
-                                                                <button type="button" className="btn h-10 w-10" onClick={() => stickerVM.setOffX(v => v - nudgeValue)}>↓</button>
-                                                                <div />
+                                                                    className={`btn ${style === 'illustrated' ? 'btn-primary' : 'btn-ghost'}`}
+                                                                    onClick={() => setStyle('illustrated')}
+                                                                    disabled={!ILLU_BASE || controlsDisabled}
+                                                                    title={ILLU_BASE ? 'Use illustrated' : 'Set NEXT_PUBLIC_MOONBIRDS_ILLU_BASE'}
+                                                                >
+                                                                    Illustrated
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    className={`btn ${style === 'pixel' ? 'btn-primary' : 'btn-ghost'}`}
+                                                                    onClick={() => setStyle('pixel')}
+                                                                    disabled={!PIXEL_BASE || controlsDisabled}
+                                                                    title={PIXEL_BASE ? 'Use pixel' : 'Set NEXT_PUBLIC_MOONBIRDS_PIXEL_BASE'}
+                                                                >
+                                                                    Pixel
+                                                                </button>
                                                             </div>
-                                                        </Field>
-
-                                                        <div className="flex flex-col gap-2 shrink-0">
-                                                            <Field labelText="Rotate" className="w-[220px]">
-                                                                <div className="flex items-center gap-2">
-                                                                    <button
-                                                                        type="button"
-                                                                        className="btn h-10 w-10"
-                                                                        title="Rotate counter-clockwise"
-                                                                        onClick={() => stickerVM.setRotation((r: number) => (r - 15 + 360) % 360)}
-                                                                    >
-                                                                        <RotateCcw className="w-4 h-4" />
-                                                                    </button>
-                                                                    <button
-                                                                        type="button"
-                                                                        className="btn h-10 w-10"
-                                                                        title="Rotate clockwise"
-                                                                        onClick={() => stickerVM.setRotation((r: number) => (r + 15) % 360)}
-                                                                    >
-                                                                        <RotateCw className="w-4 h-4" />
-                                                                    </button>
-                                                                </div>
-                                                            </Field>
                                                         </div>
-                                                    </div>
-                                                </>
-                                            )}
-                                        </div>
-                                    </AccordionSection>
+                                                        <p className="text-xs text-neutral-500">Token is composited onto the selected background.</p>
+                                                    </Field>
 
-                                    {/* Text Layter */}
-                                    <AccordionSection
-                                        title="Text Layer"
-                                        open={openId === 'text'}
-                                        onToggle={(next) => setOpenId(next ? 'text' : '')}
-                                    >
-                                        <div className="space-y-4">
-                                            <Field labelText="Text (max 10 chars)">
-                                                <div className="flex items-center gap-2">
-                                                    <input
-                                                        className="input w-full"
-                                                        type="text"
-                                                        maxLength={10}
-                                                        value={textValue}
-                                                        onChange={(e) => setTextValue(e.target.value.slice(0, 10))}
-                                                        placeholder="e.g. BIRB"
-                                                    />
-                                                    <span className="text-xs text-neutral-500 tabular-nums">{textValue.length}/10</span>
+                                                    <Field labelText="Token Scale">
+                                                        <div className="flex items-center gap-2">
+                                                            <input
+                                                                className="input w-28"
+                                                                type="number"
+                                                                step={0.25}
+                                                                min={0.25}
+                                                                max={10}
+                                                                value={tokenScale}
+                                                                onChange={(e) => {
+                                                                    const n = Number(e.target.value)
+                                                                    setTokenScale(Number.isFinite(n) ? Math.max(0.05, Math.min(10, n)) : 1)
+                                                                }}
+                                                                title="Multiply the base size"
+                                                            />
+                                                            <input
+                                                                className="w-full accent-neutral-800"
+                                                                type="range"
+                                                                min={0.25}
+                                                                max={5}
+                                                                step={0.25}
+                                                                value={tokenScale}
+                                                                onChange={(e) => setTokenScale(Number(e.target.value))}
+                                                                title="Drag to scale"
+                                                            />
+                                                            <button type="button" className="btn btn-ghost" onClick={() => setTokenScale(1)} title="Reset">
+                                                                Reset
+                                                            </button>
+                                                        </div>
+                                                    </Field>
+
+                                                    <Field labelText="Nudge Position">
+                                                        <div className="grid grid-cols-3 gap-2 w-[220px]">
+                                                            <div />
+                                                            <button type="button" className="btn" onClick={() => setOffsetX(v => v + nudgeValue)} title="Up">↑</button>
+                                                            <div />
+                                                            <button type="button" className="btn" onClick={() => setOffsetY(v => v - nudgeValue)} title="Left">←</button>
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-ghost"
+                                                                onClick={() => { setOffsetX(0); setOffsetY(0) }}
+                                                                title="Center"
+                                                            >•</button>
+                                                            <button type="button" className="btn" onClick={() => setOffsetY(v => v + nudgeValue)} title="Right">→</button>
+                                                            <div />
+                                                            <button type="button" className="btn" onClick={() => setOffsetX(v => v - nudgeValue)} title="Down">↓</button>
+                                                            <div />
+                                                        </div>
+                                                        <div className="flex items-center gap-3 pt-2 text-xs text-neutral-600">
+                                                            <span>X: {offsetX}px</span>
+                                                            <span>Y: {offsetY}px</span>
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-ghost btn-sm"
+                                                                onClick={() => { setOffsetX(0); setOffsetY(0) }}
+                                                            >
+                                                                Reset
+                                                            </button>
+                                                        </div>
+                                                    </Field>
                                                 </div>
-                                            </Field>
+                                            </AccordionSection>
 
-                                            <Field labelText="Font" className="flex-1">
-                                                {/* <select
-                                                    className="input"
-                                                    value={textFont}
-                                                    onChange={(e) => setTextFont(e.target.value as TextFont)}
-                                                > */}
-                                                <select
-                                                    className="input"
-                                                    value={textFont}
-                                                    onChange={async (e) => {
-                                                        const next = e.target.value as TextFont;
-                                                        // map your option to the actual @font-face family name
-                                                        const faceName =
-                                                            next === 'graffiti'
-                                                                ? 'graffiti'
-                                                                : next === 'oscine'
-                                                                    ? 'oscine'
-                                                                    : next === 'pridi'
-                                                                        ? 'pridi'
-                                                                        : next === 'gazpacho'
-                                                                            ? 'gazpacho'
-                                                                            : next === 'impact'
-                                                                                ? 'Impact'
-                                                                                : ''; // sans/mono use system stacks
+                                            <AccordionSection
+                                                title="Glyphs"
+                                                open={openId === 'glyphs'}
+                                                onToggle={(next) => setOpenId(next ? 'glyphs' : '')}
+                                            >
+                                                {/* Tab/segment switcher */}
+                                                <div className="inline-flex rounded-full bg-neutral-200 p-1 mb-3">
+                                                    {(['g1', 'g2', 'g3'] as const).map((key) => (
+                                                        <button
+                                                            key={key}
+                                                            type="button"
+                                                            onClick={() => setActiveGlyphTab(key)}
+                                                            className={`px-5 py-2 text-sm font-medium rounded-full transition-all duration-200
+          ${activeGlyphTab === key ? 'bg-[#d12429] text-white shadow-sm' : 'text-neutral-700 hover:bg-neutral-300'}
+        `}
+                                                        >
+                                                            {glyphVM[key].label}
+                                                        </button>
+                                                    ))}
+                                                </div>
 
-                                                        if (faceName) {
-                                                            await ensureFontLoaded(faceName);
-                                                        }
-                                                        setTextFont(next);
-                                                    }}
-                                                >
-                                                    {/* options... */}
+                                                {/* Controls for the selected glyph */}
+                                                <GlyphControls vm={glyphVM[activeGlyphTab]} />
+                                            </AccordionSection>
 
-                                                    {/* <option value="impact">Impact / Narrow Bold</option> */}
-                                                    <option value="oscine">Oscine XBold</option>
-                                                    <option value="pridi">Pridi</option>
-                                                    <option value="graffiti">Graffiti</option>
-                                                    <option value="gazpacho">Gazpacho</option>
-                                                    {/* <option value="sans">Sans Serif</option>
-                                                    <option value="mono">Monospace</option> */}
-                                                </select>
-                                            </Field>
+                                            <AccordionSection
+                                                title="Stickers"
+                                                open={openId === 'stickers'}
+                                                onToggle={(next) => setOpenId(next ? 'stickers' : '')}
+                                            >
+                                                {/* Tab toggle like Glyphs 1–3 */}
+                                                <div className="inline-flex rounded-full bg-neutral-200 p-1 mb-4">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setStickerTab('g4')}
+                                                        className={`px-5 py-2 text-sm font-medium rounded-full transition-all duration-200
+        ${stickerTab === 'g4' ? 'bg-[#d12429] text-white shadow-sm' : 'text-neutral-700 hover:bg-neutral-300'}`}
+                                                    >
+                                                        Sticker 1
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setStickerTab('g5')}
+                                                        className={`px-5 py-2 text-sm font-medium rounded-full transition-all duration-200
+        ${stickerTab === 'g5' ? 'bg-[#d12429] text-white shadow-sm' : 'text-neutral-700 hover:bg-neutral-300'}`}
+                                                    >
+                                                        Sticker 2
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setStickerTab('g6')}
+                                                        className={`px-5 py-2 text-sm font-medium rounded-full transition-all duration-200
+        ${stickerTab === 'g6' ? 'bg-[#d12429] text-white shadow-sm' : 'text-neutral-700 hover:bg-neutral-300'}`}
+                                                    >
+                                                        Sticker 3
+                                                    </button>
+                                                </div>
 
-                                            <div className="flex items-end gap-4">
-                                                {/*  */}
+                                                {/* Options grid for the active sticker layer */}
+                                                <div className="space-y-3">
+                                                    <OptionsGrid>
+                                                        {stickerVM.list.map((g) => (
+                                                            <OptionTile
+                                                                key={`st-${stickerTab}-${g.id}`}
+                                                                label={g.name}
+                                                                image={g.image}
+                                                                selected={stickerVM.id === g.id}
+                                                                onClick={() => {
+                                                                    stickerVM.setId(g.id)
+                                                                    if (g.id !== 'none') stickerVM.setScale(0.25) // default small
+                                                                }}
+                                                                thumbClassName="w-12 h-12"
+                                                            />
+                                                        ))}
+                                                    </OptionsGrid>
 
-                                                <Field labelText="Color" className="w-[104px]">
-                                                    <input
-                                                        type="color"
-                                                        value={textColor}
-                                                        onChange={(e) => setTextColor(e.target.value)}
-                                                        className="
+                                                    {stickerVM.id !== 'none' && (
+                                                        <>
+                                                            {/* Scale */}
+                                                            <div className="flex items-end gap-3 sm:gap-4 flex-wrap sm:flex-nowrap">
+                                                                <Field labelText="Scale" className="w-[100px] shrink-0">
+                                                                    <input
+                                                                        className="input h-11 w-full"
+                                                                        type="number" step={0.1} min={0.1} max={5}
+                                                                        value={stickerVM.scale}
+                                                                        onChange={(e) => stickerVM.setScale(Math.max(0.1, Math.min(5, Number(e.target.value) || 1)))}
+                                                                        title="Multiply the base size"
+                                                                    />
+                                                                </Field>
+                                                            </div>
+
+                                                            {/* Nudge + Rotate */}
+                                                            <div className="flex items-start gap-6 flex-wrap sm:flex-nowrap">
+                                                                <Field labelText="Nudge" className="shrink-0">
+                                                                    <div className="grid grid-cols-3 gap-2 w-[130px]">
+                                                                        <div />
+                                                                        <button type="button" className="btn h-10 w-10" onClick={() => stickerVM.setOffX(v => v + nudgeValue)}>↑</button>
+                                                                        <div />
+                                                                        <button type="button" className="btn h-10 w-10" onClick={() => stickerVM.setOffY(v => v - nudgeValue)}>←</button>
+                                                                        <button
+                                                                            type="button"
+                                                                            className="btn btn-ghost"
+                                                                            onClick={() => { stickerVM.setOffX(0); stickerVM.setOffY(0); }}
+                                                                            title="Center"
+                                                                        >•</button>
+                                                                        <button type="button" className="btn h-10 w-10" onClick={() => stickerVM.setOffY(v => v + nudgeValue)}>→</button>
+                                                                        <div />
+                                                                        <button type="button" className="btn h-10 w-10" onClick={() => stickerVM.setOffX(v => v - nudgeValue)}>↓</button>
+                                                                        <div />
+                                                                    </div>
+                                                                </Field>
+
+                                                                <div className="flex flex-col gap-2 shrink-0">
+                                                                    <Field labelText="Rotate" className="w-[220px]">
+                                                                        <div className="flex items-center gap-2">
+                                                                            <button
+                                                                                type="button"
+                                                                                className="btn h-10 w-10"
+                                                                                title="Rotate counter-clockwise"
+                                                                                onClick={() => stickerVM.setRotation((r: number) => (r - 15 + 360) % 360)}
+                                                                            >
+                                                                                <RotateCcw className="w-4 h-4" />
+                                                                            </button>
+                                                                            <button
+                                                                                type="button"
+                                                                                className="btn h-10 w-10"
+                                                                                title="Rotate clockwise"
+                                                                                onClick={() => stickerVM.setRotation((r: number) => (r + 15) % 360)}
+                                                                            >
+                                                                                <RotateCw className="w-4 h-4" />
+                                                                            </button>
+                                                                        </div>
+                                                                    </Field>
+                                                                </div>
+                                                            </div>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </AccordionSection>
+
+                                            {/* Text Layer */}
+                                            <AccordionSection
+                                                title="Text Layer"
+                                                open={openId === 'text'}
+                                                onToggle={(next) => setOpenId(next ? 'text' : '')}
+                                            >
+                                                <div className="space-y-4">
+                                                    <Field labelText="Token text (# + numbers only, max 10 chars)">
+                                                        <div className="flex items-center gap-2">
+                                                            <input
+                                                                className="input w-full"
+                                                                type="text"
+                                                                maxLength={10} // still fine, but we also enforce in JS
+                                                                value={textValue}
+                                                                onChange={(e) => {
+                                                                    // Raw user input
+                                                                    let raw = e.target.value;
+
+                                                                    /////COMMENT OUT THIS SECTION TO ENABLE ALL TEXT///////
+                                                                    // 1) Keep only '#' and digits
+                                                                    raw = raw.replace(/[^#0-9]/g, "");
+
+                                                                    // 2) If there's any '#', normalize to a single leading '#'
+                                                                    if (raw.includes("#")) {
+                                                                        const digits = raw.replace(/#/g, ""); // strip all '#'
+                                                                        raw = "#" + digits;                   // put one '#' at start
+                                                                    }
+
+                                                                    ///////END COMMENT OUT///////
+
+                                                                    // 3) Enforce max length
+                                                                    raw = raw.slice(0, 10);
+
+                                                                    setTextValue(raw);
+                                                                }}
+                                                                placeholder="#8209"
+                                                            />
+                                                            <span className="text-xs text-neutral-500 tabular-nums">
+                                                                {textValue.length}/10
+                                                            </span>
+                                                        </div>
+                                                    </Field>
+
+                                                    <Field labelText="Font" className="flex-1">
+                                                        <select
+                                                            className="input"
+                                                            value={textFont}
+                                                            onChange={async (e) => {
+                                                                const next = e.target.value as TextFont;
+                                                                const faceName =
+                                                                    next === "graffiti"
+                                                                        ? "graffiti"
+                                                                        : next === "oscine"
+                                                                            ? "oscine"
+                                                                            : next === "pridi"
+                                                                                ? "pridi"
+                                                                                : next === "gazpacho"
+                                                                                    ? "gazpacho"
+                                                                                    : next === "impact"
+                                                                                        ? "Impact"
+                                                                                        : "";
+
+                                                                if (faceName) {
+                                                                    await ensureFontLoaded(faceName);
+                                                                }
+                                                                setTextFont(next);
+                                                            }}
+                                                        >
+                                                            <option value="oscine">Oscine XBold</option>
+                                                            <option value="pridi">Pridi</option>
+                                                            <option value="graffiti">Graffiti</option>
+                                                            <option value="gazpacho">Gazpacho</option>
+                                                        </select>
+                                                    </Field>
+
+                                                    {/* rest of your Text Layer controls unchanged */}
+
+                                                    <div className="flex items-end gap-4">
+                                                        {/*  */}
+
+                                                        <Field labelText="Color" className="w-[104px]">
+                                                            <input
+                                                                type="color"
+                                                                value={textColor}
+                                                                onChange={(e) => setTextColor(e.target.value)}
+                                                                className="
             h-11 w-full rounded-md border border-neutral-300 p-0 cursor-pointer
             [&::-webkit-color-swatch-wrapper]:p-0
             [&::-webkit-color-swatch]:border-0
             [&::-moz-color-swatch]:border-0
           "
-                                                        title="Pick text color"
-                                                    />
-                                                </Field>
-                                                <Field labelText="Blend Mode">
-                                                    <select
-                                                        className="input"
-                                                        value={textBlend}
-                                                        onChange={(e) => setTextBlend(e.target.value as GlobalCompositeOperation)}
-                                                        title="How the text mixes with the artwork"
-                                                    >
-                                                        {BLEND_MODES.map((m) => (
-                                                            <option key={m} value={m}>{m}</option>
-                                                        ))}
-                                                    </select>
-                                                    {/* <p className="text-xs text-neutral-500">
+                                                                title="Pick text color"
+                                                            />
+                                                        </Field>
+                                                        <Field labelText="Blend Mode">
+                                                            <select
+                                                                className="input"
+                                                                value={textBlend}
+                                                                onChange={(e) => setTextBlend(e.target.value as GlobalCompositeOperation)}
+                                                                title="How the text mixes with the artwork"
+                                                            >
+                                                                {BLEND_MODES.map((m) => (
+                                                                    <option key={m} value={m}>{m}</option>
+                                                                ))}
+                                                            </select>
+                                                            {/* <p className="text-xs text-neutral-500">
                                                     Tip: <code>multiply</code> darkens (ink), <code>screen</code> brightens (glow), <code>overlay</code> boosts contrast.
                                                 </p> */}
-                                                </Field>
+                                                        </Field>
+                                                    </div>
+
+                                                    <Field labelText="Scale">
+                                                        <div className="flex items-center gap-2">
+                                                            <input
+                                                                className="input w-28"
+                                                                type="number"
+                                                                step={1}
+                                                                min={1}
+                                                                max={15}
+                                                                value={textScale}
+                                                                onChange={(e) => setTextScale(Math.max(1, Math.min(15, Number(e.target.value) || 1)))}
+                                                                title="Multiply the base size"
+                                                            />
+                                                            <input
+                                                                className="w-full accent-neutral-800"
+                                                                type="range"
+                                                                min={1}
+                                                                max={15}
+                                                                step={1}
+                                                                value={textScale}
+                                                                onChange={(e) => setTextScale(Number(e.target.value))}
+                                                                title="Drag to scale"
+                                                            />
+                                                            <button type="button" className="btn btn-ghost" onClick={() => setTextScale(1)}>
+                                                                Reset
+                                                            </button>
+                                                        </div>
+                                                    </Field>
+
+                                                    <Field labelText="Rotate">
+                                                        <div className="flex items-center gap-2">
+                                                            <input
+                                                                className="input w-28"
+                                                                type="number"
+                                                                step={5}
+                                                                min={-180}
+                                                                max={180}
+                                                                value={textRotation}
+                                                                onChange={(e) => setTextRotation(Math.max(-180, Math.min(180, Number(e.target.value) || 0)))}
+                                                                title="Degrees"
+                                                            />
+                                                            <input
+                                                                className="w-full accent-neutral-800"
+                                                                type="range"
+                                                                min={-180}
+                                                                max={180}
+                                                                step={5}
+                                                                value={textRotation}
+                                                                onChange={(e) => setTextRotation(Number(e.target.value))}
+                                                                title="Drag to rotate"
+                                                            />
+                                                            <button type="button" className="btn btn-ghost" onClick={() => setTextRotation(0)}>
+                                                                Reset
+                                                            </button>
+                                                        </div>
+                                                    </Field>
+
+                                                    <Field labelText="Nudge">
+                                                        <div className="grid grid-cols-3 gap-2 w-[220px]">
+                                                            <div />
+                                                            <button type="button" className="btn" onClick={() => setTextOffsetX(v => v + nudgeValueSm)}>↑</button>
+                                                            <div />
+                                                            <button type="button" className="btn" onClick={() => setTextOffsetY(v => v - nudgeValueSm)}>←</button>
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-ghost"
+                                                                onClick={() => { setTextOffsetX(0); setTextOffsetY(0) }}
+                                                                title="Center"
+                                                            >
+                                                                •
+                                                            </button>
+                                                            <button type="button" className="btn" onClick={() => setTextOffsetY(v => v + nudgeValueSm)}>→</button>
+                                                            <div />
+                                                            <button type="button" className="btn" onClick={() => setTextOffsetX(v => v - nudgeValueSm)}>↓</button>
+                                                            <div />
+                                                        </div>
+                                                        <div className="flex items-center gap-3 pt-2 text-xs text-neutral-600">
+                                                            <span>X: {textOffsetX}px</span>
+                                                            <span>Y: {textOffsetY}px</span>
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-ghost btn-sm"
+                                                                onClick={() => { setTextOffsetX(0); setTextOffsetY(0) }}
+                                                            >
+                                                                Reset
+                                                            </button>
+                                                        </div>
+                                                    </Field>
+                                                </div>
+                                            </AccordionSection>
+
+                                        </>
+                                    )}
+
+                                    {/* JK-only */}
+                                    {mode === 'jk' && hasJK && (
+                                        <AccordionSection
+                                            title="JK Designs"
+                                            open={openId === 'jk'}
+                                            onToggle={(next) => setOpenId(next ? 'jk' : '')}
+                                        >
+                                            <div className="space-y-3">
+                                                <OptionsGrid>
+                                                    {jkDesigns.map((d) => (
+                                                        <OptionTile
+                                                            key={d.id}
+                                                            label={d.name}
+                                                            image={d.image}
+                                                            selected={jkId === d.id}
+                                                            onClick={() => setJkId(d.id)}
+                                                        />
+                                                    ))}
+                                                </OptionsGrid>
+                                                <p className="text-xs text-neutral-500">
+                                                    Fixed artwork; token and glyph controls are hidden, more coming soon!
+                                                </p>
                                             </div>
+                                        </AccordionSection>
+                                    )}
+                                </div>
+                                <div className="grid grid-cols-2 gap-2 mt-6">
+                                    <button
+                                        type="button"
+                                        className="btn btn-primary"
+                                        onClick={() => void exportCombinedHorizontal()}
+                                        title="Download PNG (top & bottom combined)"
+                                    >
+                                        Download PNG
+                                    </button>
 
-                                            <Field labelText="Scale">
-                                                <div className="flex items-center gap-2">
-                                                    <input
-                                                        className="input w-28"
-                                                        type="number"
-                                                        step={1}
-                                                        min={1}
-                                                        max={15}
-                                                        value={textScale}
-                                                        onChange={(e) => setTextScale(Math.max(1, Math.min(15, Number(e.target.value) || 1)))}
-                                                        title="Multiply the base size"
-                                                    />
-                                                    <input
-                                                        className="w-full accent-neutral-800"
-                                                        type="range"
-                                                        min={1}
-                                                        max={15}
-                                                        step={1}
-                                                        value={textScale}
-                                                        onChange={(e) => setTextScale(Number(e.target.value))}
-                                                        title="Drag to scale"
-                                                    />
-                                                    <button type="button" className="btn btn-ghost" onClick={() => setTextScale(1)}>
-                                                        Reset
-                                                    </button>
-                                                </div>
-                                            </Field>
-
-                                            <Field labelText="Rotate">
-                                                <div className="flex items-center gap-2">
-                                                    <input
-                                                        className="input w-28"
-                                                        type="number"
-                                                        step={5}
-                                                        min={-180}
-                                                        max={180}
-                                                        value={textRotation}
-                                                        onChange={(e) => setTextRotation(Math.max(-180, Math.min(180, Number(e.target.value) || 0)))}
-                                                        title="Degrees"
-                                                    />
-                                                    <input
-                                                        className="w-full accent-neutral-800"
-                                                        type="range"
-                                                        min={-180}
-                                                        max={180}
-                                                        step={5}
-                                                        value={textRotation}
-                                                        onChange={(e) => setTextRotation(Number(e.target.value))}
-                                                        title="Drag to rotate"
-                                                    />
-                                                    <button type="button" className="btn btn-ghost" onClick={() => setTextRotation(0)}>
-                                                        Reset
-                                                    </button>
-                                                </div>
-                                            </Field>
-
-                                            <Field labelText="Nudge">
-                                                <div className="grid grid-cols-3 gap-2 w-[220px]">
-                                                    <div />
-                                                    <button type="button" className="btn" onClick={() => setTextOffsetX(v => v + nudgeValueSm)}>↑</button>
-                                                    <div />
-                                                    <button type="button" className="btn" onClick={() => setTextOffsetY(v => v - nudgeValueSm)}>←</button>
-                                                    <button
-                                                        type="button"
-                                                        className="btn btn-ghost"
-                                                        onClick={() => { setTextOffsetX(0); setTextOffsetY(0) }}
-                                                        title="Center"
-                                                    >
-                                                        •
-                                                    </button>
-                                                    <button type="button" className="btn" onClick={() => setTextOffsetY(v => v + nudgeValueSm)}>→</button>
-                                                    <div />
-                                                    <button type="button" className="btn" onClick={() => setTextOffsetX(v => v - nudgeValueSm)}>↓</button>
-                                                    <div />
-                                                </div>
-                                                <div className="flex items-center gap-3 pt-2 text-xs text-neutral-600">
-                                                    <span>X: {textOffsetX}px</span>
-                                                    <span>Y: {textOffsetY}px</span>
-                                                    <button
-                                                        type="button"
-                                                        className="btn btn-ghost btn-sm"
-                                                        onClick={() => { setTextOffsetX(0); setTextOffsetY(0) }}
-                                                    >
-                                                        Reset
-                                                    </button>
-                                                </div>
-                                            </Field>
-                                        </div>
-                                    </AccordionSection>
-
-                                </>
-                            )}
-
-                            {/* JK-only */}
-                            {mode === 'jk' && hasJK && (
-                                <AccordionSection
-                                    title="JK Designs"
-                                    open={openId === 'jk'}
-                                    onToggle={(next) => setOpenId(next ? 'jk' : '')}
-                                >
-                                    <div className="space-y-3">
-                                        <OptionsGrid>
-                                            {jkDesigns.map((d) => (
-                                                <OptionTile
-                                                    key={d.id}
-                                                    label={d.name}
-                                                    image={d.image}
-                                                    selected={jkId === d.id}
-                                                    onClick={() => setJkId(d.id)}
-                                                />
-                                            ))}
-                                        </OptionsGrid>
-                                        <p className="text-xs text-neutral-500">
-                                            Fixed artwork; token and glyph controls are hidden, more coming soon!
-                                        </p>
-                                    </div>
-                                </AccordionSection>
-                            )}
-                        </div>
-                        <div className="grid grid-cols-2 gap-2 mt-6">
-                            <button
-                                type="button"
-                                className="btn btn-primary"
-                                onClick={() => void exportCombinedHorizontal()}
-                                title="Download PNG (top & bottom combined)"
-                            >
-                                Download PNG
-                            </button>
-
-                            {/* <button
+                                    {/* <button
                                 type="button"
                                 className="btn btn-primary"
                                 onClick={() => void exportCombinedHorizontal('GenerationalMerch_MB_Deck.jpeg')}
@@ -1975,41 +1735,41 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                 Download JPEG
                             </button> */}
 
-                            {/* Optional mobile-only Share/Save button */}
-                            {typeof navigator !== 'undefined' && !!navigator.share && (
-                                <button
-                                    type="button"
-                                    className="btn col-span-2 lg:hidden"
-                                    onClick={async () => {
-                                        const png = await window.deckCapture?.({ view: 'top', width: 2560, height: 800 });
-                                        if (!png) return;
-                                        const blob = await (await fetch(png)).blob();
-                                        const file = new File([blob], 'deck.png', { type: blob.type });
-                                        await navigator.share({
-                                            files: [file],
-                                            title: 'Generational Merch Deck',
-                                            text: 'My Moonbirds deck design 🛹',
-                                        });
-                                    }}
-                                    title="Share / Save to Photos"
-                                >
-                                    Share / Save
-                                </button>
-                            )}
-                        </div>
+                                    {/* Optional mobile-only Share/Save button */}
+                                    {typeof navigator !== 'undefined' && !!navigator.share && (
+                                        <button
+                                            type="button"
+                                            className="btn col-span-2 lg:hidden"
+                                            onClick={async () => {
+                                                const png = await window.deckCapture?.({ view: 'top', width: 2560, height: 800 });
+                                                if (!png) return;
+                                                const blob = await (await fetch(png)).blob();
+                                                const file = new File([blob], 'deck.png', { type: blob.type });
+                                                await navigator.share({
+                                                    files: [file],
+                                                    title: 'Generational Merch Deck',
+                                                    text: 'My Moonbirds deck design 🛹',
+                                                });
+                                            }}
+                                            title="Share / Save to Photos"
+                                        >
+                                            Share / Save
+                                        </button>
+                                    )}
+                                </div>
 
-                        <div className="text-xs text-neutral-500 pt-2">
-                            Preview is web-resolution; final print assets are prepared offline.
-                        </div>
-                    </div>
-                </aside >
+                                <div className="text-xs text-neutral-500 pt-2">
+                                    Preview is web-resolution; final print assets are prepared offline.
+                                </div>
+                            </div>
+                        </aside >
 
-                {/* Preview */}
-                < section className="rounded-2xl border shadow-sm p-4 lg:p-5" >
-                    <div className="flex items-center justify-between mb-3">
-                        {/* <h3 className="text-sm font-medium">Preview</h3> */}
-                        <div className="flex gap-2">
-                            {/* <button
+                        {/* Preview */}
+                        <section className="rounded-2xl border shadow-sm p-4 lg:p-5 lg:sticky lg:top-6 self-start">
+                            <div className="flex items-center justify-between mb-3">
+                                {/* <h3 className="text-sm font-medium">Preview</h3> */}
+                                <div className="flex gap-2">
+                                    {/* <button
                             type="button"
                             className="btn btn-primary"
                             onClick={() => void exportCombinedHorizontal()}   // <-- wrap it
@@ -2017,14 +1777,16 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                         >
                             Download combined PNG
                         </button> */}
-                        </div>
-                    </div>
-                    <div className="rounded-xl bg-white overflow-hidden">
-                        <DeckViewerMinimal topUrl={selectedGrip.image} bottomUrl={bottomPreviewUrl} />
-                    </div>
+                                </div>
+                            </div>
+                            <div className="rounded-xl bg-white overflow-hidden">
+                                <DeckViewerMinimal topUrl={selectedGrip.image} bottomUrl={bottomPreviewUrl} />
+                            </div>
 
-                </section >
-            </div >
-        </>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div>
     )
 }

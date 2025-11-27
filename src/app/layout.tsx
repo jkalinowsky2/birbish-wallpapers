@@ -21,7 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body
-        className={`${merriweather.variable} font-merriweather min-h-screen bg-[#f7f7f7] text-neutral-900`}
+        className={`${merriweather.variable} font-merriweather min-h-screen bg-[#fafafa] text-neutral-900`}
       >
         <Web3Provider>
           <SiteHeader />
