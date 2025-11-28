@@ -478,7 +478,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
     const [jkId, setJkId] = useState<string>(initialJKId)
 
     // One-open accordion
-    const [openId, setOpenId] = useState<string>('grip')
+    const [openId, setOpenId] = useState<string>('')
 
     // Viewer output
     const [bottomPreviewUrl, setBottomPreviewUrl] = useState<string>(initialBottomBG.image)
@@ -1488,17 +1488,17 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
 
                                             {/* Text Layer */}
                                             <AccordionSection
-                                                title="Text Layer"
+                                                title="Text"
                                                 open={openId === 'text'}
                                                 onToggle={(next) => setOpenId(next ? 'text' : '')}
                                             >
                                                 <div className="space-y-4">
-                                                    <Field labelText="Token text (# + numbers only, max 10 chars)">
+                                                    <Field labelText="Numbers and symbols only (15 max)">
                                                         <div className="flex items-center gap-2">
                                                             <input
                                                                 className="input w-full"
                                                                 type="text"
-                                                                maxLength={10} // still fine, but we also enforce in JS
+                                                                maxLength={15} // still fine, but we also enforce in JS
                                                                 value={textValue}
                                                                 onChange={(e) => {
                                                                     // Raw user input
@@ -1506,25 +1506,26 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
 
                                                                     /////COMMENT OUT THIS SECTION TO ENABLE ALL TEXT///////
                                                                     // 1) Keep only '#' and digits
-                                                                    raw = raw.replace(/[^#0-9]/g, "");
+                                                                    // raw = raw.replace(/[^#0-9]/g, "");
+                                                                    raw = raw.replace(/[A-Za-z]/g, "");
 
                                                                     // 2) If there's any '#', normalize to a single leading '#'
-                                                                    if (raw.includes("#")) {
-                                                                        const digits = raw.replace(/#/g, ""); // strip all '#'
-                                                                        raw = "#" + digits;                   // put one '#' at start
-                                                                    }
+                                                                    // if (raw.includes("#")) {
+                                                                    //     const digits = raw.replace(/#/g, ""); // strip all '#'
+                                                                    //     raw = "#" + digits;                   // put one '#' at start
+                                                                    // }
 
                                                                     ///////END COMMENT OUT///////
 
                                                                     // 3) Enforce max length
-                                                                    raw = raw.slice(0, 10);
+                                                                    raw = raw.slice(0, 15);
 
                                                                     setTextValue(raw);
                                                                 }}
                                                                 placeholder="#8209"
                                                             />
                                                             <span className="text-xs text-neutral-500 tabular-nums">
-                                                                {textValue.length}/10
+                                                                {textValue.length}/15
                                                             </span>
                                                         </div>
                                                     </Field>

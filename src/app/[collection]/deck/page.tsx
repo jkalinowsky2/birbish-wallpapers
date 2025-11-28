@@ -21,7 +21,26 @@ export default function Page() {
               <p className="mt-3 text-sm md:text-base text-white">
                 Customize your Moonbirds skate deck!
               </p>
+                                      <div
+                            className="
+    inline-flex items-center gap-2 
+    rounded-full bg-black/60 border border-white/10
+    px-3 py-[4px]          /* tighter padding on mobile */
+    text-[10px] sm:text-xs text-neutral-100 
+    mt-4 sm:mt-6
+  "
+                        >
+
+                            <span className="font-semibold uppercase tracking-[0.18em] text-[11px] text-[#ffd28f]">
+                                BETA TESTING LIVE!
+                            </span>
+
+                            <span className="text-[11px] md:text-xs">
+                                {/* Free Moonbird-exclusive holographic sticker with $10+ order. */}
+                            </span>
+                        </div>
             </div>
+      
           </section>
         </div>
 

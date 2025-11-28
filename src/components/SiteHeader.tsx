@@ -9,6 +9,8 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 
 type Item = { label: string; href: string };
+const ACTIVE_CLS =
+  "text-white bg-gradient-to-b from-[#ce0000] to-[#b20000]";
 
 const WALLPAPER_ITEMS: Item[] = [
   { label: "Moonbirds", href: "/moonbirds/wallpaper" },
@@ -25,12 +27,12 @@ const BANNER_ITEMS = [
   // { label: "Gobs", href: "/gobs/banner" },
 ];
 
-const DECK_ITEMS: Item[] = [
-  { label: "Moonbirds", href: "/moonbirds/deck" },
-  // { label: "Glyders", href: "/glyders/wallpaper" },
-  // { label: "Trenchers", href: "/trenchers/wallpaper" },
-  // { label: "Gobs", href: "/gobs/wallpaper" },
-];
+// const DECK_ITEMS: Item[] = [
+//   { label: "Moonbirds", href: "/moonbirds/deck" },
+//   // { label: "Glyders", href: "/glyders/wallpaper" },
+//   // { label: "Trenchers", href: "/trenchers/wallpaper" },
+//   // { label: "Gobs", href: "/gobs/wallpaper" },
+// ];
 
 export default function Header() {
   const pathname = usePathname();
@@ -39,7 +41,7 @@ export default function Header() {
 
   const linkClasses = (href: string) =>
     `block px-3 py-2 rounded-md text-sm ${pathname?.startsWith(href)
-      ? "bg-neutral-900 text-white"
+      ? ACTIVE_CLS
       : "text-neutral-700 hover:bg-neutral-100"
     }`;
 
@@ -76,18 +78,34 @@ export default function Header() {
         <nav className="hidden md:flex items-center gap-2">
           <Link
             href="/shop"
-            className="px-3 py-2 rounded-lg text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100"
-          >
+            className={`px-3 py-2 rounded-lg text-sm font-medium 
+    ${pathname?.startsWith("/shop")
+                ? ACTIVE_CLS
+                : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100"
+              }`}          >
             Shop
           </Link>
+          <Link
+            href="/moonbirds/deck"
+            className={`px-3 py-2 rounded-lg text-sm font-medium 
+    ${pathname?.startsWith("/moonbirds/deck")
+                ? ACTIVE_CLS
+                : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100"
+              }`}      >
+            Deck Designer
+          </Link>
+          {/* <Dropdown label="Deck Designer" items={DECK_ITEMS} pathname={pathname} /> */}
           <Dropdown label="Wallpapers" items={WALLPAPER_ITEMS} pathname={pathname} />
           <Dropdown label="Banners" items={BANNER_ITEMS} pathname={pathname} />
-          {/* <Dropdown label="Decks" items={DECK_ITEMS} pathname={pathname} /> */}
+
 
           <Link
             href="/gallery"
-            className="px-3 py-2 rounded-lg text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100"
-          >
+            className={`px-3 py-2 rounded-lg text-sm font-medium 
+    ${pathname?.startsWith("/gallery")
+                ? ACTIVE_CLS
+                : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100"
+              }`}          >
             Gallery
           </Link>
           {/* <Link
@@ -131,6 +149,22 @@ export default function Header() {
           >
             Shop
           </Link>
+
+          <Link
+            href="/moonbirds/deck"
+            className={linkClasses("/deck")}
+            onClick={() => setMobileOpen(false)}
+          >
+            Deck Designer
+          </Link>
+
+          {/* <button
+            className="w-full flex items-center justify-between px-2 py-2 text-sm font-medium"
+            onClick={() => setMobileOpenSection((s) => (s === "deck" ? null : "deck"))}
+          >
+            <span className="text-neutral-500">{mobileOpenSection === "deck" ? "–" : "+"}</span>
+          </button> */}
+
           <div className="mx-auto max-w-6xl px-2 py-2">
             {/* Wallpapers section */}
             <button
@@ -156,6 +190,7 @@ export default function Header() {
               </ul>
             )}
 
+
             {/* Banners section */}
             <button
               className="w-full flex items-center justify-between px-2 py-2 text-sm font-medium"
@@ -179,36 +214,6 @@ export default function Header() {
                 ))}
               </ul>
             )}
-
-
-
-
-            {/* Decks section */}
-            {/* <button
-              className="w-full flex items-center justify-between px-2 py-2 text-sm font-medium"
-              onClick={() => setMobileOpenSection((s) => (s === "deck" ? null : "deck"))}
-            >
-              <span>Decks</span>
-              <span className="text-neutral-500">{mobileOpenSection === "deck" ? "–" : "+"}</span>
-            </button>
-            {mobileOpenSection === "deck" && (
-              <ul className="mb-2">
-                {DECK_ITEMS.map((it) => (
-                  <li key={it.href}>
-                    <Link
-                      href={it.href}
-                      className={linkClasses(it.href)}
-                      onClick={() => setMobileOpen(false)}
-                    >
-                      {it.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )} */}
-
-
-
 
             <hr className="my-2 border-neutral-200" />
             <Link
@@ -264,15 +269,16 @@ function Dropdown({
             const active = pathname?.startsWith(it.href);
             return (
               <li key={it.href}>
-                <Link
-                  href={it.href}
-                  className={`block px-3 py-2 text-sm ${active
-                    ? "bg-neutral-900 text-white"
-                    : "text-neutral-700 hover:bg-neutral-100"
-                    }`}
-                >
-                  {it.label}
-                </Link>
+<Link
+  href={it.href}
+  className={`block px-3 py-2 text-sm ${
+    active
+      ? ACTIVE_CLS
+      : "text-neutral-700 hover:bg-neutral-100"
+  }`}
+>
+  {it.label}
+</Link>
               </li>
             );
           })}
