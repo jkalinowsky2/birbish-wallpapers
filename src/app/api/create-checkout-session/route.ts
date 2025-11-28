@@ -147,6 +147,7 @@ export async function POST(request: Request) {
             'MX', //Mexico
             'TH', //Thailand
             'NZ', //New Zealand
+            'SG', //Singapore
             
             // 'FR',
             // 'NZ', 
