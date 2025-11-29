@@ -236,34 +236,45 @@ function makeHorizontalCanvas(img: HTMLImageElement): HTMLCanvasElement {
 }
 
 //Shrink to JPEG  for quote
+// Shrink to JPEG for quote — now with white background
 async function toJpegDataUrl(pngDataUrl: string, quality = 0.8): Promise<string> {
     // Guard: this must only run in the browser
     if (typeof window === 'undefined' || typeof window.Image === 'undefined') {
-        throw new Error('Image constructor not available')
+        throw new Error('Image constructor not available');
     }
 
     return new Promise<string>((resolve, reject) => {
-        const img = new window.Image()  // <-- use DOM Image, not next/image
-        img.onload = () => {
-            const c = document.createElement('canvas')
-            c.width = img.width
-            c.height = img.height
+        const img = new window.Image();  // Use DOM Image, not next/image
 
-            const ctx = c.getContext('2d')
+        img.onload = () => {
+            const c = document.createElement('canvas');
+            c.width = img.width;
+            c.height = img.height;
+
+            const ctx = c.getContext('2d');
             if (!ctx) {
-                reject(new Error('No 2D context'))
-                return
+                reject(new Error('No 2D context'));
+                return;
             }
 
-            ctx.drawImage(img, 0, 0)
-            const jpeg = c.toDataURL('image/jpeg', quality)
-            resolve(jpeg)
-        }
+            // ⭐️ NEW: fill white background BEFORE drawing the PNG
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, c.width, c.height);
+
+            // Draw the PNG on top of the white background
+            ctx.drawImage(img, 0, 0);
+
+            // Export as JPEG
+            const jpeg = c.toDataURL('image/jpeg', quality);
+            resolve(jpeg);
+        };
+
         img.onerror = () => {
-            reject(new Error('Failed to load PNG for JPEG conversion'))
-        }
-        img.src = pngDataUrl
-    })
+            reject(new Error('Failed to load PNG for JPEG conversion'));
+        };
+
+        img.src = pngDataUrl;
+    });
 }
 
 /* ---------- Main component ---------- */
@@ -969,95 +980,95 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
     }
 
     //REQUEST QUOTE FUNCTION
-async function handleRequestQuote() {
-    try {
-        setQuoteMessage(null)
+    async function handleRequestQuote() {
+        try {
+            setQuoteMessage(null)
 
-        if (!quoteEmail.trim()) {
-            setQuoteMessage('Please enter your email so we can send the quote.')
-            return
+            if (!quoteEmail.trim()) {
+                setQuoteMessage('Please enter your email so we can send the quote.')
+                return
+            }
+
+            if (!window.deckCapture) {
+                setQuoteMessage('Capture is not available right now. Please try again later.')
+                return
+            }
+
+            setQuotePending(true)
+
+            // Smaller capture size just for quote previews
+            const QUOTE_WIDTH = 1200
+            const QUOTE_HEIGHT = 400
+
+            const [topPng, bottomPng] = await Promise.all([
+                window.deckCapture?.({
+                    view: 'top',
+                    width: QUOTE_WIDTH,
+                    height: QUOTE_HEIGHT,
+                    marginX: 1.12,
+                    marginYFactor: 0.88,
+                }),
+                window.deckCapture?.({
+                    view: 'bottom',
+                    width: QUOTE_WIDTH,
+                    height: QUOTE_HEIGHT,
+                    marginX: 1.12,
+                    marginYFactor: 0.88,
+                }),
+            ])
+
+            if (!topPng || !bottomPng) {
+                throw new Error('Failed to capture deck images')
+            }
+
+            // Convert to JPEG to shrink payload a lot
+            const [topJpeg, bottomJpeg] = await Promise.all([
+                toJpegDataUrl(topPng, 0.8),
+                toJpegDataUrl(bottomPng, 0.8),
+            ])
+
+            const configSnapshot = {
+                mode,
+                gripId,
+                bottomBgId,
+                tokenId,
+                style,
+                text: {
+                    value: textValue,
+                    color: textColor,
+                    font: textFont,
+                    scale: textScale,
+                    offsetX: textOffsetX,
+                    offsetY: textOffsetY,
+                    rotation: textRotation,
+                },
+                // you can add more fields here later
+            }
+
+            const res = await fetch('/api/deck-quote', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: quoteEmail.trim(),
+                    notes: quoteNotes.trim(),
+                    topPng: topJpeg,
+                    bottomPng: bottomJpeg,
+                    config: configSnapshot,
+                }),
+            })
+
+            if (!res.ok) {
+                throw new Error(`Server responded with ${res.status}`)
+            }
+
+            setQuoteMessage('Got it! Your design was submitted for a quote.')
+        } catch (err) {
+            console.error(err)
+            setQuoteMessage('Something went wrong submitting your quote. Please try again.')
+        } finally {
+            setQuotePending(false)
         }
-
-        if (!window.deckCapture) {
-            setQuoteMessage('Capture is not available right now. Please try again later.')
-            return
-        }
-
-        setQuotePending(true)
-
-        // Smaller capture size just for quote previews
-        const QUOTE_WIDTH = 1200
-        const QUOTE_HEIGHT = 400
-
-        const [topPng, bottomPng] = await Promise.all([
-            window.deckCapture?.({
-                view: 'top',
-                width: QUOTE_WIDTH,
-                height: QUOTE_HEIGHT,
-                marginX: 1.12,
-                marginYFactor: 0.88,
-            }),
-            window.deckCapture?.({
-                view: 'bottom',
-                width: QUOTE_WIDTH,
-                height: QUOTE_HEIGHT,
-                marginX: 1.12,
-                marginYFactor: 0.88,
-            }),
-        ])
-
-        if (!topPng || !bottomPng) {
-            throw new Error('Failed to capture deck images')
-        }
-
-        // Convert to JPEG to shrink payload a lot
-        const [topJpeg, bottomJpeg] = await Promise.all([
-            toJpegDataUrl(topPng, 0.8),
-            toJpegDataUrl(bottomPng, 0.8),
-        ])
-
-        const configSnapshot = {
-            mode,
-            gripId,
-            bottomBgId,
-            tokenId,
-            style,
-            text: {
-                value: textValue,
-                color: textColor,
-                font: textFont,
-                scale: textScale,
-                offsetX: textOffsetX,
-                offsetY: textOffsetY,
-                rotation: textRotation,
-            },
-            // you can add more fields here later
-        }
-
-        const res = await fetch('/api/deck-quote', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                email: quoteEmail.trim(),
-                notes: quoteNotes.trim(),
-                topPng: topJpeg,
-                bottomPng: bottomJpeg,
-                config: configSnapshot,
-            }),
-        })
-
-        if (!res.ok) {
-            throw new Error(`Server responded with ${res.status}`)
-        }
-
-        setQuoteMessage('Got it! Your design was submitted for a quote.')
-    } catch (err) {
-        console.error(err)
-        setQuoteMessage('Something went wrong submitting your quote. Please try again.')
-    } finally {
-        setQuotePending(false)
     }
-}
     function GlyphControls({
         vm,
     }: {
