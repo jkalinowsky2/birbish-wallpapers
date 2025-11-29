@@ -485,6 +485,12 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
 
     const [stickerTab, setStickerTab] = useState<StickerTab>('g4')
 
+    // Quote request UI state
+    const [quoteEmail, setQuoteEmail] = useState<string>('')
+    const [quoteNotes, setQuoteNotes] = useState<string>('')
+    const [quotePending, setQuotePending] = useState(false)
+    const [quoteMessage, setQuoteMessage] = useState<string | null>(null)
+
     // Derived selections
     const selectedGrip = grips.find((g) => g.id === gripId) ?? initialGrip
     const selectedBottomBG = bottoms.find((b) => b.id === bottomBgId) ?? initialBottomBG
@@ -929,6 +935,90 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                 </div>
             </div>
         );
+    }
+
+    //REQUEST QUOTE FUNCTION
+    async function handleRequestQuote() {
+        try {
+            setQuoteMessage(null)
+
+            if (!quoteEmail.trim()) {
+                setQuoteMessage('Please enter your email so we can send the quote.')
+                return
+            }
+
+            if (!window.deckCapture) {
+                setQuoteMessage('Capture is not available right now. Please try again later.')
+                return
+            }
+
+            setQuotePending(true)
+
+            // 1) Capture top + bottom as PNG data URLs
+            const [topPng, bottomPng] = await Promise.all([
+                window.deckCapture?.({
+                    view: 'top',
+                    width: 2560,
+                    height: 800,
+                    marginX: 1.12,
+                    marginYFactor: 0.88,
+                }),
+                window.deckCapture?.({
+                    view: 'bottom',
+                    width: 2560,
+                    height: 800,
+                    marginX: 1.12,
+                    marginYFactor: 0.88,
+                }),
+            ])
+
+            if (!topPng || !bottomPng) {
+                throw new Error('Failed to capture deck images')
+            }
+
+            // 2) (Optional but easy) capture a minimal config snapshot
+            const configSnapshot = {
+                mode,
+                gripId,
+                bottomBgId,
+                tokenId,
+                style,
+                text: {
+                    value: textValue,
+                    color: textColor,
+                    font: textFont,
+                    scale: textScale,
+                    offsetX: textOffsetX,
+                    offsetY: textOffsetY,
+                    rotation: textRotation,
+                },
+                // you can add more later: glyphs, stickers, etc.
+            }
+
+            // 3) Send to API route
+            const res = await fetch('/api/deck-quote', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: quoteEmail.trim(),
+                    notes: quoteNotes.trim(),
+                    topPng,
+                    bottomPng,
+                    config: configSnapshot,
+                }),
+            })
+
+            if (!res.ok) {
+                throw new Error(`Server responded with ${res.status}`)
+            }
+
+            setQuoteMessage('Got it! Your design was submitted for a quote.')
+        } catch (err) {
+            console.error(err)
+            setQuoteMessage('Something went wrong submitting your quote. Please try again.')
+        } finally {
+            setQuotePending(false)
+        }
     }
 
     function GlyphControls({
@@ -1727,15 +1817,6 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                         Download PNG
                                     </button>
 
-                                    {/* <button
-                                type="button"
-                                className="btn btn-primary"
-                                onClick={() => void exportCombinedHorizontal('GenerationalMerch_MB_Deck.jpeg')}
-                                title="Download JPEG (top & bottom combined)"
-                            >
-                                Download JPEG
-                            </button> */}
-
                                     {/* Optional mobile-only Share/Save button */}
                                     {typeof navigator !== 'undefined' && !!navigator.share && (
                                         <button
@@ -1756,6 +1837,57 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                         >
                                             Share / Save
                                         </button>
+                                    )}
+
+                                </div>
+                                <div className="space-y-3 mt-6">
+                                    {/* Quote contact fields */}
+                                    <div className="space-y-2">
+                                        <Field labelText="Email for quote">
+                                            <input
+                                                className="input w-full"
+                                                type="email"
+                                                placeholder="you@example.com"
+                                                value={quoteEmail}
+                                                onChange={(e) => setQuoteEmail(e.target.value)}
+                                            />
+                                        </Field>
+
+                                        <Field labelText="Notes (optional)">
+                                            <textarea
+                                                className="input w-full min-h-[64px]"
+                                                placeholder="Quantity, color preferences, any special requests…"
+                                                value={quoteNotes}
+                                                onChange={(e) => setQuoteNotes(e.target.value)}
+                                            />
+                                        </Field>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <button
+                                            type="button"
+                                            className="btn btn-primary"
+                                            onClick={() => void exportCombinedHorizontal()}
+                                            title="Download PNG (top & bottom combined)"
+                                        >
+                                            Download PNG
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            className="btn btn-secondary"
+                                            onClick={() => void handleRequestQuote()}
+                                            disabled={quotePending}
+                                            title="Submit this design for a printed deck quote"
+                                        >
+                                            {quotePending ? 'Submitting…' : 'Request a quote'}
+                                        </button>
+                                    </div>
+
+                                    {quoteMessage && (
+                                        <p className="text-xs text-neutral-600">
+                                            {quoteMessage}
+                                        </p>
                                     )}
                                 </div>
 
