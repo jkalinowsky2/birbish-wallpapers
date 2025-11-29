@@ -1911,7 +1911,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                 </div>
 
                                 {/* Quote form */}
-                                <div className="space-y-3 mt-6">
+                                <div className="space-y-3 mt-6 px-2">
                                     {/* Quote contact fields */}
                                     <div className="space-y-2">
                                         <Field labelText="Email for quote">
@@ -1937,7 +1937,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                     {/* Request button full width */}
                                     <button
                                         type="button"
-                                        className="btn btn-primary w-full"
+                                        className="btn btn-primary"
                                         onClick={() => void handleRequestQuote()}
                                         disabled={quotePending}
                                         title="Submit this design for a printed deck quote"
