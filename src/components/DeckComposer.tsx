@@ -49,7 +49,7 @@ type BuildMode = 'custom' | 'jk'
 /* ---------- Small UI helpers ---------- */
 function Field({ labelText, children, className }: { labelText: string; children: React.ReactNode; className?: string }) {
   return (
-    <label className={`flex flex-col gap-2 w-full ${className ?? ''}`}>
+    <label className={`flex flex-col gap-2 ${className ?? ''}`}>
       <span className="text-sm font-medium">{labelText}</span>
       {children}
     </label>
