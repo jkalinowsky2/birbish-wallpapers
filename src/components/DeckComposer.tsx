@@ -47,22 +47,30 @@ type LayoutMode = 'verticalTail' | 'horizontalLeft'
 type BuildMode = 'custom' | 'jk'
 
 /* ---------- Small UI helpers ---------- */
-function Field({
-    labelText,
-    children,
-    className,
-}: {
-    labelText: string
-    children: React.ReactNode
-    className?: string
-}) {
-    return (
-        <label className={`inline-flex flex-col gap-2 ${className ?? ''}`}>
-            <span className="text-sm font-medium">{labelText}</span>
-            {children}
-        </label>
-    )
+function Field({ labelText, children, className }: { labelText: string; children: React.ReactNode; className?: string }) {
+  return (
+    <label className={`flex flex-col gap-2 w-full ${className ?? ''}`}>
+      <span className="text-sm font-medium">{labelText}</span>
+      {children}
+    </label>
+  )
 }
+// function Field({
+//     labelText,
+//     children,
+//     className,
+// }: {
+//     labelText: string
+//     children: React.ReactNode
+//     className?: string
+// }) {
+//     return (
+//         <label className={`inline-flex flex-col gap-2 ${className ?? ''}`}>
+//             <span className="text-sm font-medium">{labelText}</span>
+//             {children}
+//         </label>
+//     )
+// }
 
 function OptionTile({
     image,
@@ -1864,6 +1872,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                         </AccordionSection>
                                     )}
                                 </div>
+                                {/* Primary actions: download + optional share */}
                                 <div className="grid grid-cols-2 gap-2 mt-6">
                                     <button
                                         type="button"
@@ -1878,31 +1887,36 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                     {typeof navigator !== 'undefined' && !!navigator.share && (
                                         <button
                                             type="button"
-                                            className="btn col-span-2 lg:hidden"
+                                            className="btn lg:hidden"
                                             onClick={async () => {
-                                                const png = await window.deckCapture?.({ view: 'top', width: 2560, height: 800 });
-                                                if (!png) return;
-                                                const blob = await (await fetch(png)).blob();
-                                                const file = new File([blob], 'deck.png', { type: blob.type });
+                                                const png = await window.deckCapture?.({
+                                                    view: 'top',
+                                                    width: 2560,
+                                                    height: 800,
+                                                })
+                                                if (!png) return
+                                                const blob = await (await fetch(png)).blob()
+                                                const file = new File([blob], 'deck.png', { type: blob.type })
                                                 await navigator.share({
                                                     files: [file],
                                                     title: 'Generational Merch Deck',
                                                     text: 'My Moonbirds deck design 🛹',
-                                                });
+                                                })
                                             }}
                                             title="Share / Save to Photos"
                                         >
                                             Share / Save
                                         </button>
                                     )}
-
                                 </div>
+
+                                {/* Quote form */}
                                 <div className="space-y-3 mt-6">
                                     {/* Quote contact fields */}
                                     <div className="space-y-2">
                                         <Field labelText="Email for quote">
                                             <input
-                                                className="input w-full"
+                                                className="input w-full text-neutral-400"
                                                 type="email"
                                                 placeholder="you@example.com"
                                                 value={quoteEmail}
@@ -1912,34 +1926,24 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
 
                                         <Field labelText="Notes (optional)">
                                             <textarea
-                                                className="input w-full min-h-[64px]"
-                                                placeholder="Quantity, color preferences, any special requests…"
+                                                className="input w-full min-h-[64px] text-neutral-400"
+                                                placeholder="Quantity, country, any special requests…"
                                                 value={quoteNotes}
                                                 onChange={(e) => setQuoteNotes(e.target.value)}
                                             />
                                         </Field>
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <button
-                                            type="button"
-                                            className="btn btn-primary"
-                                            onClick={() => void exportCombinedHorizontal()}
-                                            title="Download PNG (top & bottom combined)"
-                                        >
-                                            Download PNG
-                                        </button>
-
-                                        <button
-                                            type="button"
-                                            className="btn btn-secondary"
-                                            onClick={() => void handleRequestQuote()}
-                                            disabled={quotePending}
-                                            title="Submit this design for a printed deck quote"
-                                        >
-                                            {quotePending ? 'Submitting…' : 'Request a quote'}
-                                        </button>
-                                    </div>
+                                    {/* Request button full width */}
+                                    <button
+                                        type="button"
+                                        className="btn btn-primary w-full"
+                                        onClick={() => void handleRequestQuote()}
+                                        disabled={quotePending}
+                                        title="Submit this design for a printed deck quote"
+                                    >
+                                        {quotePending ? 'Submitting…' : 'Request a quote'}
+                                    </button>
 
                                     {quoteMessage && (
                                         <p className="text-xs text-neutral-600">
