@@ -235,9 +235,12 @@ function makeHorizontalCanvas(img: HTMLImageElement): HTMLCanvasElement {
     return can;
 }
 
-//Shrink to JPEG  for quote
-// Shrink to JPEG for quote — now with white background
-async function toJpegDataUrl(pngDataUrl: string, quality = 0.8): Promise<string> {
+// Shrink to JPEG for quote — white background + optional 180° rotation
+async function toJpegDataUrl(
+    pngDataUrl: string,
+    quality = 0.8,
+    rotate180 = false
+): Promise<string> {
     // Guard: this must only run in the browser
     if (typeof window === 'undefined' || typeof window.Image === 'undefined') {
         throw new Error('Image constructor not available');
@@ -257,14 +260,20 @@ async function toJpegDataUrl(pngDataUrl: string, quality = 0.8): Promise<string>
                 return;
             }
 
-            // ⭐️ NEW: fill white background BEFORE drawing the PNG
+            // White background
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, c.width, c.height);
 
-            // Draw the PNG on top of the white background
-            ctx.drawImage(img, 0, 0);
+            if (rotate180) {
+                // Rotate around center by 180°
+                ctx.translate(c.width / 2, c.height / 2);
+                ctx.rotate(Math.PI);
+                ctx.drawImage(img, -img.width / 2, -img.height / 2);
+            } else {
+                // Normal draw
+                ctx.drawImage(img, 0, 0);
+            }
 
-            // Export as JPEG
             const jpeg = c.toDataURL('image/jpeg', quality);
             resolve(jpeg);
         };
@@ -1021,11 +1030,11 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                 throw new Error('Failed to capture deck images')
             }
 
-            // Convert to JPEG to shrink payload a lot
+            // Convert to JPEG (top normal, bottom rotated 180°)
             const [topJpeg, bottomJpeg] = await Promise.all([
-                toJpegDataUrl(topPng, 0.8),
-                toJpegDataUrl(bottomPng, 0.8),
-            ])
+                toJpegDataUrl(topPng, 0.8, false), // top: no rotation
+                toJpegDataUrl(bottomPng, 0.8, true), // bottom: rotate 180°
+            ]);
 
             const configSnapshot = {
                 mode,
