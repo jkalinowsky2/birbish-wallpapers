@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 const APPS_SCRIPT_WEBHOOK_URL = process.env.DECK_QUOTE_WEBHOOK_URL
+const DECK_QUOTE_FOLDER_ID = '1x2Qy5ORoMH-lz5OwipyDIZbsPM0iyWQ_';
 
 export async function POST(req: NextRequest) {
   try {
