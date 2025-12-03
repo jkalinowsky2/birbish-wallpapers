@@ -8,6 +8,7 @@ export type Product = {
     image: string;
     priceId: string;     // Stripe price ID
     giftOnly?: boolean
+    outOfStock?: boolean;
 };
 
 export const STICKER_PRODUCTS: Product[] = [
@@ -18,6 +19,7 @@ export const STICKER_PRODUCTS: Product[] = [
         description: "Logo Sticker. 3 x 3 inches",
         image: "/assets/store/stickers/birblogosticker.png",
         priceId: "price_1SSNvA0n54kwZghJiTSORDLI", //
+        outOfStock: false, 
     
 
     },
@@ -28,6 +30,7 @@ export const STICKER_PRODUCTS: Product[] = [
         description: "birb. Sticker. 4 x 2 inches",
         image: "/assets/store/stickers/birbsticker.png",
         priceId: "price_1SSNvz0n54kwZghJvhG7TsVC", //
+        outOfStock: false, 
 
     },
 
@@ -38,6 +41,7 @@ export const STICKER_PRODUCTS: Product[] = [
         description: "Head birb sticker in mustard. 2 x 3 inches.",
         image: "/assets/store/stickers/headbirbsticker-must.png",
         priceId: "price_1SRz6I0n54kwZghJv7x2zRyo", //
+        outOfStock: false, 
 
     },
     {
@@ -47,6 +51,7 @@ export const STICKER_PRODUCTS: Product[] = [
         description: "I ❤️ MB sticker. 3 x 3 inches.",
         image: "/assets/store/stickers/ilovembsticker-pat.png",
         priceId: "price_1SSNuf0n54kwZghJrl0bQDHP", //
+        outOfStock: false, 
 
     },
     {
@@ -56,6 +61,7 @@ export const STICKER_PRODUCTS: Product[] = [
         description: "Toobins sticker. 2 x 2 inches",
         image: "/assets/store/stickers/toobinssticker.png",
         priceId: "price_1SSNva0n54kwZghJPTofWD8J", //
+        outOfStock: false, 
 
     },
     {id: "droobins-sticker",
@@ -64,15 +70,17 @@ export const STICKER_PRODUCTS: Product[] = [
     description: "Droobins sticker. 2 x 2 inches",
     image: "/assets/store/stickers/droobinssticker.png",
     priceId: "price_1SVu470n54kwZghJnRSfukak", //
+    outOfStock: false, 
 
     },
-{
+    {
     id: "gm-stickerpack",
         name: "birb Sticker Pack 1",
             priceLabel: "$15.00",
                 description: "Birbs sticker pack - 5 birbish stickers",
                     image: "/assets/store/stickers/stickerpack1.png",
                         priceId: "price_1SSO0a0n54kwZghJjM2dgJBA", //
+                        outOfStock: false, 
 
     },
 
@@ -83,6 +91,7 @@ export const STICKER_PRODUCTS: Product[] = [
                 description: "birb. Euro sticker. 5 x 3 inches.",
                     image: "/assets/store/stickers/birbeurosticker.png",
                         priceId: "price_1SRxuC0n54kwZghJqVLWMmbI", //
+                        outOfStock: false, 
 
 
     },
@@ -94,6 +103,19 @@ export const STICKER_PRODUCTS: Product[] = [
                     image: "/assets/store/stickers/birblogosticker-holo.png",
                         priceId: "price_1STSql0n54kwZghJct2G53rB", //
                         giftOnly: true,
+                        outOfStock: false, 
+                        
+    },
+
+        {
+    id: "my-other-birb",
+        name: "Custom 'My Other Birb...' Sticker - 10 Pack",
+            priceLabel: "$32.00",
+                description: "10 pack of stickers customized for your birb. 3 x 3 inches.",
+                    image: "/assets/store/stickers/myotherbirb.png",
+                        priceId: "price_1STSql0n54kwZghJct2G53rB-UPDATE", //
+                        giftOnly: false,
+                        outOfStock: true, 
                         
     },
 ];
@@ -108,6 +130,7 @@ export const DECAL_PRODUCTS: Product[] = [
         priceLabel: '$6.50',
         image: '/assets/store/decals/birblogodecal.png',
         description: 'Cream logo transfer sticker. 3 x 3 inches',
+        outOfStock: false, 
     },
 ]
 

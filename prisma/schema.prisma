@@ -1,0 +1,30 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  slug        String   @unique            // e.g. "birb-logo-transfer-sticker"
+  name        String
+  priceId     String   @unique            // Stripe price ID
+  description String
+  image       String
+  price       Float
+
+  inventory   Inventory?
+}
+
+model Inventory {
+  id        String   @id @default(cuid())
+  productId String   @unique
+  quantity  Int      @default(0)          // ← how many you actually have
+
+  product   Product  @relation(fields: [productId], references: [id])
+}

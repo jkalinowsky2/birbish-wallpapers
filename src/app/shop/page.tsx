@@ -1,5 +1,6 @@
 // src/app/shop/page.tsx
 'use client'
+import { OrdersClosedAnnouncement } from "@/components/OrdersClosedAnnouncement";
 
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
@@ -11,10 +12,14 @@ import {
 } from './products'
 import { useAccount } from 'wagmi'
 
+
 export default function ShopPage() {
     // cart maps priceId -> quantity
     const [cart, setCart] = useState<Record<string, number>>({})
     const [isCheckingOut, setIsCheckingOut] = useState(false)
+
+    // ✅ New: inventory by priceId
+    const [inventoryByPriceId, setInventoryByPriceId] = useState<Record<string, number>>({})
 
     // wallet
     const { address } = useAccount() // address will be undefined if not connected
@@ -27,46 +32,96 @@ export default function ShopPage() {
     const [shippingRegion, setShippingRegion] =
         useState<'domestic' | 'international'>('domestic')
 
+
+
+
+
     // Call the API to check holder status
+    // 🔹 Load inventory from API
     useEffect(() => {
         let cancelled = false
 
-        async function check() {
-            if (!address) {
-                setIsHolder(false)
-                setHasClaimedGift(false)
-                setRemainingGifts(null)
-                return
-            }
+        async function loadInventory() {
             try {
-                const r = await fetch('/api/holder-status', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ address }),
-                })
-                const data = await r.json()
-
-                if (cancelled) return
-
-                setIsHolder(!!data?.isHolder)
-                setHasClaimedGift(!!data?.hasClaimedGift)
-                setRemainingGifts(
-                    typeof data?.remainingGifts === 'number' ? data.remainingGifts : null,
-                )
-            } catch {
-                if (!cancelled) {
-                    setIsHolder(false)
-                    setHasClaimedGift(false)
-                    setRemainingGifts(null)
+                const res = await fetch('/api/inventory')
+                if (!res.ok) {
+                    console.error('Failed to fetch inventory', await res.text())
+                    return
                 }
+
+                const raw = await res.json()
+                console.log('Inventory API data:', raw)
+
+                // Handle different possible shapes:
+                // { items: [...] }  or  { inventory: [...] }  or  [...]
+                const rows: any[] =
+                    (Array.isArray(raw) ? raw : raw.items ?? raw.inventory ?? []) ?? []
+
+                const map: Record<string, number> = {}
+
+                for (const row of rows) {
+                    const priceId = row.product?.priceId ?? row.priceId
+                    if (!priceId) continue
+
+                    const quantity =
+                        typeof row.quantity === 'number' ? row.quantity : 0
+
+                    map[priceId] = quantity
+                }
+
+                if (!cancelled) {
+                    setInventoryByPriceId(map)
+                }
+            } catch (err) {
+                console.error('Error loading inventory', err)
             }
         }
 
-        check()
+        loadInventory()
         return () => {
             cancelled = true
         }
-    }, [address])
+    }, [])
+
+    // 🔹 Load inventory from API
+    useEffect(() => {
+        let cancelled = false
+
+        async function loadInventory() {
+            try {
+                const res = await fetch('/api/inventory')
+                if (!res.ok) {
+                    console.error('Failed to fetch inventory', await res.text())
+                    return
+                }
+                const data = await res.json() as {
+                    items?: Array<{
+                        quantity?: number
+                        product?: { priceId?: string }
+                        priceId?: string
+                    }>
+                }
+
+                if (cancelled) return
+
+                const map: Record<string, number> = {}
+                for (const row of data.items ?? []) {
+                    const priceId = row.product?.priceId || row.priceId
+                    if (!priceId) continue
+                    map[priceId] = typeof row.quantity === 'number' ? row.quantity : 0
+                }
+
+                setInventoryByPriceId(map)
+            } catch (err) {
+                console.error('Error loading inventory', err)
+            }
+        }
+
+        loadInventory()
+        return () => {
+            cancelled = true
+        }
+    }, [])
 
     const setQuantity = (priceId: string, qty: number) => {
         setCart((prev) => {
@@ -83,13 +138,20 @@ export default function ShopPage() {
     const totalItems = Object.values(cart).reduce((sum, q) => sum + q, 0)
 
     // optional: compute a rough total from priceLabel strings
+    // const totalPrice = ALL_PRODUCTS.reduce((sum, product) => {
+    //     const qty = cart[product.priceId] ?? 0
+    //     if (!qty) return sum
+    //     const numeric = Number(product.priceLabel.replace(/[^0-9.]/g, '')) || 0
+    //     return sum + numeric * qty
+    // }, 0)
+
     const totalPrice = ALL_PRODUCTS.reduce((sum, product) => {
+        if (product.outOfStock) return sum;  // 👈 skip
         const qty = cart[product.priceId] ?? 0
         if (!qty) return sum
         const numeric = Number(product.priceLabel.replace(/[^0-9.]/g, '')) || 0
         return sum + numeric * qty
     }, 0)
-
     // Compute eligibility for free sticker
     const REQ_MIN = 10
     const isGiftEligible =
@@ -99,31 +161,183 @@ export default function ShopPage() {
         (remainingGifts === null || remainingGifts > 0)
 
     // helper to render products for a given category
+    // const renderProducts = (items: Product[]) =>
+    //     items.map((product) => {
+    //         const qty = cart[product.priceId] ?? 0
+    //         const isGiftOnly = product.giftOnly === true
+
+    //         return (
+    //             <article
+    //                 key={product.id}
+    //                 className={`relative flex flex-col rounded-lg overflow-hidden shadow-sm border border-neutral-200/60
+    //   bg-white transition duration-150 ease-out
+    //   hover:shadow-md hover:brightness-[1.03] hover:border-neutral-300
+    //   ${isGiftOnly ? 'bg-[#fffdf7] ring-1 ring-amber-200/60' : ''}
+    // `}
+    //             >
+
+    // OLD RENDER PRODUCTS
+    // const renderProducts = (items: Product[]) =>
+    //     items.map((product) => {
+    //         const isGiftOnly = product.giftOnly === true
+    //         const isOutOfStock = product.outOfStock === true
+
+    //         // if out of stock, force qty to 0 so it doesn’t sneak into the cart
+    //         const qty = isOutOfStock ? 0 : (cart[product.priceId] ?? 0)
+
+    //         return (
+    //             <article
+    //                 key={product.id}
+    //                 className={`relative flex flex-col rounded-lg overflow-hidden shadow-sm border border-neutral-200/60
+    //   bg-white transition duration-150 ease-out
+    //   ${!isOutOfStock ? 'hover:shadow-md hover:brightness-[1.03] hover:border-neutral-300' : ''}
+    //   ${isGiftOnly ? 'bg-[#fffdf7] ring-1 ring-amber-200/60' : ''}
+    //   ${isOutOfStock ? 'opacity-60' : ''}
+    // `}
+    //             >
+
+    //                 {/* 🔸 Holder-perk badge (top-left of card, stays where it is) */}
+    //                 {isGiftOnly && (
+    //                     <span
+    //                         className="absolute left-2 top-2 rounded-full bg-amber-100 px-2 py-0.5
+    //     text-[10px] font-semibold uppercase tracking-wide text-[#b20000] border border-amber-300 shadow-sm"
+    //                     >
+    //                         Holder perk
+    //                     </span>
+    //                 )}
+
+    //                 {/* 🔹 Image wrapper – Out Of Stock badge moved HERE */}
+    //                 <div className="relative aspect-[3/2] sm:aspect-[4/3]">
+    //                     <Image
+    //                         src={product.image}
+    //                         alt={product.name}
+    //                         fill
+    //                         sizes="(min-width: 1024px) 20vw, 50vw"
+    //                         style={{ objectFit: 'contain' }}
+    //                     />
+
+    //                     {/* 🔥 Out of stock pill NOW on top of the image */}
+    //                     {isOutOfStock && (
+    //                         <span
+    //                             className="absolute right-2 top-2 rounded-full bg-neutral-900/90 px-2 py-0.5
+    //         text-[10px] font-semibold uppercase tracking-wide text-white shadow-sm"
+    //                         >
+    //                             Out of stock
+    //                         </span>
+    //                     )}
+    //                 </div>
+
+    //                 {/* body */}
+    //                 <div className="p-3 flex flex-col gap-2 flex-1">
+    //                     <div>
+    //                         <h2 className="text-sm font-semibold leading-snug">
+    //                             {product.name}
+    //                         </h2>
+    //                         <p className="text-xs text-neutral-600 mt-1 leading-relaxed">
+    //                             {product.description}
+    //                         </p>
+    //                     </div>
+
+    //                     <div className="mt-auto flex items-center justify-between">
+    //                         {product.giftOnly ? (
+    //                             <span className="text-sm font-semibold flex items-center gap-2">
+    //                                 <span className="line-through text-neutral-400">
+    //                                     {product.priceLabel}
+    //                                 </span>
+    //                             </span>
+    //                         ) : (
+    //                             <span className="text-sm font-semibold">
+    //                                 {product.priceLabel}
+    //                             </span>
+    //                         )}
+
+    //                         {isGiftOnly ? (
+    //                             <div className="text-right text-sm leading-tight">
+    //                                 {typeof remainingGifts === 'number' && (
+    //                                     <div className="text-sm font-semibold text-neutral-400">
+    //                                         {remainingGifts} stickers left
+    //                                     </div>
+    //                                 )}
+    //                             </div>
+    //                         ) : isOutOfStock ? (
+    //                             <div className="text-xs font-semibold text-red-600 text-right">
+    //                                 Out of stock
+    //                             </div>
+    //                         ) : (
+    //                             <div className="inline-flex items-center gap-2">
+    //                                 <button
+    //                                     type="button"
+    //                                     className="h-6 w-6 rounded-full border border-neutral-300 text-sm leading-none hover:bg-neutral-200"
+    //                                     onClick={() =>
+    //                                         setQuantity(product.priceId, Math.max(0, qty - 1))
+    //                                     }
+    //                                 >
+    //                                     –
+    //                                 </button>
+    //                                 <input
+    //                                     type="number"
+    //                                     min={0}
+    //                                     step={1}
+    //                                     value={qty}
+    //                                     onChange={(e) => {
+    //                                         const raw = Number(e.target.value)
+    //                                         const clean = Math.max(0, Math.floor(raw) || 0)
+    //                                         setQuantity(product.priceId, clean)
+    //                                     }}
+    //                                     className="w-10 h-8 text-center text-sm border border-neutral-300 rounded-md bg-neutral-50"
+    //                                 />
+    //                                 <button
+    //                                     type="button"
+    //                                     className="h-6 w-6 rounded-full border bg-neutral-900 text-white text-sm leading-none hover:bg-[#b20b2b]"
+    //                                     onClick={() => setQuantity(product.priceId, qty + 1)}
+    //                                 >
+    //                                     +
+    //                                 </button>
+    //                             </div>
+    //                         )}
+    //                     </div>
+    //                 </div>
+    //             </article>
+    //         )
+    //     })
+    //NEW RENDER PRODUCTS WITH INVENTORY
     const renderProducts = (items: Product[]) =>
         items.map((product) => {
-            const qty = cart[product.priceId] ?? 0
             const isGiftOnly = product.giftOnly === true
+
+            // 🔹 Look up inventory from DB using priceId
+            const inventoryQty = inventoryByPriceId[product.priceId]
+
+            // 🔹 Treat 0 or negative inventory as out of stock
+            const isOutOfStock =
+                product.outOfStock === true ||
+                (typeof inventoryQty === 'number' && inventoryQty <= 0)
+
+            // if out of stock, force qty to 0 so it doesn’t sneak into the cart
+            const qty = isOutOfStock ? 0 : (cart[product.priceId] ?? 0)
 
             return (
                 <article
                     key={product.id}
                     className={`relative flex flex-col rounded-lg overflow-hidden shadow-sm border border-neutral-200/60
       bg-white transition duration-150 ease-out
-      hover:shadow-md hover:brightness-[1.03] hover:border-neutral-300
+      ${!isOutOfStock ? 'hover:shadow-md hover:brightness-[1.03] hover:border-neutral-300' : ''}
       ${isGiftOnly ? 'bg-[#fffdf7] ring-1 ring-amber-200/60' : ''}
+      ${isOutOfStock ? 'opacity-60' : ''}
     `}
                 >
-                    {/* 🔸 Small badge in the top-left for the gift card only */}
+
+                    {/* 🔸 Holder-perk badge (top-left of card, stays where it is) */}
                     {isGiftOnly && (
                         <span
                             className="absolute left-2 top-2 rounded-full bg-amber-100 px-2 py-0.5
-  text-[10px] font-semibold uppercase tracking-wide text-[#b20000] border border-amber-300 shadow-sm"
+        text-[10px] font-semibold uppercase tracking-wide text-[#b20000] border border-amber-300 shadow-sm"
                         >
                             Holder perk
                         </span>
                     )}
 
-                    {/* image */}
+                    {/* 🔹 Image wrapper – Out Of Stock badge on top of the image */}
                     <div className="relative aspect-[3/2] sm:aspect-[4/3]">
                         <Image
                             src={product.image}
@@ -132,6 +346,15 @@ export default function ShopPage() {
                             sizes="(min-width: 1024px) 20vw, 50vw"
                             style={{ objectFit: 'contain' }}
                         />
+
+                        {isOutOfStock && (
+                            <span
+                                className="absolute right-2 top-2 rounded-full bg-neutral-900/90 px-2 py-0.5
+            text-[10px] font-semibold uppercase tracking-wide text-white shadow-sm"
+                            >
+                                Out of stock
+                            </span>
+                        )}
                     </div>
 
                     {/* body */}
@@ -143,6 +366,15 @@ export default function ShopPage() {
                             <p className="text-xs text-neutral-600 mt-1 leading-relaxed">
                                 {product.description}
                             </p>
+
+                            {/* 🔹 Inventory display */}
+                            {typeof inventoryQty === 'number' && (
+                                <p className="mt-1 text-[11px] text-neutral-500">
+                                    {inventoryQty > 0
+                                        ? `${inventoryQty} in stock`
+                                        : 'Out of stock'}
+                                </p>
+                            )}
                         </div>
 
                         <div className="mt-auto flex items-center justify-between">
@@ -166,6 +398,10 @@ export default function ShopPage() {
                                         </div>
                                     )}
                                 </div>
+                            ) : isOutOfStock ? (
+                                <div className="text-xs font-semibold text-red-600 text-right">
+                                    Out of stock
+                                </div>
                             ) : (
                                 <div className="inline-flex items-center gap-2">
                                     <button
@@ -180,19 +416,23 @@ export default function ShopPage() {
                                     <input
                                         type="number"
                                         min={0}
-                                        step={1}                       // 👈 blocks decimals in the browser UI
+                                        step={1}
                                         value={qty}
                                         onChange={(e) => {
-                                            const raw = Number(e.target.value);
-                                            const clean = Math.max(0, Math.floor(raw) || 0);  // 👈 ensures integer only
-                                            setQuantity(product.priceId, clean);
+                                            const raw = Number(e.target.value)
+                                            const clean = Math.max(0, Math.floor(raw) || 0)
+                                            const capped = inventoryQty ? Math.min(clean, inventoryQty) : clean
+                                            setQuantity(product.priceId, capped)
                                         }}
                                         className="w-10 h-8 text-center text-sm border border-neutral-300 rounded-md bg-neutral-50"
                                     />
                                     <button
                                         type="button"
                                         className="h-6 w-6 rounded-full border bg-neutral-900 text-white text-sm leading-none hover:bg-[#b20b2b]"
-                                        onClick={() => setQuantity(product.priceId, qty + 1)}
+                                        // onClick={() => setQuantity(product.priceId, qty + 1)}
+                                        onClick={() => {
+                                            if (qty < inventoryQty) setQuantity(product.priceId, qty + 1)
+                                        }}
                                     >
                                         +
                                     </button>
@@ -253,6 +493,9 @@ export default function ShopPage() {
     return (
         // Full-width wrapper that breaks out of the centered layout
         <div className="w-screen relative left-1/2 right-1/2 ml-[-50vw] mr-[-50vw] bg-neutral-50">
+            {/* UNCOMMENT FOR CLOSED POPUP */}
+            {/* <OrdersClosedAnnouncement /> */}
+
             <div className="bg-[#faf7f2] p-0 m-0">
                 {/* Hero band */}
                 <section className="w-full bg-gradient-to-b from-[#ce0000] to-[#b20000] text-white border-b border-neutral-900">
@@ -336,10 +579,10 @@ export default function ShopPage() {
                 </div>
 
                 {/* Cart / checkout bar – now full-width since parent is full-width */}
-<div className="sticky bottom-0 bg-[#f7f7f7] border-t z-40 py-4">
-{/* <div className="bg-[#f7f7f7] border-t z-40 sm:py-4 py-2"> */}
-  <div
-    className="
+                <div className="sticky bottom-0 bg-[#f7f7f7] border-t z-40 py-4">
+                    {/* <div className="bg-[#f7f7f7] border-t z-40 sm:py-4 py-2"> */}
+                    <div
+                        className="
       mx-auto max-w-7xl 
       flex flex-col gap-2 sm:gap-4
       sm:flex-row sm:items-center sm:justify-between 
@@ -348,7 +591,7 @@ export default function ShopPage() {
       shadow-sm 
       text-[12px] sm:text-sm    /* smaller text on mobile */
     "
-  >
+                    >
                         <div className="text-xs sm:text-sm text-neutral-700">
                             {totalItems ? (
                                 <>
@@ -396,82 +639,53 @@ export default function ShopPage() {
                         </div>
 
                         {/* Right: region selector + checkout buttons aligned right */}
-                        <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                        {/* Buttons */}
+                        <div className="flex flex-col items-end gap-2 w-full sm:w-auto">
 
-                            {/* Region selector aligned to the right */}
-                            <div className="inline-flex items-center gap-2 text-xs md:text-sm justify-end">
-                                <span className="text-neutral-600">Select shipping region:</span>
+                            {/* Main checkout button */}
+                            <button
+                                type="button"
+                                onClick={handleCheckout}
+                                disabled={!totalItems || isCheckingOut}
+                                className="px-5 py-2 rounded-md text-sm font-medium bg-black text-white 
+               disabled:bg-neutral-300 disabled:cursor-not-allowed w-full sm:w-auto"
+                            >
+                                {isCheckingOut
+                                    ? 'Starting checkout…'
+                                    : totalItems
+                                        ? `Checkout (${totalItems})`
+                                        : 'Checkout'}
+                            </button>
 
-                                <div className="inline-flex rounded-md border border-neutral-200 bg-neutral-50 p-0.5">
-                                    <button
-                                        type="button"
-                                        onClick={() => setShippingRegion('domestic')}
-                                        className={`px-2 py-0.5 text-[11px] rounded-md
-        ${shippingRegion === 'domestic'
-                                                ? 'bg-neutral-900 text-white'
-                                                : 'text-neutral-700'}
-      `}
-                                    >
-                                        United States
-                                    </button>
+                            {/* === $BIRB Coming Soon (Teaser Button) === */}
+                            {/* <div
+                                className="
+      mt-1
+      px-5 py-2 rounded-md text-sm font-medium 
+      bg-gradient-to-r from-[#0dd19c] to-[#9e54fc] 
+      text-white shadow-sm 
+      flex items-center gap-2 
+      cursor-default select-none opacity-90
+      w-full sm:w-auto
+    "
+                            >
+                                <span className="uppercase font-bold tracking-wide text-[11px] opacity-90">
+                                    Pay with
+                                </span>
+                                <span className="font-black text-[13px]">$birb</span>
 
-                                    <button
-                                        type="button"
-                                        onClick={() => setShippingRegion('international')}
-                                        className={`px-2 py-0.5 text-[11px] rounded-md
-        ${shippingRegion === 'international'
-                                                ? 'bg-neutral-900 text-white'
-                                                : 'text-neutral-700'}
-      `}
-                                    >
-                                        International
-                                    </button>
-                                </div>
-                            </div>
+                            </div> */}
 
-                            {/* Buttons (you keep both versions) */}
-                            <div className="flex flex-col items-end gap-2 w-full sm:w-auto">
-
-                                {/* Main checkout button Enable*/}
-                                <button
-      type="button"
-      onClick={handleCheckout}
-      disabled={!totalItems || isCheckingOut}
-      className="px-5 py-2 rounded-md text-sm font-medium bg-black text-white 
-                 disabled:bg-neutral-300 disabled:cursor-not-allowed w-full sm:w-auto"
-    >
-      {isCheckingOut
-        ? 'Starting checkout…'
-        : totalItems
-          ? `Checkout (${totalItems})`
-          : 'Checkout'}
-    </button>
-
-                                {/* This is the alternate/disabled button you want to keep */}
-                                {/* <button
-                                    type="button"
-                                    disabled={!totalItems || isCheckingOut}
-                                    className="px-5 py-2 rounded-md text-sm font-medium bg-black text-white 
-                 disabled:bg-neutral-300 disabled:cursor-not-allowed w-full sm:w-auto"
-                                >
-                                    {isCheckingOut
-                                        ? 'Starting checkout…'
-                                        : totalItems
-                                            ? 'Checkout Disabled'
-                                            : 'Checkout Disabled'}
-                                </button> */}
-
-                            </div>
                         </div>
                     </div>
 
 
                 </div>
-                    <div className="text-xs text-neutral-500 text-center md:text-right mx-10 my-1 sm:mx-0">
-                        <p> Now shipping to the following countries: US, Canada, Mexico, Australia, UK, Germany, South Korea, Japan, Thailand, New Zealand, & Singapore</p>
+                <div className="text-xs text-neutral-500 text-center md:text-right mx-10 my-1 sm:mx-0">
+                    <p> Now shipping to the following countries: US, Canada, Mexico, Australia, UK, Germany, South Korea, Japan, Thailand, New Zealand, & Singapore</p>
 
 
-                    </div>
+                </div>
             </div>
         </div>
     )
