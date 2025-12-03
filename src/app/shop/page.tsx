@@ -54,7 +54,13 @@ export default function ShopPage() {
 
                 // Handle different possible shapes:
                 // { items: [...] }  or  { inventory: [...] }  or  [...]
-                const rows: any[] =
+                type InventoryRow = {
+                    quantity?: number
+                    product?: { priceId?: string }
+                    priceId?: string
+                }
+
+                const rows: InventoryRow[] =
                     (Array.isArray(raw) ? raw : raw.items ?? raw.inventory ?? []) ?? []
 
                 const map: Record<string, number> = {}
