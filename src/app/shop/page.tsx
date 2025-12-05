@@ -1,6 +1,7 @@
 // src/app/shop/page.tsx
 'use client'
 import { OrdersClosedAnnouncement } from "@/components/OrdersClosedAnnouncement";
+import { siteConfig } from "@/config/siteConfig"
 
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
@@ -307,6 +308,8 @@ export default function ShopPage() {
     //         )
     //     })
     //NEW RENDER PRODUCTS WITH INVENTORY
+
+
     const renderProducts = (items: Product[]) =>
         items.map((product) => {
             const isGiftOnly = product.giftOnly === true
@@ -374,11 +377,9 @@ export default function ShopPage() {
                             </p>
 
                             {/* 🔹 Inventory display */}
-                            {typeof inventoryQty === 'number' && (
+                            {siteConfig.showInventory && typeof inventoryQty === 'number' && (
                                 <p className="mt-1 text-[11px] text-neutral-500">
-                                    {inventoryQty > 0
-                                        ? `${inventoryQty} in stock`
-                                        : 'Out of stock'}
+                                    {inventoryQty > 0 ? `${inventoryQty} in stock` : 'Out of stock'}
                                 </p>
                             )}
                         </div>
@@ -427,8 +428,14 @@ export default function ShopPage() {
                                         onChange={(e) => {
                                             const raw = Number(e.target.value)
                                             const clean = Math.max(0, Math.floor(raw) || 0)
-                                            const capped = inventoryQty ? Math.min(clean, inventoryQty) : clean
-                                            setQuantity(product.priceId, capped)
+
+                                            // ⭐ NEW — Only limit quantity when the config flag is enabled
+                                            const finalQty =
+                                                siteConfig.limitOrdersToInventory && typeof inventoryQty === 'number'
+                                                    ? Math.min(clean, inventoryQty)
+                                                    : clean
+
+                                            setQuantity(product.priceId, finalQty)
                                         }}
                                         className="w-10 h-8 text-center text-sm border border-neutral-300 rounded-md bg-neutral-50"
                                     />
@@ -437,7 +444,14 @@ export default function ShopPage() {
                                         className="h-6 w-6 rounded-full border bg-neutral-900 text-white text-sm leading-none hover:bg-[#b20b2b]"
                                         // onClick={() => setQuantity(product.priceId, qty + 1)}
                                         onClick={() => {
-                                            if (qty < inventoryQty) setQuantity(product.priceId, qty + 1)
+                                            const nextQty = qty + 1
+
+                                            const finalQty =
+                                                siteConfig.limitOrdersToInventory && typeof inventoryQty === 'number'
+                                                    ? Math.min(nextQty, inventoryQty)
+                                                    : nextQty
+
+                                            setQuantity(product.priceId, finalQty)
                                         }}
                                     >
                                         +
@@ -500,7 +514,8 @@ export default function ShopPage() {
         // Full-width wrapper that breaks out of the centered layout
         <div className="w-screen relative left-1/2 right-1/2 ml-[-50vw] mr-[-50vw] bg-neutral-50">
             {/* UNCOMMENT FOR CLOSED POPUP */}
-            {/* <OrdersClosedAnnouncement /> */}
+            
+            {siteConfig.shopPopupOn && <OrdersClosedAnnouncement />}
 
             <div className="bg-[#faf7f2] p-0 m-0">
                 {/* Hero band */}
@@ -652,15 +667,18 @@ export default function ShopPage() {
                             <button
                                 type="button"
                                 onClick={handleCheckout}
-                                disabled={!totalItems || isCheckingOut}
+                                disabled={!siteConfig.checkoutEnabled || !totalItems || isCheckingOut}
+                                // disabled={!totalItems || isCheckingOut}
                                 className="px-5 py-2 rounded-md text-sm font-medium bg-black text-white 
                disabled:bg-neutral-300 disabled:cursor-not-allowed w-full sm:w-auto"
                             >
-                                {isCheckingOut
-                                    ? 'Starting checkout…'
-                                    : totalItems
-                                        ? `Checkout (${totalItems})`
-                                        : 'Checkout'}
+                                {!siteConfig.checkoutEnabled
+                                    ? 'Checkout disabled'
+                                    : isCheckingOut
+                                        ? 'Starting checkout…'
+                                        : totalItems > 0
+                                            ? `Checkout (${totalItems})`
+                                            : 'Checkout'}
                             </button>
 
                             {/* === $BIRB Coming Soon (Teaser Button) === */}

@@ -9,7 +9,7 @@ const MOONBIRDS = (process.env.MOONBIRDS_CONTRACT ??
 const ABI = ['function balanceOf(address owner) view returns (uint256)']
 
 const RPC = process.env.ETH_MAINNET_RPC
-const FREE_GIFT_MAX = Number(process.env.FREE_GIFT_MAX ?? '50')
+const FREE_GIFT_MAX = Number(process.env.FREE_GIFT_MAX ?? '19')
 
 // Delegate.xyz
 const DELEGATE_API_BASE = 'https://api.delegate.xyz/registry/v2'
