@@ -10,6 +10,8 @@ import {
     DECAL_PRODUCTS,
     ALL_PRODUCTS,
     type Product,
+    getTieredUnitPrice,
+    getTierForQuantity,
 } from './products'
 import { useAccount } from 'wagmi'
 
@@ -153,12 +155,13 @@ export default function ShopPage() {
     // }, 0)
 
     const totalPrice = ALL_PRODUCTS.reduce((sum, product) => {
-        if (product.outOfStock) return sum;  // 👈 skip
-        const qty = cart[product.priceId] ?? 0
-        if (!qty) return sum
-        const numeric = Number(product.priceLabel.replace(/[^0-9.]/g, '')) || 0
-        return sum + numeric * qty
-    }, 0)
+        if (product.outOfStock) return sum;
+        const qty = cart[product.priceId] ?? 0;
+        if (!qty) return sum;
+
+        const unit = getTieredUnitPrice(product, qty);
+        return sum + unit * qty;
+    }, 0);
     // Compute eligibility for free sticker
     const REQ_MIN = 10
     const isGiftEligible =
@@ -310,6 +313,190 @@ export default function ShopPage() {
     //NEW RENDER PRODUCTS WITH INVENTORY
 
 
+    // const renderProducts = (items: Product[]) =>
+    //     items.map((product) => {
+    //         const isGiftOnly = product.giftOnly === true
+
+    //         // 🔹 Look up inventory from DB using priceId
+    //         const inventoryQty = inventoryByPriceId[product.priceId]
+
+    //         // 🔹 Treat 0 or negative inventory as out of stock
+    //         const isOutOfStock =
+    //             product.outOfStock === true ||
+    //             (typeof inventoryQty === 'number' && inventoryQty <= 0)
+
+    //         // if out of stock, force qty to 0 so it doesn’t sneak into the cart
+    //         const qty = isOutOfStock ? 0 : (cart[product.priceId] ?? 0)
+
+    //         const tiers = product.tiers ?? []
+    //         const bestTier =
+    //             tiers.length > 0
+    //                 ? [...tiers].sort((a, b) => a.minQty - b.minQty)[tiers.length - 1]
+    //                 : null
+
+    //         return (
+    //             <article
+    //                 key={product.id}
+    //                 className={`relative flex flex-col rounded-lg overflow-hidden shadow-sm border border-neutral-200/60
+    //   bg-white transition duration-150 ease-out
+    //   ${!isOutOfStock ? 'hover:shadow-md hover:brightness-[1.03] hover:border-neutral-300' : ''}
+    //   ${isGiftOnly ? 'bg-[#fffdf7] ring-1 ring-amber-200/60' : ''}
+    //   ${isOutOfStock ? 'opacity-60' : ''}
+    // `}
+    //             >
+
+    //                 {/* 🔸 Holder-perk badge (top-left of card, stays where it is) */}
+    //                 {isGiftOnly && (
+    //                     <span
+    //                         className="absolute left-2 top-2 rounded-full bg-amber-100 px-2 py-0.5
+    //     text-[10px] font-semibold uppercase tracking-wide text-[#b20000] border border-amber-300 shadow-sm"
+    //                     >
+    //                         Holder perk
+    //                     </span>
+    //                 )}
+
+    //                 {/* 🔹 Image wrapper – Out Of Stock badge on top of the image */}
+    //                 <div className="relative aspect-[3/2] sm:aspect-[4/3]">
+    //                     <Image
+    //                         src={product.image}
+    //                         alt={product.name}
+    //                         fill
+    //                         sizes="(min-width: 1024px) 20vw, 50vw"
+    //                         style={{ objectFit: 'contain' }}
+    //                     />
+
+    //                     {isOutOfStock && (
+    //                         <span
+    //                             className="absolute right-2 top-2 rounded-full bg-neutral-900/90 px-2 py-0.5
+    //         text-[10px] font-semibold uppercase tracking-wide text-white shadow-sm"
+    //                         >
+    //                             Out of stock
+    //                         </span>
+    //                     )}
+    //                 </div>
+
+    //                 {/* body */}
+    //                 <div className="p-3 flex flex-col gap-2 flex-1">
+    //                     <div>
+    //                         <h2 className="text-sm font-semibold leading-snug">
+    //                             {product.name}
+    //                         </h2>
+    //                         <p className="text-xs text-neutral-600 mt-1 leading-relaxed">
+    //                             {product.description}
+    //                         </p>
+
+    //                         {/* 🔹 Inventory display */}
+    //                         {siteConfig.showInventory && typeof inventoryQty === 'number' && (
+    //                             <p className="mt-1 text-[11px] text-neutral-500">
+    //                                 {inventoryQty > 0 ? `${inventoryQty} in stock` : 'Out of stock'}
+    //                             </p>
+    //                         )}
+    //                     </div>
+
+    //                     <div className="mt-auto flex items-center justify-between">
+    //                         {product.giftOnly ? (
+    //                             <span className="text-sm font-semibold flex items-center gap-2">
+    //                                 <span className="line-through text-neutral-400">
+    //                                     {product.priceLabel}
+    //                                 </span>
+    //                             </span>
+    //                         ) : (
+    //                             <span className="flex flex-col items-start text-sm">
+    //                                 {/* Base price */}
+    //                                 <span className="font-semibold">{product.priceLabel}</span>
+
+    //                                 {/* 🔹 Tier hint (e.g. "10+ for $2.50 each") */}
+    //                                 {bestTier && (
+    //                                     <span className="mt-0.5 text-[11px] text-emerald-700 font-medium">
+    //                                         {bestTier.minQty}
+    //                                         {typeof bestTier.maxQty === 'number'
+    //                                             ? `–${bestTier.maxQty}`
+    //                                             : '+'}{' '}
+    //                                         for ${bestTier.unitPrice.toFixed(2)} each
+    //                                     </span>
+    //                                 )}
+    //                             </span>
+    //                         )}
+    //                         {/* {product.giftOnly ? (
+    //                             <span className="text-sm font-semibold flex items-center gap-2">
+    //                                 <span className="line-through text-neutral-400">
+    //                                     {product.priceLabel}
+    //                                 </span>
+    //                             </span>
+    //                         ) : (
+    //                             <span className="text-sm font-semibold">
+    //                                 {product.priceLabel}
+    //                             </span>
+    //                         )} */}
+
+
+
+    //                         {isGiftOnly ? (
+    //                             <div className="text-right text-sm leading-tight">
+    //                                 {typeof remainingGifts === 'number' && (
+    //                                     <div className="text-sm font-semibold text-neutral-400">
+    //                                         {remainingGifts} stickers left
+    //                                     </div>
+    //                                 )}
+    //                             </div>
+    //                         ) : isOutOfStock ? (
+    //                             <div className="text-xs font-semibold text-red-600 text-right">
+    //                                 Out of stock
+    //                             </div>
+    //                         ) : (
+    //                             <div className="inline-flex items-center gap-2">
+    //                                 <button
+    //                                     type="button"
+    //                                     className="h-6 w-6 rounded-full border border-neutral-300 text-sm leading-none hover:bg-neutral-200"
+    //                                     onClick={() =>
+    //                                         setQuantity(product.priceId, Math.max(0, qty - 1))
+    //                                     }
+    //                                 >
+    //                                     –
+    //                                 </button>
+    //                                 <input
+    //                                     type="number"
+    //                                     min={0}
+    //                                     step={1}
+    //                                     value={qty}
+    //                                     onChange={(e) => {
+    //                                         const raw = Number(e.target.value)
+    //                                         const clean = Math.max(0, Math.floor(raw) || 0)
+
+    //                                         // ⭐ NEW — Only limit quantity when the config flag is enabled
+    //                                         const finalQty =
+    //                                             siteConfig.limitOrdersToInventory && typeof inventoryQty === 'number'
+    //                                                 ? Math.min(clean, inventoryQty)
+    //                                                 : clean
+
+    //                                         setQuantity(product.priceId, finalQty)
+    //                                     }}
+    //                                     className="w-10 h-8 text-center text-sm border border-neutral-300 rounded-md bg-neutral-50"
+    //                                 />
+    //                                 <button
+    //                                     type="button"
+    //                                     className="h-6 w-6 rounded-full border bg-neutral-900 text-white text-sm leading-none hover:bg-[#b20b2b]"
+    //                                     // onClick={() => setQuantity(product.priceId, qty + 1)}
+    //                                     onClick={() => {
+    //                                         const nextQty = qty + 1
+
+    //                                         const finalQty =
+    //                                             siteConfig.limitOrdersToInventory && typeof inventoryQty === 'number'
+    //                                                 ? Math.min(nextQty, inventoryQty)
+    //                                                 : nextQty
+
+    //                                         setQuantity(product.priceId, finalQty)
+    //                                     }}
+    //                                 >
+    //                                     +
+    //                                 </button>
+    //                             </div>
+    //                         )}
+    //                     </div>
+    //                 </div>
+    //             </article>
+    //         )
+    //     })
     const renderProducts = (items: Product[]) =>
         items.map((product) => {
             const isGiftOnly = product.giftOnly === true
@@ -324,6 +511,22 @@ export default function ShopPage() {
 
             // if out of stock, force qty to 0 so it doesn’t sneak into the cart
             const qty = isOutOfStock ? 0 : (cart[product.priceId] ?? 0)
+
+            const tiers = product.tiers ?? []
+            const bestTier =
+                tiers.length > 0
+                    ? [...tiers].sort((a, b) => a.minQty - b.minQty)[tiers.length - 1]
+                    : null
+
+            // 🔹 NEW: which tier applies for *this* quantity?
+            const currentTier = getTierForQuantity(product, qty)
+
+            // Base unit price from priceLabel (e.g. "$3.50" -> 3.5)
+            const baseUnitPrice =
+                Number(product.priceLabel.replace(/[^0-9.]/g, '')) || 0
+
+            // Unit price that actually applies at this quantity
+            const effectiveUnitPrice = currentTier?.unitPrice ?? baseUnitPrice
 
             return (
                 <article
@@ -392,8 +595,31 @@ export default function ShopPage() {
                                     </span>
                                 </span>
                             ) : (
-                                <span className="text-sm font-semibold">
-                                    {product.priceLabel}
+                                <span className="flex flex-col items-start text-sm">
+                                    {/* 🔹 Main price line — updates when a tier applies */}
+                                    {currentTier && effectiveUnitPrice < baseUnitPrice ? (
+                                        <span className="font-semibold">
+                                            <span className="line-through text-neutral-400 mr-1">
+                                                {product.priceLabel}
+                                            </span>
+                                            <span>${effectiveUnitPrice.toFixed(2)} each</span>
+                                        </span>
+                                    ) : (
+                                        <span className="font-semibold">
+                                            {product.priceLabel}
+                                        </span>
+                                    )}
+
+                                    {/* 🔹 Tier hint (e.g. "10+ for $2.50 each") */}
+                                    {bestTier && (
+                                        <span className="mt-0.5 text-[11px] text-emerald-700 font-medium">
+                                            {bestTier.minQty}
+                                            {typeof bestTier.maxQty === 'number'
+                                                ? `–${bestTier.maxQty}`
+                                                : '+'}{' '}
+                                            for ${bestTier.unitPrice.toFixed(2)} each
+                                        </span>
+                                    )}
                                 </span>
                             )}
 
@@ -429,7 +655,6 @@ export default function ShopPage() {
                                             const raw = Number(e.target.value)
                                             const clean = Math.max(0, Math.floor(raw) || 0)
 
-                                            // ⭐ NEW — Only limit quantity when the config flag is enabled
                                             const finalQty =
                                                 siteConfig.limitOrdersToInventory && typeof inventoryQty === 'number'
                                                     ? Math.min(clean, inventoryQty)
@@ -442,7 +667,6 @@ export default function ShopPage() {
                                     <button
                                         type="button"
                                         className="h-6 w-6 rounded-full border bg-neutral-900 text-white text-sm leading-none hover:bg-[#b20b2b]"
-                                        // onClick={() => setQuantity(product.priceId, qty + 1)}
                                         onClick={() => {
                                             const nextQty = qty + 1
 
@@ -514,7 +738,7 @@ export default function ShopPage() {
         // Full-width wrapper that breaks out of the centered layout
         <div className="w-screen relative left-1/2 right-1/2 ml-[-50vw] mr-[-50vw] bg-neutral-50">
             {/* UNCOMMENT FOR CLOSED POPUP */}
-            
+
             {siteConfig.shopPopupOn && <OrdersClosedAnnouncement />}
 
             <div className="bg-[#faf7f2] p-0 m-0">

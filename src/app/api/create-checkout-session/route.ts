@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { kv } from '@vercel/kv'
+import { ALL_PRODUCTS, getTierForQuantity, getBaseUnitPrice } from '@/app/shop/products';
 
 const secretKey = process.env.STRIPE_SECRET_KEY
 if (!secretKey) {
@@ -53,16 +54,46 @@ export async function POST(request: Request) {
             'http://localhost:3000'
 
         // Normal cart line items
-        const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = items
-            .filter((i) => i.quantity > 0)
-            .map((i) => ({
-                price: i.priceId,
-                quantity: i.quantity,
-            }))
+// Normal cart line items (tier-aware)
+const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = []
 
-        if (lineItems.length === 0) {
-            return NextResponse.json({ error: 'Cart is empty.' }, { status: 400 })
-        }
+for (const item of items) {
+  if (!item.quantity || item.quantity <= 0) continue
+
+  // Find the matching product by its base priceId
+  const product = ALL_PRODUCTS.find((p) => p.priceId === item.priceId)
+
+  // If we can't find the product, fall back to whatever came from the client
+  if (!product) {
+    lineItems.push({
+      price: item.priceId,
+      quantity: item.quantity,
+    })
+    continue
+  }
+
+  // Try to find a tier for this quantity
+  const tier = getTierForQuantity(product, item.quantity)
+  const baseUnit = getBaseUnitPrice(product)
+
+  // If no tier, or tier price == base price, just use the base priceId
+  if (!tier || tier.unitPrice === baseUnit) {
+    lineItems.push({
+      price: product.priceId,
+      quantity: item.quantity,
+    })
+  } else {
+    // Otherwise use the tier's Stripe priceId
+    lineItems.push({
+      price: tier.priceId,
+      quantity: item.quantity,
+    })
+  }
+}
+
+if (lineItems.length === 0) {
+  return NextResponse.json({ error: 'Cart is empty.' }, { status: 400 })
+}
 
         // -------------------------------
         // Server-side gift eligibility

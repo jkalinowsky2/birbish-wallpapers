@@ -9,7 +9,16 @@ export type Product = {
     priceId: string;     // Stripe price ID
     giftOnly?: boolean
     outOfStock?: boolean;
+    tiers?: PriceTier[]
 };
+
+export type PriceTier = {
+  minQty: number;          // inclusive
+  maxQty?: number;         // inclusive; if omitted, means "no upper limit"
+  unitPrice: number;    // price per sticker in this tier
+  priceId: string;      // Stripe price for this tier
+};
+
 
 export const STICKER_PRODUCTS: Product[] = [
     {
@@ -20,6 +29,19 @@ export const STICKER_PRODUCTS: Product[] = [
         image: "/assets/store/stickers/birblogosticker.png",
         priceId: "price_1SSNvA0n54kwZghJiTSORDLI", //
         outOfStock: false, 
+          tiers: [
+    {
+      minQty: 1,
+      maxQty: 5,
+      unitPrice: 3.5,
+      priceId: "price_1SRz6I0n54kwZghJv7x2zRyo",
+    },
+    {
+      minQty: 6,
+      unitPrice: 3.0,
+      priceId: "price_1SeKfE0n54kwZghJx584kL6V", 
+    },
+  ],
     
 
     },
@@ -34,16 +56,39 @@ export const STICKER_PRODUCTS: Product[] = [
 
     },
 
-    {
-        id: "head-birb-sticker-must",
-        name: "Head birb Sticker - Mustard",
-        priceLabel: "$3.50",
-        description: "Head birb sticker in mustard. 2 x 3 inches.",
-        image: "/assets/store/stickers/headbirbsticker-must.png",
-        priceId: "price_1SRz6I0n54kwZghJv7x2zRyo", //
-        outOfStock: false, 
+    // {
+    //     id: "head-birb-sticker-must",
+    //     name: "Head birb Sticker - Mustard",
+    //     priceLabel: "$3.50",
+    //     description: "Head birb sticker in mustard. 2 x 3 inches.",
+    //     image: "/assets/store/stickers/headbirbsticker-must.png",
+    //     priceId: "price_1SRz6I0n54kwZghJv7x2zRyo", //
+    //     outOfStock: false, 
 
+    // },
+    {
+  id: "head-birb-sticker-must",
+  name: "Head birb Sticker - Mustard",
+  priceLabel: "$3.50", // you can change this to "From $2.50" if you want
+  description: "Head birb sticker in mustard. 2 x 3 inches.",
+  image: "/assets/store/stickers/headbirbsticker-must.png",
+  priceId: "price_1SRz6I0n54kwZghJv7x2zRyo",
+  outOfStock: false,
+  tiers: [
+    {
+      minQty: 1,
+      maxQty: 5,
+      unitPrice: 3.5,
+      priceId: "price_1SRz6I0n54kwZghJv7x2zRyo",
     },
+    {
+      minQty: 6,
+      unitPrice: 3.0,
+      priceId: "price_1Sc8kS0n54kwZghJ5wDg6g94", // ← replace with your real bulk price ID
+    },
+  ],
+
+},
     {
         id: "i-love-mb-sticker",
         name: "I ❤️ MB Sticker",
@@ -140,6 +185,31 @@ export const ALL_PRODUCTS: Product[] = [
     ...DECAL_PRODUCTS,
 ]
 
+export function getTierForQuantity(product: Product, qty: number): PriceTier | null {
+  if (!product.tiers || qty <= 0) return null;
+
+  // ensure tiers sorted by min ascending
+  const tiers = [...product.tiers].sort((a, b) => a.minQty - b.minQty);
+
+  // pick the *last* tier whose min <= qty and (max == undefined or qty <= max)
+  let chosen: PriceTier | null = null;
+  for (const tier of tiers) {
+    if (qty >= tier.minQty && (tier.maxQty == null || qty <= tier.maxQty)) {
+      chosen = tier;
+    }
+  }
+  return chosen;
+}
+
+export function getBaseUnitPrice(product: Product): number {
+  return Number(product.priceLabel.replace(/[^0-9.]/g, '')) || 0;
+}
+
+export function getTieredUnitPrice(product: Product, qty: number): number {
+  const base = getBaseUnitPrice(product);
+  const tier = getTierForQuantity(product, qty);
+  return tier?.unitPrice ?? base;
+}
 
 
 // TEST CHECKOUT PRICE ID'S - UNCOMMENT BELOW AND COMMENT OUT ABOVE

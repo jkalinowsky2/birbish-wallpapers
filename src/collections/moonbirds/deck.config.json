@@ -8,10 +8,11 @@
         "bottom": { "rotationFixDeg": 0, "flipX": false, "flipY": false }
       },
       "grips": [
-        { "id": "mb-red-birb",  "label": "birb.",  "image": "/deckAssets/grips/mb_birb_red.png" },
+        { "id": "mb-red-birb",  "label": "birb. ",  "image": "/deckAssets/grips/mb_birb_red.png" },
         { "id": "mb-blk-birb",  "label": "birb.",  "image": "/deckAssets/grips/mb_birb_blk.png" },
+        { "id": "mb-blk-birb2",  "label": "birb. 2",  "image": "/deckAssets/grips/mb_birb_blk2.png" },
         { "id": "mb-red-birbish", "label": "birbish", "image": "/deckAssets/grips/mb_birbish_red.png" },
-        { "id": "mb-blkbirbish", "label": "birbish", "image": "/deckAssets/grips/mb_birbish_blk.png" },
+        { "id": "mb-blkbirbish", "label": "birbish black", "image": "/deckAssets/grips/mb_birbish_blk.png" },
         { "id": "mb-red-pattern",  "label": "red pattern",  "image": "/deckAssets/grips/mb_red_pattern.png" },
         { "id": "mb-black-pattern", "label": "black pattern", "image": "/deckAssets/grips/mb_black_pattern.png" },
         { "id": "mb-red-toobins", "label": "red toobins", "image": "/deckAssets/grips/mb_toobins_red.png" },
@@ -121,7 +122,8 @@
         
         { "id": "beastiebirbs", "name": "beastie birbs 1", "image": "/deckAssets/overlays/beastiebirbs.png"},
         { "id": "beastiebirbs2", "name": "beastie birbs 2", "image": "/deckAssets/overlays/beastiebirbs2.png"},
-        { "id": "birbish", "name": "birbish", "image": "/deckAssets/overlays/birbishsticker.png"},
+        { "id": "birbish", "name": "birbish red", "image": "/deckAssets/overlays/birbishsticker.png"},
+        { "id": "birbish_blk", "name": "birbish black", "image": "/deckAssets/overlays/birbishsticker_blk.png"},
         { "id": "birbtang_yel", "name": "moon-tang yellow", "image": "/deckAssets/overlays/birbtang1_yel.png"},
         { "id": "birbtang_red", "name": "moon-tang red", "image": "/deckAssets/overlays/birbtang1_red.png"},
         { "id": "birbtang2", "name": "moon-tang 2", "image": "/deckAssets/overlays/birbtang2.png"},
