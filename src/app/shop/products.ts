@@ -53,6 +53,19 @@ export const STICKER_PRODUCTS: Product[] = [
         image: "/assets/store/stickers/birbsticker.png",
         priceId: "price_1SSNvz0n54kwZghJvhG7TsVC", //
         outOfStock: false, 
+        tiers: [
+            {
+            minQty: 1,
+            maxQty: 5,
+            unitPrice: 3.5,
+            priceId: "price_1SSNvz0n54kwZghJvhG7TsVC",
+            },
+            {
+            minQty: 6,
+            unitPrice: 3.0,
+            priceId: "price_1SeL1w0n54kwZghJe3S0flbt", // ← replace with your real bulk price ID
+            },
+  ],
 
     },
 
@@ -107,6 +120,20 @@ export const STICKER_PRODUCTS: Product[] = [
         image: "/assets/store/stickers/toobinssticker.png",
         priceId: "price_1SSNva0n54kwZghJPTofWD8J", //
         outOfStock: false, 
+        tiers: [
+            {
+            minQty: 1,
+            maxQty: 5,
+            unitPrice: 3.5,
+            priceId: "price_1SSNva0n54kwZghJPTofWD8J",
+            },
+            {
+            minQty: 6,
+            unitPrice: 3.0,
+            priceId: "price_1SeL130n54kwZghJfcngSyk6", // ← replace with your real bulk price ID
+            },
+  ],
+        
 
     },
     {id: "droobins-sticker",
