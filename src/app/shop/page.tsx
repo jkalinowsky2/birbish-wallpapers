@@ -35,6 +35,60 @@ export default function ShopPage() {
     const [shippingRegion, setShippingRegion] =
         useState<'domestic' | 'international'>('domestic')
 
+        ///NEW HOLDER CHECK:
+        // ✅ Call the API to check holder status whenever the wallet changes
+useEffect(() => {
+  let cancelled = false
+
+  async function loadHolderStatus() {
+    // wallet disconnected -> reset UI state
+    if (!address) {
+      setIsHolder(false)
+      setHasClaimedGift(false)
+      setRemainingGifts(null)
+      return
+    }
+
+    try {
+      const res = await fetch('/api/holder-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        body: JSON.stringify({ address }),
+      })
+
+      const data = await res.json()
+      console.log('[shop] holder-status:', data)
+
+      if (cancelled) return
+
+      setIsHolder(!!data?.isHolder)
+      setHasClaimedGift(!!data?.hasClaimedGift)
+      setRemainingGifts(
+        typeof data?.remainingGifts === 'number' ? data.remainingGifts : null
+      )
+    } catch (err) {
+      console.error('[shop] holder-status error:', err)
+      if (!cancelled) {
+        setIsHolder(false)
+        setHasClaimedGift(false)
+        setRemainingGifts(null)
+      }
+    }
+  }
+
+  loadHolderStatus()
+
+  return () => {
+    cancelled = true
+  }
+}, [address])
+
+///END HOLDER CHECK
+
+
+
+
 
 
 
@@ -93,44 +147,44 @@ export default function ShopPage() {
     }, [])
 
     // 🔹 Load inventory from API
-    useEffect(() => {
-        let cancelled = false
+    // useEffect(() => {
+    //     let cancelled = false
 
-        async function loadInventory() {
-            try {
-                const res = await fetch('/api/inventory')
-                if (!res.ok) {
-                    console.error('Failed to fetch inventory', await res.text())
-                    return
-                }
-                const data = await res.json() as {
-                    items?: Array<{
-                        quantity?: number
-                        product?: { priceId?: string }
-                        priceId?: string
-                    }>
-                }
+    //     async function loadInventory() {
+    //         try {
+    //             const res = await fetch('/api/inventory')
+    //             if (!res.ok) {
+    //                 console.error('Failed to fetch inventory', await res.text())
+    //                 return
+    //             }
+    //             const data = await res.json() as {
+    //                 items?: Array<{
+    //                     quantity?: number
+    //                     product?: { priceId?: string }
+    //                     priceId?: string
+    //                 }>
+    //             }
 
-                if (cancelled) return
+    //             if (cancelled) return
 
-                const map: Record<string, number> = {}
-                for (const row of data.items ?? []) {
-                    const priceId = row.product?.priceId || row.priceId
-                    if (!priceId) continue
-                    map[priceId] = typeof row.quantity === 'number' ? row.quantity : 0
-                }
+    //             const map: Record<string, number> = {}
+    //             for (const row of data.items ?? []) {
+    //                 const priceId = row.product?.priceId || row.priceId
+    //                 if (!priceId) continue
+    //                 map[priceId] = typeof row.quantity === 'number' ? row.quantity : 0
+    //             }
 
-                setInventoryByPriceId(map)
-            } catch (err) {
-                console.error('Error loading inventory', err)
-            }
-        }
+    //             setInventoryByPriceId(map)
+    //         } catch (err) {
+    //             console.error('Error loading inventory', err)
+    //         }
+    //     }
 
-        loadInventory()
-        return () => {
-            cancelled = true
-        }
-    }, [])
+    //     loadInventory()
+    //     return () => {
+    //         cancelled = true
+    //     }
+    // }, [])
 
     const setQuantity = (priceId: string, qty: number) => {
         setCart((prev) => {

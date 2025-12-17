@@ -122,9 +122,11 @@ async function checkDelegatedHolder(delegate: string): Promise<boolean> {
 }
 
 export async function POST(req: Request) {
+
+  
   try {
     const { address } = (await req.json()) as { address?: string }
-
+    console.log('[holder-status] called with address:', address)
     // Force flag for easy testing
     if (process.env.FORCE_HOLDER === 'true') {
       // Still return KV info for UI
