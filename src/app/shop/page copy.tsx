@@ -574,13 +574,10 @@ export default function ShopPage() {
                     totalPrice={totalPrice}
                     onCheckout={handleCheckout}
                     isCheckingOut={isCheckingOut}
-                    checkoutEnabled={siteConfig.checkoutEnabled}
-                    shippingRegion={shippingRegion}
-                    setShippingRegion={setShippingRegion}
                 />
 
                 {/* Cart / checkout bar – now full-width since parent is full-width */}
-                <div className="sticky bg-[#fafafa] bottom-0 border-t z-40 py-4">
+                <div className="sticky bottom-0 border-t z-40 py-4">
                     {/* <div className="bg-[#f7f7f7] border-t z-40 sm:py-4 py-2"> */}
                     <div
                         className="
@@ -643,54 +640,83 @@ export default function ShopPage() {
                         {/* Buttons */}
                         {/* NEW */}
 
-                        <div className="flex flex-col items-end gap-2">
-                            {/* Shipping row (aligned width with button below) */}
-                            {/* Shipping row (label + full-width toggle) */}
-                            {/* Shipping row (label + full-width toggle) */}
-                            {/* <div className="w-full">
-                                <div className="grid grid-cols-[auto,1fr] items-center gap-2 text-xs text-neutral-700">
-                                    <span className="font-medium whitespace-nowrap">Shipping</span>
+                        <div className="flex flex-col items-end gap-2 w-full sm:w-auto">
+                            {/* Shipping region toggle — MOVED HERE */}
+                            <div className="flex items-center gap-2 text-xs text-neutral-700">
+                                <span className="font-medium">Shipping</span>
 
-                                    <div className="grid grid-cols-2 w-full rounded-md border overflow-hidden">
-                                        <button
-                                            type="button"
-                                            onClick={() => setShippingRegion('domestic')}
-                                            className={`py-2 text-sm font-medium text-center ${shippingRegion === 'domestic'
-                                                    ? 'bg-neutral-900 text-white'
-                                                    : 'bg-white hover:bg-neutral-50'
-                                                }`}
-                                        >
-                                            US
-                                        </button>
+                                <div className="inline-flex rounded-md border overflow-hidden">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShippingRegion('domestic')}
+                                        className={`px-3 py-1 ${shippingRegion === 'domestic'
+                                                ? 'bg-neutral-900 text-white'
+                                                : 'bg-white hover:bg-neutral-50'
+                                            }`}
+                                    >
+                                        US
+                                    </button>
 
-                                        <button
-                                            type="button"
-                                            onClick={() => setShippingRegion('international')}
-                                            className={`py-2 text-sm font-medium text-center border-l ${shippingRegion === 'international'
-                                                    ? 'bg-neutral-900 text-white'
-                                                    : 'bg-white hover:bg-neutral-50'
-                                                }`}
-                                        >
-                                            International
-                                        </button>
-                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShippingRegion('international')}
+                                        className={`px-3 py-1 border-l ${shippingRegion === 'international'
+                                                ? 'bg-neutral-900 text-white'
+                                                : 'bg-white hover:bg-neutral-50'
+                                            }`}
+                                    >
+                                        International
+                                    </button>
                                 </div>
-                            </div> */}
-
-                            {/* Single action in bar: open cart */}
+                            </div>
+                            {/* CartDrawer */}
                             <button
                                 type="button"
                                 onClick={() => setIsCartOpen(true)}
                                 disabled={!totalItems}
-                                className="
-   px-5 py-2 rounded-md text-sm font-medium
-    bg-black text-white
-    disabled:bg-neutral-300 disabled:text-white
-    disabled:opacity-50 disabled:cursor-not-allowed
-  "
+                                className="px-5 py-2 rounded-md text-sm font-medium border
+             disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
                             >
                                 View cart ({totalItems})
                             </button>
+
+                            {/* Main checkout button */}
+                            <button
+                                type="button"
+                                onClick={handleCheckout}
+                                disabled={!siteConfig.checkoutEnabled || !totalItems || isCheckingOut}
+                                // disabled={!totalItems || isCheckingOut}
+                                className="px-5 py-2 rounded-md text-sm font-medium bg-black text-white 
+               disabled:bg-neutral-300 disabled:cursor-not-allowed w-full sm:w-auto"
+                            >
+                                {!siteConfig.checkoutEnabled
+                                    ? 'Checkout disabled'
+                                    : isCheckingOut
+                                        ? 'Starting checkout…'
+                                        : totalItems > 0
+                                            ? `Checkout (${totalItems})`
+                                            : 'Checkout'}
+                            </button>
+
+                            {/* === $BIRB Coming Soon (Teaser Button) === */}
+                            {/* <div
+                                className="
+      mt-1
+      px-5 py-2 rounded-md text-sm font-medium 
+      bg-gradient-to-r from-[#0dd19c] to-[#9e54fc] 
+      text-white shadow-sm 
+      flex items-center gap-2 
+      cursor-default select-none opacity-90
+      w-full sm:w-auto
+    "
+                            >
+                                <span className="uppercase font-bold tracking-wide text-[11px] opacity-90">
+                                    Pay with
+                                </span>
+                                <span className="font-black text-[13px]">$birb</span>
+
+                            </div> */}
+
                         </div>
                     </div>
 

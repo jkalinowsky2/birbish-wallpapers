@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import { getTierForQuantity, getTieredUnitPrice } from '@/app/shop/products'
 import type { Product } from '@/app/shop/products'
 
 type Props = {
@@ -12,6 +13,9 @@ type Props = {
     totalPrice: number
     onCheckout: () => void
     isCheckingOut?: boolean
+    checkoutEnabled?: boolean
+    shippingRegion: 'domestic' | 'international'
+    setShippingRegion: (v: 'domestic' | 'international') => void
 }
 
 export function CartDrawer({
@@ -23,6 +27,10 @@ export function CartDrawer({
     totalPrice,
     onCheckout,
     isCheckingOut = false,
+    checkoutEnabled = true,
+    shippingRegion,
+    setShippingRegion,
+
 }: Props) {
     if (!open) return null
 
@@ -78,9 +86,14 @@ export function CartDrawer({
                                 <div className="text-sm font-semibold leading-tight">
                                     {product?.name ?? 'Unknown item'}
                                 </div>
-                                <div className="text-xs text-neutral-600 mt-0.5">
-                                    {product?.priceLabel ?? ''}
-                                </div>
+
+
+                                {product && (
+                                    <div className="text-xs text-neutral-600 mt-0.5">
+                                        ${getTieredUnitPrice(product, qty).toFixed(2)} each
+                                    </div>
+                                )}
+
 
                                 <div className="mt-2 flex items-center gap-2">
                                     <button
@@ -131,14 +144,42 @@ export function CartDrawer({
                     <span className="font-semibold">${totalPrice.toFixed(2)}</span>
                 </div>
 
+                    <div className="mt-4 flex items-center justify-between text-xs text-neutral-600">
+                        <span className="font-medium">Shipping</span>
+
+                        <div className="inline-flex rounded-md border overflow-hidden">
+                            <button
+                                type="button"
+                                onClick={() => setShippingRegion('domestic')}
+                                className={`px-3 py-1.5 ${shippingRegion === 'domestic'
+                                    ? 'bg-neutral-900 text-white'
+                                    : 'bg-white hover:bg-neutral-50'
+                                    }`}
+                            >
+                                US
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => setShippingRegion('international')}
+                                className={`px-3 py-1.5 border-l ${shippingRegion === 'international'
+                                    ? 'bg-neutral-900 text-white'
+                                    : 'bg-white hover:bg-neutral-50'
+                                    }`}
+                            >
+                                International
+                            </button>
+                        </div>
+                    </div>
+
                     <button
                         type="button"
                         onClick={onCheckout}
-                        disabled={lines.length === 0 || isCheckingOut}
+                        disabled={!checkoutEnabled || lines.length === 0 || isCheckingOut}
                         className="mt-3 w-full px-4 py-2 rounded-md text-sm font-medium bg-black text-white
-                       disabled:bg-neutral-300 disabled:cursor-not-allowed"
+             disabled:bg-neutral-300 disabled:cursor-not-allowed"
                     >
-                        {isCheckingOut ? 'Starting checkout…' : 'Checkout'}
+                        {!checkoutEnabled ? 'Checkout disabled' : isCheckingOut ? 'Starting checkout…' : 'Checkout'}
                     </button>
                 </div>
             </aside>
