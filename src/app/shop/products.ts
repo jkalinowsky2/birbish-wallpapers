@@ -206,7 +206,7 @@ export const CUSTOM_PRODUCTS: Product[] = [
                     image: "/assets/store/stickers/myotherbirb.png",
                         priceId: "price_1STSql0n54kwZghJct2G53rB-UPDATE", //
                         giftOnly: false,
-                        outOfStock: false, 
+                        outOfStock: true, 
                         
     },
 
@@ -218,7 +218,7 @@ export const CUSTOM_PRODUCTS: Product[] = [
                     image: "/assets/store/stickers/tenpack.png",
                         priceId: "price_1STSql0n54kwZghJct2G53rB-UPDATE", //
                         giftOnly: false,
-                        outOfStock: false, 
+                        outOfStock: true, 
                         
     },
 ]
