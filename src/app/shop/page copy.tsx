@@ -565,7 +565,7 @@ export default function ShopPage() {
                     </section>
                 </div>
 
-                <CartDrawer
+                {/* <CartDrawer
                     open={isCartOpen}
                     onClose={() => setIsCartOpen(false)}
                     cart={cart}
@@ -574,7 +574,7 @@ export default function ShopPage() {
                     totalPrice={totalPrice}
                     onCheckout={handleCheckout}
                     isCheckingOut={isCheckingOut}
-                />
+                /> */}
 
                 {/* Cart / checkout bar – now full-width since parent is full-width */}
                 <div className="sticky bottom-0 border-t z-40 py-4">
