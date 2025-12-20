@@ -2,12 +2,14 @@
 'use client'
 import { OrdersClosedAnnouncement } from "@/components/OrdersClosedAnnouncement";
 import { siteConfig } from "@/config/siteConfig"
+import { CartDrawer } from '@/components/CartDrawer'
 
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import {
     STICKER_PRODUCTS,
     DECAL_PRODUCTS,
+    CUSTOM_PRODUCTS,
     ALL_PRODUCTS,
     type Product,
     getTieredUnitPrice,
@@ -35,56 +37,58 @@ export default function ShopPage() {
     const [shippingRegion, setShippingRegion] =
         useState<'domestic' | 'international'>('domestic')
 
-        ///NEW HOLDER CHECK:
-        // ✅ Call the API to check holder status whenever the wallet changes
-useEffect(() => {
-  let cancelled = false
+    const [isCartOpen, setIsCartOpen] = useState(false)
 
-  async function loadHolderStatus() {
-    // wallet disconnected -> reset UI state
-    if (!address) {
-      setIsHolder(false)
-      setHasClaimedGift(false)
-      setRemainingGifts(null)
-      return
-    }
+    ///NEW HOLDER CHECK:
+    // ✅ Call the API to check holder status whenever the wallet changes
+    useEffect(() => {
+        let cancelled = false
 
-    try {
-      const res = await fetch('/api/holder-status', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        cache: 'no-store',
-        body: JSON.stringify({ address }),
-      })
+        async function loadHolderStatus() {
+            // wallet disconnected -> reset UI state
+            if (!address) {
+                setIsHolder(false)
+                setHasClaimedGift(false)
+                setRemainingGifts(null)
+                return
+            }
 
-      const data = await res.json()
-      console.log('[shop] holder-status:', data)
+            try {
+                const res = await fetch('/api/holder-status', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    cache: 'no-store',
+                    body: JSON.stringify({ address }),
+                })
 
-      if (cancelled) return
+                const data = await res.json()
+                console.log('[shop] holder-status:', data)
 
-      setIsHolder(!!data?.isHolder)
-      setHasClaimedGift(!!data?.hasClaimedGift)
-      setRemainingGifts(
-        typeof data?.remainingGifts === 'number' ? data.remainingGifts : null
-      )
-    } catch (err) {
-      console.error('[shop] holder-status error:', err)
-      if (!cancelled) {
-        setIsHolder(false)
-        setHasClaimedGift(false)
-        setRemainingGifts(null)
-      }
-    }
-  }
+                if (cancelled) return
 
-  loadHolderStatus()
+                setIsHolder(!!data?.isHolder)
+                setHasClaimedGift(!!data?.hasClaimedGift)
+                setRemainingGifts(
+                    typeof data?.remainingGifts === 'number' ? data.remainingGifts : null
+                )
+            } catch (err) {
+                console.error('[shop] holder-status error:', err)
+                if (!cancelled) {
+                    setIsHolder(false)
+                    setHasClaimedGift(false)
+                    setRemainingGifts(null)
+                }
+            }
+        }
 
-  return () => {
-    cancelled = true
-  }
-}, [address])
+        loadHolderStatus()
 
-///END HOLDER CHECK
+        return () => {
+            cancelled = true
+        }
+    }, [address])
+
+    ///END HOLDER CHECK
 
 
 
@@ -224,333 +228,7 @@ useEffect(() => {
         totalPrice >= REQ_MIN &&
         (remainingGifts === null || remainingGifts > 0)
 
-    // helper to render products for a given category
-    // const renderProducts = (items: Product[]) =>
-    //     items.map((product) => {
-    //         const qty = cart[product.priceId] ?? 0
-    //         const isGiftOnly = product.giftOnly === true
 
-    //         return (
-    //             <article
-    //                 key={product.id}
-    //                 className={`relative flex flex-col rounded-lg overflow-hidden shadow-sm border border-neutral-200/60
-    //   bg-white transition duration-150 ease-out
-    //   hover:shadow-md hover:brightness-[1.03] hover:border-neutral-300
-    //   ${isGiftOnly ? 'bg-[#fffdf7] ring-1 ring-amber-200/60' : ''}
-    // `}
-    //             >
-
-    // OLD RENDER PRODUCTS
-    // const renderProducts = (items: Product[]) =>
-    //     items.map((product) => {
-    //         const isGiftOnly = product.giftOnly === true
-    //         const isOutOfStock = product.outOfStock === true
-
-    //         // if out of stock, force qty to 0 so it doesn’t sneak into the cart
-    //         const qty = isOutOfStock ? 0 : (cart[product.priceId] ?? 0)
-
-    //         return (
-    //             <article
-    //                 key={product.id}
-    //                 className={`relative flex flex-col rounded-lg overflow-hidden shadow-sm border border-neutral-200/60
-    //   bg-white transition duration-150 ease-out
-    //   ${!isOutOfStock ? 'hover:shadow-md hover:brightness-[1.03] hover:border-neutral-300' : ''}
-    //   ${isGiftOnly ? 'bg-[#fffdf7] ring-1 ring-amber-200/60' : ''}
-    //   ${isOutOfStock ? 'opacity-60' : ''}
-    // `}
-    //             >
-
-    //                 {/* 🔸 Holder-perk badge (top-left of card, stays where it is) */}
-    //                 {isGiftOnly && (
-    //                     <span
-    //                         className="absolute left-2 top-2 rounded-full bg-amber-100 px-2 py-0.5
-    //     text-[10px] font-semibold uppercase tracking-wide text-[#b20000] border border-amber-300 shadow-sm"
-    //                     >
-    //                         Holder perk
-    //                     </span>
-    //                 )}
-
-    //                 {/* 🔹 Image wrapper – Out Of Stock badge moved HERE */}
-    //                 <div className="relative aspect-[3/2] sm:aspect-[4/3]">
-    //                     <Image
-    //                         src={product.image}
-    //                         alt={product.name}
-    //                         fill
-    //                         sizes="(min-width: 1024px) 20vw, 50vw"
-    //                         style={{ objectFit: 'contain' }}
-    //                     />
-
-    //                     {/* 🔥 Out of stock pill NOW on top of the image */}
-    //                     {isOutOfStock && (
-    //                         <span
-    //                             className="absolute right-2 top-2 rounded-full bg-neutral-900/90 px-2 py-0.5
-    //         text-[10px] font-semibold uppercase tracking-wide text-white shadow-sm"
-    //                         >
-    //                             Out of stock
-    //                         </span>
-    //                     )}
-    //                 </div>
-
-    //                 {/* body */}
-    //                 <div className="p-3 flex flex-col gap-2 flex-1">
-    //                     <div>
-    //                         <h2 className="text-sm font-semibold leading-snug">
-    //                             {product.name}
-    //                         </h2>
-    //                         <p className="text-xs text-neutral-600 mt-1 leading-relaxed">
-    //                             {product.description}
-    //                         </p>
-    //                     </div>
-
-    //                     <div className="mt-auto flex items-center justify-between">
-    //                         {product.giftOnly ? (
-    //                             <span className="text-sm font-semibold flex items-center gap-2">
-    //                                 <span className="line-through text-neutral-400">
-    //                                     {product.priceLabel}
-    //                                 </span>
-    //                             </span>
-    //                         ) : (
-    //                             <span className="text-sm font-semibold">
-    //                                 {product.priceLabel}
-    //                             </span>
-    //                         )}
-
-    //                         {isGiftOnly ? (
-    //                             <div className="text-right text-sm leading-tight">
-    //                                 {typeof remainingGifts === 'number' && (
-    //                                     <div className="text-sm font-semibold text-neutral-400">
-    //                                         {remainingGifts} stickers left
-    //                                     </div>
-    //                                 )}
-    //                             </div>
-    //                         ) : isOutOfStock ? (
-    //                             <div className="text-xs font-semibold text-red-600 text-right">
-    //                                 Out of stock
-    //                             </div>
-    //                         ) : (
-    //                             <div className="inline-flex items-center gap-2">
-    //                                 <button
-    //                                     type="button"
-    //                                     className="h-6 w-6 rounded-full border border-neutral-300 text-sm leading-none hover:bg-neutral-200"
-    //                                     onClick={() =>
-    //                                         setQuantity(product.priceId, Math.max(0, qty - 1))
-    //                                     }
-    //                                 >
-    //                                     –
-    //                                 </button>
-    //                                 <input
-    //                                     type="number"
-    //                                     min={0}
-    //                                     step={1}
-    //                                     value={qty}
-    //                                     onChange={(e) => {
-    //                                         const raw = Number(e.target.value)
-    //                                         const clean = Math.max(0, Math.floor(raw) || 0)
-    //                                         setQuantity(product.priceId, clean)
-    //                                     }}
-    //                                     className="w-10 h-8 text-center text-sm border border-neutral-300 rounded-md bg-neutral-50"
-    //                                 />
-    //                                 <button
-    //                                     type="button"
-    //                                     className="h-6 w-6 rounded-full border bg-neutral-900 text-white text-sm leading-none hover:bg-[#b20b2b]"
-    //                                     onClick={() => setQuantity(product.priceId, qty + 1)}
-    //                                 >
-    //                                     +
-    //                                 </button>
-    //                             </div>
-    //                         )}
-    //                     </div>
-    //                 </div>
-    //             </article>
-    //         )
-    //     })
-    //NEW RENDER PRODUCTS WITH INVENTORY
-
-
-    // const renderProducts = (items: Product[]) =>
-    //     items.map((product) => {
-    //         const isGiftOnly = product.giftOnly === true
-
-    //         // 🔹 Look up inventory from DB using priceId
-    //         const inventoryQty = inventoryByPriceId[product.priceId]
-
-    //         // 🔹 Treat 0 or negative inventory as out of stock
-    //         const isOutOfStock =
-    //             product.outOfStock === true ||
-    //             (typeof inventoryQty === 'number' && inventoryQty <= 0)
-
-    //         // if out of stock, force qty to 0 so it doesn’t sneak into the cart
-    //         const qty = isOutOfStock ? 0 : (cart[product.priceId] ?? 0)
-
-    //         const tiers = product.tiers ?? []
-    //         const bestTier =
-    //             tiers.length > 0
-    //                 ? [...tiers].sort((a, b) => a.minQty - b.minQty)[tiers.length - 1]
-    //                 : null
-
-    //         return (
-    //             <article
-    //                 key={product.id}
-    //                 className={`relative flex flex-col rounded-lg overflow-hidden shadow-sm border border-neutral-200/60
-    //   bg-white transition duration-150 ease-out
-    //   ${!isOutOfStock ? 'hover:shadow-md hover:brightness-[1.03] hover:border-neutral-300' : ''}
-    //   ${isGiftOnly ? 'bg-[#fffdf7] ring-1 ring-amber-200/60' : ''}
-    //   ${isOutOfStock ? 'opacity-60' : ''}
-    // `}
-    //             >
-
-    //                 {/* 🔸 Holder-perk badge (top-left of card, stays where it is) */}
-    //                 {isGiftOnly && (
-    //                     <span
-    //                         className="absolute left-2 top-2 rounded-full bg-amber-100 px-2 py-0.5
-    //     text-[10px] font-semibold uppercase tracking-wide text-[#b20000] border border-amber-300 shadow-sm"
-    //                     >
-    //                         Holder perk
-    //                     </span>
-    //                 )}
-
-    //                 {/* 🔹 Image wrapper – Out Of Stock badge on top of the image */}
-    //                 <div className="relative aspect-[3/2] sm:aspect-[4/3]">
-    //                     <Image
-    //                         src={product.image}
-    //                         alt={product.name}
-    //                         fill
-    //                         sizes="(min-width: 1024px) 20vw, 50vw"
-    //                         style={{ objectFit: 'contain' }}
-    //                     />
-
-    //                     {isOutOfStock && (
-    //                         <span
-    //                             className="absolute right-2 top-2 rounded-full bg-neutral-900/90 px-2 py-0.5
-    //         text-[10px] font-semibold uppercase tracking-wide text-white shadow-sm"
-    //                         >
-    //                             Out of stock
-    //                         </span>
-    //                     )}
-    //                 </div>
-
-    //                 {/* body */}
-    //                 <div className="p-3 flex flex-col gap-2 flex-1">
-    //                     <div>
-    //                         <h2 className="text-sm font-semibold leading-snug">
-    //                             {product.name}
-    //                         </h2>
-    //                         <p className="text-xs text-neutral-600 mt-1 leading-relaxed">
-    //                             {product.description}
-    //                         </p>
-
-    //                         {/* 🔹 Inventory display */}
-    //                         {siteConfig.showInventory && typeof inventoryQty === 'number' && (
-    //                             <p className="mt-1 text-[11px] text-neutral-500">
-    //                                 {inventoryQty > 0 ? `${inventoryQty} in stock` : 'Out of stock'}
-    //                             </p>
-    //                         )}
-    //                     </div>
-
-    //                     <div className="mt-auto flex items-center justify-between">
-    //                         {product.giftOnly ? (
-    //                             <span className="text-sm font-semibold flex items-center gap-2">
-    //                                 <span className="line-through text-neutral-400">
-    //                                     {product.priceLabel}
-    //                                 </span>
-    //                             </span>
-    //                         ) : (
-    //                             <span className="flex flex-col items-start text-sm">
-    //                                 {/* Base price */}
-    //                                 <span className="font-semibold">{product.priceLabel}</span>
-
-    //                                 {/* 🔹 Tier hint (e.g. "10+ for $2.50 each") */}
-    //                                 {bestTier && (
-    //                                     <span className="mt-0.5 text-[11px] text-emerald-700 font-medium">
-    //                                         {bestTier.minQty}
-    //                                         {typeof bestTier.maxQty === 'number'
-    //                                             ? `–${bestTier.maxQty}`
-    //                                             : '+'}{' '}
-    //                                         for ${bestTier.unitPrice.toFixed(2)} each
-    //                                     </span>
-    //                                 )}
-    //                             </span>
-    //                         )}
-    //                         {/* {product.giftOnly ? (
-    //                             <span className="text-sm font-semibold flex items-center gap-2">
-    //                                 <span className="line-through text-neutral-400">
-    //                                     {product.priceLabel}
-    //                                 </span>
-    //                             </span>
-    //                         ) : (
-    //                             <span className="text-sm font-semibold">
-    //                                 {product.priceLabel}
-    //                             </span>
-    //                         )} */}
-
-
-
-    //                         {isGiftOnly ? (
-    //                             <div className="text-right text-sm leading-tight">
-    //                                 {typeof remainingGifts === 'number' && (
-    //                                     <div className="text-sm font-semibold text-neutral-400">
-    //                                         {remainingGifts} stickers left
-    //                                     </div>
-    //                                 )}
-    //                             </div>
-    //                         ) : isOutOfStock ? (
-    //                             <div className="text-xs font-semibold text-red-600 text-right">
-    //                                 Out of stock
-    //                             </div>
-    //                         ) : (
-    //                             <div className="inline-flex items-center gap-2">
-    //                                 <button
-    //                                     type="button"
-    //                                     className="h-6 w-6 rounded-full border border-neutral-300 text-sm leading-none hover:bg-neutral-200"
-    //                                     onClick={() =>
-    //                                         setQuantity(product.priceId, Math.max(0, qty - 1))
-    //                                     }
-    //                                 >
-    //                                     –
-    //                                 </button>
-    //                                 <input
-    //                                     type="number"
-    //                                     min={0}
-    //                                     step={1}
-    //                                     value={qty}
-    //                                     onChange={(e) => {
-    //                                         const raw = Number(e.target.value)
-    //                                         const clean = Math.max(0, Math.floor(raw) || 0)
-
-    //                                         // ⭐ NEW — Only limit quantity when the config flag is enabled
-    //                                         const finalQty =
-    //                                             siteConfig.limitOrdersToInventory && typeof inventoryQty === 'number'
-    //                                                 ? Math.min(clean, inventoryQty)
-    //                                                 : clean
-
-    //                                         setQuantity(product.priceId, finalQty)
-    //                                     }}
-    //                                     className="w-10 h-8 text-center text-sm border border-neutral-300 rounded-md bg-neutral-50"
-    //                                 />
-    //                                 <button
-    //                                     type="button"
-    //                                     className="h-6 w-6 rounded-full border bg-neutral-900 text-white text-sm leading-none hover:bg-[#b20b2b]"
-    //                                     // onClick={() => setQuantity(product.priceId, qty + 1)}
-    //                                     onClick={() => {
-    //                                         const nextQty = qty + 1
-
-    //                                         const finalQty =
-    //                                             siteConfig.limitOrdersToInventory && typeof inventoryQty === 'number'
-    //                                                 ? Math.min(nextQty, inventoryQty)
-    //                                                 : nextQty
-
-    //                                         setQuantity(product.priceId, finalQty)
-    //                                     }}
-    //                                 >
-    //                                     +
-    //                                 </button>
-    //                             </div>
-    //                         )}
-    //                     </div>
-    //                 </div>
-    //             </article>
-    //         )
-    //     })
     const renderProducts = (items: Product[]) =>
         items.map((product) => {
             const isGiftOnly = product.giftOnly === true
@@ -875,7 +553,28 @@ useEffect(() => {
                             {renderProducts(DECAL_PRODUCTS)}
                         </div>
                     </section>
+
+                    {/* Custom */}
+                    <section className="space-y-2 mt-4">
+                        <h2 className="text-lg font-semibold tracking-wide text-neutral-800">
+                            Custom Stickers
+                        </h2>
+                        <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 py-4">
+                            {renderProducts(CUSTOM_PRODUCTS)}
+                        </div>
+                    </section>
                 </div>
+
+                <CartDrawer
+                    open={isCartOpen}
+                    onClose={() => setIsCartOpen(false)}
+                    cart={cart}
+                    products={ALL_PRODUCTS}
+                    setQuantity={setQuantity}
+                    totalPrice={totalPrice}
+                    onCheckout={handleCheckout}
+                    isCheckingOut={isCheckingOut}
+                />
 
                 {/* Cart / checkout bar – now full-width since parent is full-width */}
                 <div className="sticky bottom-0 bg-[#f7f7f7] border-t z-40 py-4">
@@ -939,7 +638,76 @@ useEffect(() => {
 
                         {/* Right: region selector + checkout buttons aligned right */}
                         {/* Buttons */}
+
+                        {/* Shipping region toggle
+                        <div className="flex items-center gap-2 text-xs text-neutral-700">
+                            <span className="font-medium">Shipping:</span>
+
+                            <div className="inline-flex rounded-md border overflow-hidden">
+                                <button
+                                    type="button"
+                                    onClick={() => setShippingRegion('domestic')}
+                                    className={`px-3 py-1 ${shippingRegion === 'domestic'
+                                            ? 'bg-neutral-900 text-white'
+                                            : 'bg-white hover:bg-neutral-50'
+                                        }`}
+                                >
+                                    US
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={() => setShippingRegion('international')}
+                                    className={`px-3 py-1 border-l ${shippingRegion === 'international'
+                                            ? 'bg-neutral-900 text-white'
+                                            : 'bg-white hover:bg-neutral-50'
+                                        }`}
+                                >
+                                    International
+                                </button>
+                            </div>
+                        </div> */}
+                        {/* NEW */}
+
                         <div className="flex flex-col items-end gap-2 w-full sm:w-auto">
+                            {/* Shipping region toggle — MOVED HERE */}
+                            <div className="flex items-center gap-2 text-xs text-neutral-700">
+                                <span className="font-medium">Shipping</span>
+
+                                <div className="inline-flex rounded-md border overflow-hidden">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShippingRegion('domestic')}
+                                        className={`px-3 py-1 ${shippingRegion === 'domestic'
+                                                ? 'bg-neutral-900 text-white'
+                                                : 'bg-white hover:bg-neutral-50'
+                                            }`}
+                                    >
+                                        US
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => setShippingRegion('international')}
+                                        className={`px-3 py-1 border-l ${shippingRegion === 'international'
+                                                ? 'bg-neutral-900 text-white'
+                                                : 'bg-white hover:bg-neutral-50'
+                                            }`}
+                                    >
+                                        International
+                                    </button>
+                                </div>
+                            </div>
+                            {/* CartDrawer */}
+                            {/* <button
+                                type="button"
+                                onClick={() => setIsCartOpen(true)}
+                                disabled={!totalItems}
+                                className="px-5 py-2 rounded-md text-sm font-medium border
+             disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
+                            >
+                                View cart ({totalItems})
+                            </button> */}
 
                             {/* Main checkout button */}
                             <button
@@ -984,7 +752,7 @@ useEffect(() => {
 
                 </div>
                 <div className="text-xs text-neutral-500 text-center md:text-right mx-10 my-1 sm:mx-0">
-                    <p> Now shipping to the following countries: US, Canada, Mexico, Australia, UK, Germany, South Korea, Japan, Thailand, New Zealand, & Singapore</p>
+                    <p> Now shipping to the following countries: US, Canada, Mexico, Australia, UK, Germany, Hungary, South Korea, Japan, Thailand, New Zealand, & Singapore</p>
 
 
                 </div>

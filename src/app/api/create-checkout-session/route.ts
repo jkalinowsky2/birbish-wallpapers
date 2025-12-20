@@ -179,6 +179,7 @@ if (lineItems.length === 0) {
             'TH', //Thailand
             'NZ', //New Zealand
             'SG', //Singapore
+            'HU', //Hungary
             
             // 'FR',
             // 'NZ', 

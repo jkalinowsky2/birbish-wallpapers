@@ -179,17 +179,7 @@ export const STICKER_PRODUCTS: Product[] = [
                         
     },
 
-        {
-    id: "my-other-birb",
-        name: "Custom 'My Other Birb...' Sticker - 10 Pack",
-            priceLabel: "$32.00",
-                description: "10 pack of stickers customized for your birb. 3 x 3 inches.",
-                    image: "/assets/store/stickers/myotherbirb.png",
-                        priceId: "price_1STSql0n54kwZghJct2G53rB-UPDATE", //
-                        giftOnly: false,
-                        outOfStock: true, 
-                        
-    },
+       
 ];
 
 
@@ -206,10 +196,38 @@ export const DECAL_PRODUCTS: Product[] = [
     },
 ]
 
+// 🔹 New transfer decals
+export const CUSTOM_PRODUCTS: Product[] = [
+ {
+    id: "my-other-birb",
+        name: "Custom 'My Other Birb...' Sticker - 10 Pack",
+            priceLabel: "$15.00",
+                description: "10 pack of stickers customized for your birb. 3 x 3 inches.",
+                    image: "/assets/store/stickers/myotherbirb.png",
+                        priceId: "price_1STSql0n54kwZghJct2G53rB-UPDATE", //
+                        giftOnly: false,
+                        outOfStock: false, 
+                        
+    },
+
+     {
+    id: "square-moonbird",
+        name: "Custom Moonbird Square 10 Pack",
+            priceLabel: "$12.00",
+                description: "10 pack of stickers customized for your birb. 3 x 3 inches.",
+                    image: "/assets/store/stickers/tenpack.png",
+                        priceId: "price_1STSql0n54kwZghJct2G53rB-UPDATE", //
+                        giftOnly: false,
+                        outOfStock: false, 
+                        
+    },
+]
+
 // 🔹 Helper that includes *everything* for totals, etc.
 export const ALL_PRODUCTS: Product[] = [
     ...STICKER_PRODUCTS,
     ...DECAL_PRODUCTS,
+    ...CUSTOM_PRODUCTS,
 ]
 
 export function getTierForQuantity(product: Product, qty: number): PriceTier | null {
