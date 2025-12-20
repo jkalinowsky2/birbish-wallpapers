@@ -162,7 +162,7 @@ export const STICKER_PRODUCTS: Product[] = [
             priceLabel: "$5.00",
                 description: "birb. Euro sticker. 5 x 3 inches.",
                     image: "/assets/store/stickers/birbeurosticker.png",
-                        priceId: "price_1SRxuC0n54kwZghJqVLWMmbI", //
+                        priceId: "price_1SgPeq0n54kwZghJSPoehneW", //
                         outOfStock: false, 
 
 
