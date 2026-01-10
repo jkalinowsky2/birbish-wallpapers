@@ -108,6 +108,16 @@ export default function Header() {
               }`}          >
             Gallery
           </Link>
+
+          <Link
+            href="/ticker"
+            className={`px-0 py-2 rounded-lg text-sm font-medium 
+    ${pathname?.startsWith("/gallery")
+                ? ACTIVE_CLS
+                : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100"
+              }`}          >
+            🧹
+          </Link>
           {/* <Link
             href="/tip-jar"
             className="px-3 py-2 rounded-lg text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100"
@@ -137,7 +147,7 @@ export default function Header() {
             <span className="text-2xl">☰</span>
           </button>
         </div>
-        
+
       </div>
 
       {/* MOBILE MENU */}
@@ -224,6 +234,13 @@ export default function Header() {
             >
               Gallery
             </Link>
+            <Link
+              href="/ticker"
+              className={linkClasses("/ticker")}
+              onClick={() => setMobileOpen(false)}
+            >
+              🧹
+            </Link>
 
             {/* <Link
               href="/tip-jar"
@@ -270,16 +287,15 @@ function Dropdown({
             const active = pathname?.startsWith(it.href);
             return (
               <li key={it.href}>
-<Link
-  href={it.href}
-  className={`block px-3 py-2 text-sm ${
-    active
-      ? ACTIVE_CLS
-      : "text-neutral-700 hover:bg-neutral-100"
-  }`}
->
-  {it.label}
-</Link>
+                <Link
+                  href={it.href}
+                  className={`block px-3 py-2 text-sm ${active
+                    ? ACTIVE_CLS
+                    : "text-neutral-700 hover:bg-neutral-100"
+                    }`}
+                >
+                  {it.label}
+                </Link>
               </li>
             );
           })}

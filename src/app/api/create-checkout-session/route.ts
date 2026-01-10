@@ -2,7 +2,29 @@
 import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { kv } from '@vercel/kv'
-import { ALL_PRODUCTS, getTierForQuantity, getBaseUnitPrice } from '@/app/shop/products';
+import { ALL_PRODUCTS, CUSTOM_PRODUCTS, getTierForQuantity, getBaseUnitPrice } from '@/app/shop/products';
+import { randomUUID } from 'crypto'
+
+const MIN_CUSTOM_QTY = 5
+const PRODUCT_BY_PRICE_ID = new Map(ALL_PRODUCTS.map(p => [p.priceId, p]))
+const CUSTOM_PRICE_IDS = new Set(CUSTOM_PRODUCTS.map(p => p.priceId))
+
+const IS_TEST = (process.env.STRIPE_MODE ?? 'live') === 'test'
+
+const TEST_PRICE_MAP: Record<string, string> = process.env.STRIPE_TEST_PRICE_MAP
+    ? JSON.parse(process.env.STRIPE_TEST_PRICE_MAP)
+    : {}
+
+function mapToTestPrice(priceId: string) {
+    return TEST_PRICE_MAP[priceId] ?? priceId
+}
+const TEST_SHIP_MAP: Record<string, string> = process.env.STRIPE_TEST_SHIPPING_RATE_MAP
+    ? JSON.parse(process.env.STRIPE_TEST_SHIPPING_RATE_MAP)
+    : {}
+
+function mapToTestShippingRate(shippingRateId: string) {
+    return TEST_SHIP_MAP[shippingRateId] ?? shippingRateId
+}
 
 const secretKey = process.env.STRIPE_SECRET_KEY
 if (!secretKey) {
@@ -16,6 +38,8 @@ const stripe = new Stripe(secretKey, {
 type CartItem = {
     priceId: string
     quantity: number
+    tokenId?: string
+    variant?: 'illustrated' | 'pixel'
 }
 
 // Legacy single-rate fallback
@@ -30,6 +54,8 @@ const SHIP_SMALL_DOMESTIC = process.env.STRIPE_SHIP_SMALL_DOMESTIC
 const SHIP_LARGE_DOMESTIC = process.env.STRIPE_SHIP_LARGE_DOMESTIC
 const SHIP_SMALL_INTL = process.env.STRIPE_SHIP_SMALL_INTL
 const SHIP_LARGE_INTL = process.env.STRIPE_SHIP_LARGE_INTL
+
+
 
 export async function POST(request: Request) {
     try {
@@ -53,47 +79,128 @@ export async function POST(request: Request) {
             process.env.NEXT_PUBLIC_SITE_URL ??
             'http://localhost:3000'
 
-        // Normal cart line items
-// Normal cart line items (tier-aware)
-const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = []
+        // ---- Safety guard: never allow STRIPE_MODE=test on the live domain ----
+        const isLiveOrigin =
+            typeof origin === 'string' &&
+            (origin.includes('https://www.genmerch.xyz') || origin.includes('https://genmerch.xyz'))
 
-for (const item of items) {
-  if (!item.quantity || item.quantity <= 0) continue
+        if (isLiveOrigin && IS_TEST) {
+            return NextResponse.json(
+                { error: 'Refusing to run STRIPE_MODE=test on the live domain.' },
+                { status: 400 },
+            )
+        }
 
-  // Find the matching product by its base priceId
-  const product = ALL_PRODUCTS.find((p) => p.priceId === item.priceId)
+        // -------------------------------
+        // Build tier-aware line items (grouped by priceId)
+        // Also capture custom token breakdown for fulfillment
+        // -------------------------------
+        const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = []
 
-  // If we can't find the product, fall back to whatever came from the client
-  if (!product) {
-    lineItems.push({
-      price: item.priceId,
-      quantity: item.quantity,
-    })
-    continue
-  }
+        // priceId -> totalQty
+        const qtyByPriceId = new Map<string, number>()
 
-  // Try to find a tier for this quantity
-  const tier = getTierForQuantity(product, item.quantity)
-  const baseUnit = getBaseUnitPrice(product)
+        // store token breakdowns (only for custom lines)
+        // const customizations: Array<{ priceId: string; tokenId: string; quantity: number }> = []
+        const customizations: Array<{
+            priceId: string
+            tokenId: string
+            variant: 'illustrated' | 'pixel'
+            quantity: number
+            collection?: string
+        }> = []
 
-  // If no tier, or tier price == base price, just use the base priceId
-  if (!tier || tier.unitPrice === baseUnit) {
-    lineItems.push({
-      price: product.priceId,
-      quantity: item.quantity,
-    })
-  } else {
-    // Otherwise use the tier's Stripe priceId
-    lineItems.push({
-      price: tier.priceId,
-      quantity: item.quantity,
-    })
-  }
-}
+        for (const item of items) {
+            if (!item.quantity || item.quantity <= 0) continue
 
-if (lineItems.length === 0) {
-  return NextResponse.json({ error: 'Cart is empty.' }, { status: 400 })
-}
+            qtyByPriceId.set(item.priceId, (qtyByPriceId.get(item.priceId) ?? 0) + item.quantity)
+
+            // ✅ If it’s a custom product, it MUST include tokenId
+            if (CUSTOM_PRICE_IDS.has(item.priceId) && !item.tokenId) {
+                return NextResponse.json(
+                    { error: 'Custom sticker items must include tokenId.', code: 'CUSTOM_TOKEN_REQUIRED' },
+                    { status: 400 }
+                )
+            }
+
+            if (item.tokenId) {
+                const product = ALL_PRODUCTS.find((p) => p.priceId === item.priceId)
+
+                customizations.push({
+                    priceId: item.priceId,
+                    tokenId: String(item.tokenId),
+                    variant: item.variant ?? 'illustrated',
+                    quantity: item.quantity,
+                    collection: product?.customCollection, // e.g. 'moonbirds' | 'mythics'
+                })
+            }
+        }
+
+        // ✅ total custom qty across ALL custom products (mix & match)
+        const totalCustomQty = items.reduce((sum, it) => {
+            if (!it.quantity || it.quantity <= 0) return sum
+            return CUSTOM_PRICE_IDS.has(it.priceId) ? sum + it.quantity : sum
+        }, 0)
+
+        // ✅ Hard guard: if they have any custom stickers, they must have at least MIN_CUSTOM_QTY
+        if (totalCustomQty > 0 && totalCustomQty < MIN_CUSTOM_QTY) {
+            return NextResponse.json(
+                {
+                    error: `Custom stickers require a minimum of ${MIN_CUSTOM_QTY} total (mix & match).`,
+                    code: 'CUSTOM_MIN_NOT_MET',
+                    totalCustomQty,
+                    minCustomQty: MIN_CUSTOM_QTY,
+                },
+                { status: 400 }
+            )
+        }
+
+        // Build Stripe line items from grouped totals (this is what fixes tier pricing across tokens)
+        for (const [priceId, totalQtyForThisProduct] of qtyByPriceId.entries()) {
+            const product = ALL_PRODUCTS.find((p) => p.priceId === priceId)
+
+            // If we can't find the product, fall back to whatever came from the client
+            if (!product) {
+                lineItems.push({ price: priceId, quantity: totalQtyForThisProduct })
+                continue
+            }
+
+            // const isTest = (process.env.STRIPE_MODE ?? 'live') === 'test'
+
+            if (IS_TEST) {
+                // TEST: always use mapped base priceIds only
+                lineItems.push({
+                    price: mapToTestPrice(product.priceId),
+                    quantity: totalQtyForThisProduct,
+                })
+            }
+            // LIVE: tier-aware pricing
+            // ✅ Custom products tier based on TOTAL custom qty (mix & match)
+            // ✅ Non-custom products tier based on qty for that product
+            const pricingQty = product.customCollection ? totalCustomQty : totalQtyForThisProduct
+
+            const tier = getTierForQuantity(product, pricingQty)
+            const baseUnit = getBaseUnitPrice(product)
+
+            if (!tier || tier.unitPrice === baseUnit) {
+                lineItems.push({
+                    price: product.priceId,
+                    quantity: totalQtyForThisProduct,
+                })
+            } else {
+                lineItems.push({
+                    price: tier.priceId,
+                    quantity: totalQtyForThisProduct,
+                })
+            }
+        }
+
+        if (lineItems.length === 0) {
+            return NextResponse.json({ error: 'Cart is empty.' }, { status: 400 })
+        }
+        console.log('[checkout] items:', items)
+        console.log('[checkout] grouped qtyByPriceId:', Array.from(qtyByPriceId.entries()))
+
 
         // -------------------------------
         // Server-side gift eligibility
@@ -160,6 +267,9 @@ if (lineItems.length === 0) {
         if (!shippingRateId && SHIPPING_RATE_ID) {
             shippingRateId = SHIPPING_RATE_ID
         }
+        if (shippingRateId) {
+            shippingRateId = mapToTestShippingRate(shippingRateId)
+        }
 
         // -------------------------------
         // Allowed countries based on region
@@ -180,7 +290,7 @@ if (lineItems.length === 0) {
             'NZ', //New Zealand
             'SG', //Singapore
             'HU', //Hungary
-            
+
             // 'FR',
             // 'NZ', 
             // 'IE',
@@ -220,6 +330,30 @@ if (lineItems.length === 0) {
             metadata: {},
         }
 
+        // -------------------------------
+        // Persist custom token breakdown for fulfillment
+        // -------------------------------
+        if (customizations.length > 0) {
+            const customRef = randomUUID()
+
+            // Store full detail in KV (keep Stripe metadata small)
+            await kv.set(
+                `customizations:${customRef}`,
+                {
+                    customizations,
+                    wallet: wallet || null,
+                    createdAt: Date.now(),
+                },
+                { ex: 60 * 60 * 24 * 30 } // 30 days
+            )
+
+            params.metadata = {
+                ...params.metadata,
+                customRef,
+                customCount: String(customizations.length),
+            }
+        }
+
         // Attach wallet for reconciliation
         if (wallet) {
             params.metadata = {
@@ -248,6 +382,14 @@ if (lineItems.length === 0) {
             params.metadata = {
                 ...params.metadata,
                 giftIntent: 'false',
+            }
+        }
+
+        if (IS_TEST) {
+            for (const li of lineItems) {
+                if (!li.price?.startsWith('price_')) {
+                    throw new Error(`Invalid test price detected: ${li.price}`)
+                }
             }
         }
 

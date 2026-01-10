@@ -16,3 +16,11 @@ Add free gift on live stripe site and update Vars - DONE
 Create/check webhook on live stripe site - done?
 
 CHECK SHIPPING RATE ID IN LIVE STRIPE IS CORREXCT IN VERCEL
+
+Diecut
+LIVE priceId for Custom A: price_...price_1SgpRG0n54kwZghJhclCiwY5
+TEST priceId for Custom A: price_...price_1SgpO714Mz115JiaWtUzQEoe
+
+Square
+LIVE priceId for Custom B: price_...price_1Sgbq60n54kwZghJk0TDvL4f
+TEST priceId for Custom B: price_...price_1SgpNV14Mz115JiagOiqjRP4

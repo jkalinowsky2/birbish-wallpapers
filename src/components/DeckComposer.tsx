@@ -48,12 +48,12 @@ type BuildMode = 'custom' | 'jk'
 
 /* ---------- Small UI helpers ---------- */
 function Field({ labelText, children, className }: { labelText: string; children: React.ReactNode; className?: string }) {
-  return (
-    <label className={`flex flex-col gap-2 ${className ?? ''}`}>
-      <span className="text-sm font-medium">{labelText}</span>
-      {children}
-    </label>
-  )
+    return (
+        <label className={`flex flex-col gap-2 ${className ?? ''}`}>
+            <span className="text-sm font-medium">{labelText}</span>
+            {children}
+        </label>
+    )
 }
 // function Field({
 //     labelText,
@@ -528,6 +528,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
     const [style, setStyle] = useState<'illustrated' | 'pixel'>('illustrated')
     const layout: LayoutMode = 'horizontalLeft'
     const [tokenScale, setTokenScale] = useState<number>(3.25)
+    const [tokenRotation, setTokenRotation] = useState<number>(0) // NEW (degrees)
     const [offsetX, setOffsetX] = useState<number>(-40)
     const [offsetY, setOffsetY] = useState<number>(60)
     const nudgeValue = 100
@@ -816,11 +817,16 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
 
                         const prev = ctx.imageSmoothingEnabled
                         ctx.imageSmoothingEnabled = !(style === 'pixel')
+
                         ctx.save()
                         ctx.translate(cx, cy)
-                        ctx.rotate(Math.PI / 2)
+
+                        // existing base rotate (90°) + NEW user rotation
+                        ctx.rotate(Math.PI / 2 + (tokenRotation * Math.PI) / 180)
+
                         ctx.drawImage(tokenImg, -tW / 2, -tH / 2, tW, tH)
                         ctx.restore()
+
                         ctx.imageSmoothingEnabled = prev
                     } else {
                         const baseDx = Math.round((W - tW) / 2)
@@ -830,7 +836,14 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
 
                         const prev = ctx.imageSmoothingEnabled
                         ctx.imageSmoothingEnabled = !(style === 'pixel')
-                        ctx.drawImage(tokenImg, dx, dy, tW, tH)
+
+                        // NEW: rotate around the token center
+                        ctx.save()
+                        ctx.translate(dx + tW / 2, dy + tH / 2)
+                        ctx.rotate((tokenRotation * Math.PI) / 180)
+                        ctx.drawImage(tokenImg, -tW / 2, -tH / 2, tW, tH)
+                        ctx.restore()
+
                         ctx.imageSmoothingEnabled = prev
                     }
                 }
@@ -841,9 +854,11 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
 
                 const url = c.toDataURL('image/png')
                 if (!cancelled) setBottomPreviewUrl(url)
-            } catch {
+            } catch (err) {
+                console.error('COMPOSITOR FAILED', err)
                 if (!cancelled) setBottomPreviewUrl((prev) => prev)
             }
+
         }
 
         buildBottom()
@@ -858,7 +873,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
         glyphId4, selectedGlyph4?.image, glyph4Scale, glyph4OffsetX, glyph4OffsetY, glyph4Rotation, glyph4FlipX,
         glyphId5, selectedGlyph5?.image, glyph5Scale, glyph5OffsetX, glyph5OffsetY, glyph5Rotation, glyph5FlipX,
         glyphId6, selectedGlyph6?.image, glyph6Scale, glyph6OffsetX, glyph6OffsetY, glyph6Rotation, glyph6FlipX,
-        tokenId, style, tokenScale, offsetX, offsetY, textValue, textColor, textFont, textScale, textOffsetX, textOffsetY, textRotation, textBlend,
+        tokenId, style, tokenScale, tokenRotation, offsetX, offsetY, textValue, textColor, textFont, textScale, textOffsetX, textOffsetY, textRotation, textBlend,
     ])
 
     // helpers
@@ -1080,9 +1095,11 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
 
             setQuoteMessage('Got it! Your design was submitted for a quote.')
         } catch (err) {
+
             console.error(err)
             setQuoteMessage('Something went wrong submitting your quote. Please try again.')
-        } finally {
+        }
+        finally {
             setQuotePending(false)
         }
     }
@@ -1397,51 +1414,61 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                                 </OptionsGrid>
                                             </AccordionSection>
 
+                                            {/* Moonbird Token            */}
                                             <AccordionSection
                                                 title="Moonbird Token"
                                                 open={openId === 'token'}
                                                 onToggle={(next) => setOpenId(next ? 'token' : '')}
                                             >
-                                                <div className="space-y-4">
+                                                <div className="space-y-3">
+                                                    {/* Token ID + Illustrated/Pixel toggle (same "header" row style) */}
                                                     <Field labelText="Token ID">
-                                                        <div className="flex flex-wrap items-center gap-2">
+                                                        <div className="flex items-center gap-3">
                                                             <input
-                                                                className="input w-36"
+                                                                className="input w-24"   // ⬅ narrower
                                                                 type="number"
-                                                                placeholder="e.g. 8209"
+                                                                placeholder="8209"
                                                                 min={1}
                                                                 value={tokenId}
                                                                 onChange={(e) => setTokenId(e.target.value.trim())}
                                                                 disabled={controlsDisabled}
                                                             />
-                                                            <div className="flex gap-1">
+
+                                                            <div className="inline-flex rounded-full bg-neutral-200 p-1">
                                                                 <button
                                                                     type="button"
-                                                                    className={`btn ${style === 'illustrated' ? 'btn-primary' : 'btn-ghost'}`}
                                                                     onClick={() => setStyle('illustrated')}
+                                                                    className={`px-4 py-2 text-sm font-medium rounded-full transition-all duration-200
+          ${style === 'illustrated'
+                                                                            ? 'bg-[#d12429] text-white shadow-sm'
+                                                                            : 'text-neutral-700 hover:bg-neutral-300'}
+        `}
                                                                     disabled={!ILLU_BASE || controlsDisabled}
-                                                                    title={ILLU_BASE ? 'Use illustrated' : 'Set NEXT_PUBLIC_MOONBIRDS_ILLU_BASE'}
                                                                 >
                                                                     Illustrated
                                                                 </button>
+
                                                                 <button
                                                                     type="button"
-                                                                    className={`btn ${style === 'pixel' ? 'btn-primary' : 'btn-ghost'}`}
                                                                     onClick={() => setStyle('pixel')}
+                                                                    className={`px-4 py-2 text-sm font-medium rounded-full transition-all duration-200
+          ${style === 'pixel'
+                                                                            ? 'bg-[#d12429] text-white shadow-sm'
+                                                                            : 'text-neutral-700 hover:bg-neutral-300'}
+        `}
                                                                     disabled={!PIXEL_BASE || controlsDisabled}
-                                                                    title={PIXEL_BASE ? 'Use pixel' : 'Set NEXT_PUBLIC_MOONBIRDS_PIXEL_BASE'}
                                                                 >
                                                                     Pixel
                                                                 </button>
                                                             </div>
                                                         </div>
-                                                        <p className="text-xs text-neutral-500">Token is composited onto the selected background.</p>
                                                     </Field>
 
-                                                    <Field labelText="Token Scale">
-                                                        <div className="flex items-center gap-2">
+                                                    {/* Scale (match Sticker: number only, no slider/reset row) */}
+                                                    <div className="flex items-end gap-3 sm:gap-4 flex-wrap sm:flex-nowrap">
+                                                        <Field labelText="Scale" className="w-[100px] shrink-0">
                                                             <input
-                                                                className="input w-28"
+                                                                className="input h-11 w-full"
                                                                 type="number"
                                                                 step={0.25}
                                                                 min={0.25}
@@ -1449,58 +1476,102 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                                                 value={tokenScale}
                                                                 onChange={(e) => {
                                                                     const n = Number(e.target.value)
-                                                                    setTokenScale(Number.isFinite(n) ? Math.max(0.05, Math.min(10, n)) : 1)
+                                                                    setTokenScale(Number.isFinite(n) ? Math.max(0.25, Math.min(10, n)) : 1)
                                                                 }}
-                                                                title="Multiply the base size"
+                                                                disabled={controlsDisabled}
                                                             />
-                                                            <input
-                                                                className="w-full accent-neutral-800"
-                                                                type="range"
-                                                                min={0.25}
-                                                                max={5}
-                                                                step={0.25}
-                                                                value={tokenScale}
-                                                                onChange={(e) => setTokenScale(Number(e.target.value))}
-                                                                title="Drag to scale"
-                                                            />
-                                                            <button type="button" className="btn btn-ghost" onClick={() => setTokenScale(1)} title="Reset">
-                                                                Reset
-                                                            </button>
-                                                        </div>
-                                                    </Field>
+                                                        </Field>
+                                                    </div>
 
-                                                    <Field labelText="Nudge Position">
-                                                        <div className="grid grid-cols-3 gap-2 w-[220px]">
-                                                            <div />
-                                                            <button type="button" className="btn" onClick={() => setOffsetX(v => v + nudgeValue)} title="Up">↑</button>
-                                                            <div />
-                                                            <button type="button" className="btn" onClick={() => setOffsetY(v => v - nudgeValue)} title="Left">←</button>
-                                                            <button
-                                                                type="button"
-                                                                className="btn btn-ghost"
-                                                                onClick={() => { setOffsetX(0); setOffsetY(0) }}
-                                                                title="Center"
-                                                            >•</button>
-                                                            <button type="button" className="btn" onClick={() => setOffsetY(v => v + nudgeValue)} title="Right">→</button>
-                                                            <div />
-                                                            <button type="button" className="btn" onClick={() => setOffsetX(v => v - nudgeValue)} title="Down">↓</button>
-                                                            <div />
+                                                    {/* Nudge + Rotate (match Sticker layout) */}
+                                                    <div className="flex items-start gap-6 flex-wrap sm:flex-nowrap">
+                                                        <Field labelText="Nudge" className="shrink-0">
+                                                            <div className="grid grid-cols-3 gap-2 w-[130px]">
+                                                                <div />
+                                                                <button
+                                                                    type="button"
+                                                                    className="btn h-10 w-10"
+                                                                    onClick={() => setOffsetX((v) => v + nudgeValue)}
+                                                                    disabled={controlsDisabled}
+                                                                >
+                                                                    ↑
+                                                                </button>
+                                                                <div />
+
+                                                                <button
+                                                                    type="button"
+                                                                    className="btn h-10 w-10"
+                                                                    onClick={() => setOffsetY((v) => v - nudgeValue)}
+                                                                    disabled={controlsDisabled}
+                                                                >
+                                                                    ←
+                                                                </button>
+
+                                                                <button
+                                                                    type="button"
+                                                                    className="btn btn-ghost"
+                                                                    onClick={() => {
+                                                                        setOffsetX(0)
+                                                                        setOffsetY(0)
+                                                                    }}
+                                                                    disabled={controlsDisabled}
+                                                                    title="Center"
+                                                                >
+                                                                    •
+                                                                </button>
+
+                                                                <button
+                                                                    type="button"
+                                                                    className="btn h-10 w-10"
+                                                                    onClick={() => setOffsetY((v) => v + nudgeValue)}
+                                                                    disabled={controlsDisabled}
+                                                                >
+                                                                    →
+                                                                </button>
+
+                                                                <div />
+                                                                <button
+                                                                    type="button"
+                                                                    className="btn h-10 w-10"
+                                                                    onClick={() => setOffsetX((v) => v - nudgeValue)}
+                                                                    disabled={controlsDisabled}
+                                                                >
+                                                                    ↓
+                                                                </button>
+                                                                <div />
+                                                            </div>
+                                                        </Field>
+
+                                                        <div className="flex flex-col gap-2 shrink-0">
+                                                            <Field labelText="Rotate" className="w-[220px]">
+                                                                <div className="flex items-center gap-2">
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn h-10 w-10"
+                                                                        title="Rotate counter-clockwise"
+                                                                        onClick={() => setTokenRotation((r) => (r - 15 + 360) % 360)}
+                                                                        disabled={controlsDisabled}
+                                                                    >
+                                                                        <RotateCcw className="w-4 h-4" />
+                                                                    </button>
+
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn h-10 w-10"
+                                                                        title="Rotate clockwise"
+                                                                        onClick={() => setTokenRotation((r) => (r + 15) % 360)}
+                                                                        disabled={controlsDisabled}
+                                                                    >
+                                                                        <RotateCw className="w-4 h-4" />
+                                                                    </button>
+                                                                </div>
+                                                            </Field>
                                                         </div>
-                                                        <div className="flex items-center gap-3 pt-2 text-xs text-neutral-600">
-                                                            <span>X: {offsetX}px</span>
-                                                            <span>Y: {offsetY}px</span>
-                                                            <button
-                                                                type="button"
-                                                                className="btn btn-ghost btn-sm"
-                                                                onClick={() => { setOffsetX(0); setOffsetY(0) }}
-                                                            >
-                                                                Reset
-                                                            </button>
-                                                        </div>
-                                                    </Field>
+                                                    </div>
                                                 </div>
                                             </AccordionSection>
 
+                                            {/* <Glyphs>                   */}
                                             <AccordionSection
                                                 title="Glyphs"
                                                 open={openId === 'glyphs'}
@@ -1526,6 +1597,7 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                                 <GlyphControls vm={glyphVM[activeGlyphTab]} />
                                             </AccordionSection>
 
+                                            {/* Sticker */}
                                             <AccordionSection
                                                 title="Stickers"
                                                 open={openId === 'stickers'}
@@ -1974,6 +2046,8 @@ export default function DeckComposer({ config }: { config: DeckComposerConfig })
                                 </div>
                             </div>
                             <div className="rounded-xl bg-white overflow-hidden">
+                                {/* DEBUG: if this updates, compositor is fine
+                                <img src={bottomPreviewUrl} alt="" className="w-full rounded-lg border" /> */}
                                 <DeckViewerMinimal topUrl={selectedGrip.image} bottomUrl={bottomPreviewUrl} />
                             </div>
 
