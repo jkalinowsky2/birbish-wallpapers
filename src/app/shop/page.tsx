@@ -706,7 +706,7 @@ export default function ShopPage() {
                     {/* Custom */}
                     <section className="space-y-2 mt-4">
                         <h2 className="text-lg font-semibold tracking-wide text-neutral-800">
-                            Custom Stickers
+                            Custom Stickers Coming Soon!
                         </h2>
 
                         {/* ✅ New: one clean pricing/rules block for all custom stickers */}
