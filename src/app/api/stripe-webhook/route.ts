@@ -89,11 +89,17 @@ export async function POST(req: NextRequest) {
 
       if (customRef) {
         try {
-          const stored = await kv.get<any>(`customizations:${customRef}`)
-          if (stored?.customizations && Array.isArray(stored.customizations)) {
-            customizations = stored.customizations
+          const stored = await kv.get<unknown>(`customizations:${customRef}`)
+
+          if (
+            stored &&
+            typeof stored === 'object' &&
+            'customizations' in stored &&
+            Array.isArray((stored as { customizations?: unknown }).customizations)
+          ) {
+            customizations = (stored as { customizations: typeof customizations }).customizations
           }
-        } catch (e) {
+        } catch (e: unknown) {
           console.error('[stripe-webhook] failed to load customizations from KV', e)
         }
       }

@@ -18,7 +18,7 @@ type CoinGeckoNftResponse = {
     usd?: number;
   };
   floor_price_in_usd_24h_percentage_change?: number;
-  [k: string]: any;
+  [k: string]: unknown;
 };
 
 type ParsedStats = {
