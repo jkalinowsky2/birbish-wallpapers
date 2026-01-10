@@ -210,7 +210,7 @@ export const CUSTOM_PRODUCTS: Product[] = [
     image: "/assets/store/stickers/moonbirdsten.png",
     priceId: "price_1SgpNV14Mz115JiagOiqjRP4",
     giftOnly: false,
-    outOfStock: false,
+    outOfStock: true,
     customCollection: "moonbirds",
     tiers: [
       { minQty: 1, maxQty: 9, unitPrice: 1.50, priceId: "price_1So4sv0n54kwZghJcWiv784r" },
