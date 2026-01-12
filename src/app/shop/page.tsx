@@ -706,18 +706,24 @@ export default function ShopPage() {
                     {/* Custom */}
                     <section className="space-y-2 mt-4">
                         <h2 className="text-lg font-semibold tracking-wide text-neutral-800">
-                            Custom Stickers Coming Soon!
+                            Custom Stickers
                         </h2>
 
                         {/* ✅ New: one clean pricing/rules block for all custom stickers */}
                         <div className="rounded-lg p-0 text-neutral-700">
                             {/* <div className="font-semibold text-neutral-900">Mix &amp; match pricing</div> */}
                             <p className="mt-0">
-                                Mix & match custom stickers across collections
-                                (minimum of <strong>5 stickers</strong> per order.)
+                                Custom stickers are high-quality, full-bleed (no borders), and finished with matte vinyl laminate for UV protection, 
+                                durability, and water-resistance.
+                                
+                                Stickers are designed for everyday use on smooth surfaces and are hand-wash only (not dishwasher safe). <br/><br/>
+                                
+                                Dimensions: 1.75" (44.5mm) square.<br/><br/>
+
+                                Mix & match custom stickers across collections (minimum of <strong>5 stickers</strong> per order.) <br/>
                             </p>
 
-                            <p className="mt-3 font-semibold text-sm">Volume Pricing (per sticker):</p>
+                            <p className="mt-3 font-semibold">Volume Pricing (per sticker):</p>
                             <div className="mt-2 pl-4 space-y-0.5 text-sm text-neutral-800">
                                 <div>• 5–9 stickers - <strong>$1.50</strong></div>
                                 <div>• 10-19 stickers - <strong>$1.25</strong></div>
@@ -836,14 +842,11 @@ export default function ShopPage() {
                                                     alt={`Preview #${customTokenId}`}
                                                     className="
                     mx-auto
-                    bg-[#0447b0] 
+                    bg-white 
                     h-40 w-40
                     object-contain
                     rounded-xl
-                    ring-8 ring-white
-                    outline outline-[0.5px] outline-neutral-300
-                    outline-offset-8
-                    shadow-[5px_10px_15px_rgba(0,0,0,0.5)]
+                    shadow-[3px_3px_12px_rgba(0,0,0,0.5)]
                   "
                                                     onError={() =>
                                                         setTokenPreviewError(
