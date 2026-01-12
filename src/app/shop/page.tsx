@@ -718,7 +718,7 @@ export default function ShopPage() {
                                 
                                 Stickers are designed for everyday use on smooth surfaces and are hand-wash only (not dishwasher safe). <br/><br/>
                                 
-                                Dimensions: 1.75" (44.5mm) square.<br/><br/>
+                                Dimensions: 1.75&quot; (44.5mm) square.<br/><br/>
 
                                 Mix & match custom stickers across collections (minimum of <strong>5 stickers</strong> per order.) <br/>
                             </p>
