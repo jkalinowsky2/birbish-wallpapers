@@ -208,9 +208,9 @@ export const CUSTOM_PRODUCTS: Product[] = [
     priceLabel: "$1.50",
     description: "Custom sticker 1.5 x 1.5 inches",
     image: "/assets/store/stickers/moonbirdsten.png",
-    priceId: "price_1SgpNV14Mz115JiagOiqjRP4",
+    priceId: "price_1So4sv0n54kwZghJcWiv784r",
     giftOnly: false,
-    outOfStock: true,
+    outOfStock: false,
     customCollection: "moonbirds",
     tiers: [
       { minQty: 1, maxQty: 9, unitPrice: 1.50, priceId: "price_1So4sv0n54kwZghJcWiv784r" },
@@ -225,9 +225,9 @@ export const CUSTOM_PRODUCTS: Product[] = [
     priceLabel: "$1.50",
     description: "Custom sticker 1.5 x 1.5 inches",
     image: "/assets/store/stickers/oddityten.png",
-    priceId: "price_1SicHw0n54kwZghJ9xL1JiGl-ODDUPDATE", //
+    priceId: "price_1So4sv0n54kwZghJcWiv784r", //
     giftOnly: false,
-    outOfStock: true,
+    outOfStock: false,
     customCollection: 'oddities',
     tiers: [
       { minQty: 1, maxQty: 9, unitPrice: 1.50, priceId: "price_1So4sv0n54kwZghJcWiv784r" },
@@ -243,9 +243,9 @@ export const CUSTOM_PRODUCTS: Product[] = [
     priceLabel: "$1.25",
     description: "Custom sticker 1.5 x 1.5 inches",
     image: "/assets/store/stickers/mythicsten.png",
-    priceId: "price_1SicHw0n54kwZghJ9xL1JiGl", //
+    priceId: "price_1So4sv0n54kwZghJcWiv784r", //
     giftOnly: false,
-    outOfStock: true,
+    outOfStock: false,
     customCollection: 'mythics',
     tiers: [
       { minQty: 1, maxQty: 9, unitPrice: 1.50, priceId: "price_1So4sv0n54kwZghJcWiv784r" },

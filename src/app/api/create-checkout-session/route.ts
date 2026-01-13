@@ -5,7 +5,6 @@ import { kv } from '@vercel/kv'
 import { ALL_PRODUCTS, CUSTOM_PRODUCTS, getTierForQuantity, getBaseUnitPrice } from '@/app/shop/products';
 import { randomUUID } from 'crypto'
 
-console.log('[checkout] ROUTE VERSION = split-variants-v1')
 
 const MIN_CUSTOM_QTY = 5
 const PRODUCT_BY_PRICE_ID = new Map(ALL_PRODUCTS.map(p => [p.priceId, p]))
@@ -60,6 +59,8 @@ const SHIP_LARGE_INTL = process.env.STRIPE_SHIP_LARGE_INTL
 
 
 export async function POST(request: Request) {
+    console.log('[checkout] ROUTE VERSION = split-variants-v1')
+
     try {
         const { items, giftEligible, walletAddress, shippingRegion } =
             (await request.json()) as {
@@ -100,7 +101,16 @@ export async function POST(request: Request) {
         const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = []
 
         // priceId -> totalQty
-        const qtyByPriceId = new Map<string, number>()
+        // const qtyByPriceId = new Map<string, number>()
+
+        // groupKey -> totalQty
+        // groupKey = priceId OR priceId:variant (when variant exists)
+        const qtyByGroupKey = new Map<string, number>()
+
+        function getGroupKey(item: CartItem) {
+            // If variant is present (moonbirds), keep it separate in Stripe
+            return item.variant ? `${item.priceId}:${item.variant}` : item.priceId
+        }
 
         // store token breakdowns (only for custom lines)
         // const customizations: Array<{ priceId: string; tokenId: string; quantity: number }> = []
@@ -115,7 +125,9 @@ export async function POST(request: Request) {
         for (const item of items) {
             if (!item.quantity || item.quantity <= 0) continue
 
-            qtyByPriceId.set(item.priceId, (qtyByPriceId.get(item.priceId) ?? 0) + item.quantity)
+            // qtyByPriceId.set(item.priceId, (qtyByPriceId.get(item.priceId) ?? 0) + item.quantity)
+            const key = getGroupKey(item)
+            qtyByGroupKey.set(key, (qtyByGroupKey.get(key) ?? 0) + item.quantity)
 
             // ✅ If it’s a custom product, it MUST include tokenId
             if (CUSTOM_PRICE_IDS.has(item.priceId) && !item.tokenId) {
@@ -158,41 +170,64 @@ export async function POST(request: Request) {
         }
 
         // Build Stripe line items from grouped totals (this is what fixes tier pricing across tokens)
-        for (const [priceId, totalQtyForThisProduct] of qtyByPriceId.entries()) {
+        // Build Stripe line items from grouped totals
+        for (const [groupKey, totalQtyForThisGroup] of qtyByGroupKey.entries()) {
+            const parts = groupKey.split(':')
+            const priceId = parts[0]
+            const variant = parts[1] as 'illustrated' | 'pixel' | undefined
+
             const product = ALL_PRODUCTS.find((p) => p.priceId === priceId)
 
             // If we can't find the product, fall back to whatever came from the client
             if (!product) {
-                lineItems.push({ price: priceId, quantity: totalQtyForThisProduct })
+                lineItems.push({ price: priceId, quantity: totalQtyForThisGroup })
                 continue
             }
 
-            // const isTest = (process.env.STRIPE_MODE ?? 'live') === 'test'
-
-            if (IS_TEST) {
-                // TEST: always use mapped base priceIds only
-                lineItems.push({
-                    price: mapToTestPrice(product.priceId),
-                    quantity: totalQtyForThisProduct,
-                })
-            }
-            // LIVE: tier-aware pricing
-            // ✅ Custom products tier based on TOTAL custom qty (mix & match)
-            // ✅ Non-custom products tier based on qty for that product
-            const pricingQty = product.customCollection ? totalCustomQty : totalQtyForThisProduct
-
+            // Tier qty basis:
+            // - Custom products tier based on TOTAL custom qty (mix & match)
+            // - Non-custom products tier based on qty for that group
+            const pricingQty = product.customCollection ? totalCustomQty : totalQtyForThisGroup
             const tier = getTierForQuantity(product, pricingQty)
             const baseUnit = getBaseUnitPrice(product)
+            const unitPrice = tier ? tier.unitPrice : baseUnit
 
+            // ✅ If this is a variant line, force Stripe to show it separately
+            // Do this BEFORE any normal `price:` line items, then continue.
+            if (variant) {
+                lineItems.push({
+                    price_data: {
+                        currency: 'usd',
+                        unit_amount: Math.round(unitPrice * 100),
+                        product_data: {
+                            name: `${product.name} (${variant})`,
+                            description: product.description,
+                        },
+                    },
+                    quantity: totalQtyForThisGroup,
+                })
+                continue
+            }
+
+            // ✅ TEST mode: use mapped base priceIds only, then continue
+            if (IS_TEST) {
+                lineItems.push({
+                    price: mapToTestPrice(product.priceId),
+                    quantity: totalQtyForThisGroup,
+                })
+                continue
+            }
+
+            // ✅ LIVE mode: tier-aware pricing via Stripe price IDs
             if (!tier || tier.unitPrice === baseUnit) {
                 lineItems.push({
                     price: product.priceId,
-                    quantity: totalQtyForThisProduct,
+                    quantity: totalQtyForThisGroup,
                 })
             } else {
                 lineItems.push({
                     price: tier.priceId,
-                    quantity: totalQtyForThisProduct,
+                    quantity: totalQtyForThisGroup,
                 })
             }
         }
@@ -201,8 +236,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Cart is empty.' }, { status: 400 })
         }
         console.log('[checkout] items:', items)
-        console.log('[checkout] grouped qtyByPriceId:', Array.from(qtyByPriceId.entries()))
-
+        console.log('[checkout] grouped qtyByGroupKey:', Array.from(qtyByGroupKey.entries()))
 
         // -------------------------------
         // Server-side gift eligibility
