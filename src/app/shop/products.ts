@@ -240,7 +240,7 @@ export const CUSTOM_PRODUCTS: Product[] = [
   {
     id: "square-mythic",
     name: "Custom Mythic Sticker",
-    priceLabel: "",
+    priceLabel: "$1.25",
     description: "Custom sticker 1.5 x 1.5 inches",
     image: "/assets/store/stickers/mythicsten.png",
     priceId: "price_1SicHw0n54kwZghJ9xL1JiGl", //
