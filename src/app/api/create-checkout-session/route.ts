@@ -5,6 +5,8 @@ import { kv } from '@vercel/kv'
 import { ALL_PRODUCTS, CUSTOM_PRODUCTS, getTierForQuantity, getBaseUnitPrice } from '@/app/shop/products';
 import { randomUUID } from 'crypto'
 
+console.log('[checkout] ROUTE VERSION = split-variants-v1')
+
 const MIN_CUSTOM_QTY = 5
 const PRODUCT_BY_PRICE_ID = new Map(ALL_PRODUCTS.map(p => [p.priceId, p]))
 const CUSTOM_PRICE_IDS = new Set(CUSTOM_PRODUCTS.map(p => p.priceId))
