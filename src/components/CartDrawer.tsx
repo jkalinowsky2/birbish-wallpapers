@@ -8,28 +8,38 @@ import { buildCustomTokenUrl } from '@/app/shop/customCollections'
 const CUSTOM_KEY_SEP = '::'
 
 function parseCartKey(cartKey: string): {
-    priceId: string
+    productId: string
     tokenId?: string
     variant?: 'illustrated' | 'pixel'
 } {
     const parts = cartKey.split(CUSTOM_KEY_SEP)
 
-    // custom with variant: priceId::variant::tokenId
+    // custom with variant: productId::variant::tokenId
     if (parts.length === 3) {
-        const [priceId, variantRaw, tokenId] = parts
+        const [productId, variantRaw, tokenId] = parts
         const variant = variantRaw === 'pixel' ? 'pixel' : 'illustrated'
-        return { priceId, variant, tokenId }
+        return { productId, variant, tokenId }
     }
 
-    // custom without variant: priceId::tokenId
+    // custom without variant: productId::tokenId
     if (parts.length === 2) {
-        const [priceId, tokenId] = parts
-        return { priceId, tokenId }
+        const [productId, tokenId] = parts
+        return { productId, tokenId }
     }
 
-    // normal: just priceId
-    return { priceId: cartKey }
+    // normal: just productId
+    return { productId: cartKey }
 }
+
+function findProduct(products: Product[], productId: string) {
+    // ✅ new world: keys are product.id
+    const byId = products.find((p) => p.id === productId)
+    if (byId) return byId
+
+    // ✅ optional back-compat if any old cart keys exist
+    return products.find((p) => p.priceId === productId)
+}
+
 
 
 type Props = {
@@ -76,8 +86,8 @@ export function CartDrawer({
     const lines = Object.entries(cart)
         .filter(([, qty]) => qty > 0)
         .map(([cartKey, qty]) => {
-            const { priceId, tokenId, variant } = parseCartKey(cartKey)
-            const product = products.find((p) => p.priceId === priceId)
+            const { productId, tokenId, variant } = parseCartKey(cartKey)
+            const product = findProduct(products, productId)
             return { cartKey, qty, tokenId, variant, product }
         })
 
@@ -113,7 +123,7 @@ export function CartDrawer({
 
                             const imgSrc =
                                 tokenId && collection
-                                    ? buildCustomTokenUrl(tokenId, collection, variant)
+                                    ? buildCustomTokenUrl(tokenId, collection, variant ?? 'illustrated')
                                     : product?.image
 
                             return (
@@ -200,8 +210,8 @@ export function CartDrawer({
                     <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900">
                         Custom stickers are <strong>mix &amp; match</strong>, but require a minimum of{' '}
                         <strong>{minCustomQty}</strong> total custom stickers per order. Add{' '}
-                            <strong>{minCustomQty - totalCustomQty}</strong> more to checkout.
-                    
+                        <strong>{minCustomQty - totalCustomQty}</strong> more to checkout.
+
                     </div>
                 )}
                 <div className="border-t px-4 pt-4 pb-8 pb-[calc(env(safe-area-inset-bottom)+2rem)]">
@@ -238,10 +248,10 @@ export function CartDrawer({
                         </div>
                     </div>
                     {totalCustomQty > 0 && (
-                    <div className="mt-4 rounded-md border border-neutral-200 bg-neutral-50 p-3 text-xs text-neutral-600">
-                        <strong className="block text-neutral-800 mb-1">Rights Certification</strong>
-                        By purchasing custom stickers, you certify that you own or have permission to use and reproduce the underlying artwork or IP associated with the selected asset(s). Generational Merch does not verify ownership or licensing rights.
-                    </div>
+                        <div className="mt-4 rounded-md border border-neutral-200 bg-neutral-50 p-3 text-xs text-neutral-600">
+                            <strong className="block text-neutral-800 mb-1">Rights Certification</strong>
+                            By purchasing custom stickers, you certify that you own or have permission to use and reproduce the underlying artwork or IP associated with the selected asset(s). Generational Merch does not verify ownership or licensing rights.
+                        </div>
                     )}
 
                     <button

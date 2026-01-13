@@ -47,20 +47,22 @@ export default function ShopPage() {
 
 
     function makeCartKey(
+        productId: string,
         priceId: string,
         tokenId?: string,
         variant?: 'illustrated' | 'pixel',
         collection?: CustomCollectionKey
     ) {
-        if (!tokenId) return priceId
+        // Normal (non-custom): just productId
+        if (!tokenId) return productId
 
-        // If we know the collection and it doesn't support variants, don't store one in the key.
+        // If collection doesn't support variants, omit it
         if (collection && !CUSTOM_COLLECTIONS[collection].supportsVariantToggle) {
-            return `${priceId}${CUSTOM_KEY_SEP}${tokenId}`
+            return `${productId}${CUSTOM_KEY_SEP}${tokenId}`
         }
 
-        // Otherwise store variant (default illustrated)
-        return `${priceId}${CUSTOM_KEY_SEP}${variant ?? 'illustrated'}${CUSTOM_KEY_SEP}${tokenId}`
+        // Otherwise include variant
+        return `${productId}${CUSTOM_KEY_SEP}${variant ?? 'illustrated'}${CUSTOM_KEY_SEP}${tokenId}`
     }
 
     function isCustomCartKey(cartKey: string) {
@@ -69,48 +71,47 @@ export default function ShopPage() {
     }
 
     function parseCartKey(cartKey: string): {
-        priceId: string
+        productId: string
         tokenId?: string
         variant?: 'illustrated' | 'pixel'
     } {
         const parts = cartKey.split(CUSTOM_KEY_SEP)
 
-        // custom with variant: priceId::variant::tokenId
+        // custom with variant: productId::variant::tokenId
         if (parts.length === 3) {
-            const [priceId, variantRaw, tokenId] = parts
+            const [productId, variantRaw, tokenId] = parts
             const variant = variantRaw === 'pixel' ? 'pixel' : 'illustrated'
-            return { priceId, variant, tokenId }
+            return { productId, variant, tokenId }
         }
 
-        // custom without variant: priceId::tokenId
+        // custom without variant: productId::tokenId
         if (parts.length === 2) {
-            const [priceId, tokenId] = parts
-            return { priceId, tokenId }
+            const [productId, tokenId] = parts
+            return { productId, tokenId }
         }
 
-        // normal: just priceId
-        return { priceId: cartKey }
+        // normal: just productId
+        return { productId: cartKey }
     }
 
     // Identify custom products by priceId
-    const CUSTOM_PRICE_IDS = new Set(CUSTOM_PRODUCTS.map((p) => p.priceId))
-
-    function isCustomProduct(priceId: string) {
-        return CUSTOM_PRICE_IDS.has(priceId)
+    const CUSTOM_PRODUCT_IDS = new Set(CUSTOM_PRODUCTS.map((p) => p.id))
+    function isCustomProductId(productId: string) {
+        return CUSTOM_PRODUCT_IDS.has(productId)
     }
 
 
     // For the product cards, show total qty across ALL variants of that priceId
-    function getTotalQtyForPriceId(priceId: string) {
+    function getTotalQtyForProductId(productId: string) {
         return Object.entries(cart).reduce((sum, [cartKey, qty]) => {
             const parsed = parseCartKey(cartKey)
-            return parsed.priceId === priceId ? sum + (qty ?? 0) : sum
+            return parsed.productId === productId ? sum + (qty ?? 0) : sum
         }, 0)
     }
 
     // --- Customize modal state ---
     const [customizeOpen, setCustomizeOpen] = useState(false)
-    const [customizePriceId, setCustomizePriceId] = useState<string | null>(null)
+    const [customizeProductId, setCustomizeProductId] = useState<string | null>(null)
     const [customTokenId, setCustomTokenId] = useState('')
     const [tokenPreviewUrl, setTokenPreviewUrl] = useState<string>('')
     const [tokenPreviewError, setTokenPreviewError] = useState<string>('')
@@ -126,26 +127,24 @@ export default function ShopPage() {
     // const MYTHICS_BASE = `https://proof-nft-image.imgix.net/${MYTHICS_CONTRACT}`
 
 
-    function openCustomize(priceId: string) {
-        setCustomizePriceId(priceId)
+    function openCustomize(productId: string) {
+        setCustomizeProductId(productId)
 
-        const product = ALL_PRODUCTS.find((p) => p.priceId === priceId)
+        const product = ALL_PRODUCTS.find((p) => p.id === productId)
         const collection: CustomCollectionKey = product?.customCollection ?? 'moonbirds'
-
         setCustomCollection(collection)
 
-        // Start blank so placeholder shows
         setCustomTokenId('')
-
-        // Default variant (safe for now since only moonbirds uses the toggle in your UI)
         setCustomVariant('illustrated')
         setCustomQty(1)
-
         setCustomizeOpen(true)
     }
 
     function confirmCustomize() {
-        if (!customizePriceId) return
+        if (!customizeProductId) return
+
+        const product = ALL_PRODUCTS.find((p) => p.id === customizeProductId)
+        if (!product) return
 
         const token = customTokenId.trim()
         if (!token) {
@@ -153,12 +152,19 @@ export default function ShopPage() {
             return
         }
 
-        const cartKey = makeCartKey(customizePriceId, token, customVariant, customCollection)
+        const cartKey = makeCartKey(
+            product.id,
+            product.priceId,
+            token,
+            customVariant,
+            customCollection
+        )
+
         const currentQty = cart[cartKey] ?? 0
         setQuantity(cartKey, currentQty + customQty)
 
         setCustomizeOpen(false)
-        setIsCartOpen(true) // optional, but nice UX
+        setIsCartOpen(true)
     }
 
     ///NEW HOLDER CHECK:
@@ -301,8 +307,8 @@ export default function ShopPage() {
 
     const totalCustomQty = Object.entries(cart).reduce((sum, [cartKey, qty]) => {
         if (!qty) return sum
-        const { priceId } = parseCartKey(cartKey)
-        return isCustomProduct(priceId) ? sum + qty : sum
+        const { productId } = parseCartKey(cartKey)
+        return isCustomProductId(productId) ? sum + qty : sum
     }, 0)
 
     const MIN_CUSTOM_QTY = 5
@@ -311,15 +317,17 @@ export default function ShopPage() {
     const totalPrice = Object.entries(cart).reduce((sum, [cartKey, qty]) => {
         if (!qty) return sum
 
-        const { priceId } = parseCartKey(cartKey)
-        const product = ALL_PRODUCTS.find((p) => p.priceId === priceId)
+        const { productId } = parseCartKey(cartKey)
+        const product = ALL_PRODUCTS.find((p) => p.id === productId)
 
         if (!product || product.outOfStock) return sum
 
-        const pricingQty = isCustomProduct(priceId) ? totalCustomQty : qty
+        const pricingQty = isCustomProductId(productId) ? totalCustomQty : qty
         const unit = getTieredUnitPrice(product, pricingQty)
+
         return sum + unit * qty
-    }, 0);
+    }, 0)
+
     // Compute eligibility for free sticker
     const REQ_MIN = 10
     const isGiftEligible =
@@ -343,14 +351,13 @@ export default function ShopPage() {
 
             // if out of stock, force qty to 0 so it doesn’t sneak into the cart
             // const qty = isOutOfStock ? 0 : (cart[product.priceId] ?? 0)
-            const baseCartKey = makeCartKey(product.priceId) // non-custom key
-            const isCustom = isCustomProduct(product.priceId)
+            const baseCartKey = makeCartKey(product.id, product.priceId) // normal key = productId
+            const isCustom = isCustomProductId(product.id)
 
-            // For custom products, show total across all variants
             const qty = isOutOfStock
                 ? 0
                 : isCustom
-                    ? getTotalQtyForPriceId(product.priceId)
+                    ? getTotalQtyForProductId(product.id)
                     : (cart[baseCartKey] ?? 0)
 
             const tiers = product.tiers ?? []
@@ -399,7 +406,7 @@ export default function ShopPage() {
                         {isCustom && !isOutOfStock ? (
                             <button
                                 type="button"
-                                onClick={() => openCustomize(product.priceId)}
+                                onClick={() => openCustomize(product.id)}
                                 className="absolute inset-0 z-10 cursor-pointer"
                                 aria-label={`Customize ${product.name}`}
                                 title="Customize"
@@ -499,7 +506,7 @@ export default function ShopPage() {
                                 <div className="flex items-center gap-2">
                                     <button
                                         type="button"
-                                        onClick={() => openCustomize(product.priceId)}
+                                        onClick={() => openCustomize(product.id)}
                                         className="px-3 py-2 rounded-md text-xs font-semibold bg-neutral-900 text-white hover:bg-[#b20b2b]"
                                     >
                                         Customize
@@ -572,12 +579,15 @@ export default function ShopPage() {
         setIsCheckingOut(true)
         try {
             const items = Object.entries(cart).map(([cartKey, quantity]) => {
-                const { priceId, tokenId, variant } = parseCartKey(cartKey)
+                const { productId, tokenId, variant } = parseCartKey(cartKey)
+                const product = ALL_PRODUCTS.find((p) => p.id === productId)
+
                 return {
-                    priceId,
+                    productId,
+                    priceId: product?.priceId ?? '', // server should validate this
                     quantity,
-                    tokenId,   // undefined for normal products (fine)
-                    variant,   // undefined for non-custom / non-variant collections (fine)
+                    tokenId,
+                    variant,
                 }
             })
             const res = await fetch('/api/create-checkout-session', {
@@ -713,14 +723,14 @@ export default function ShopPage() {
                         <div className="rounded-lg p-0 text-neutral-700">
                             {/* <div className="font-semibold text-neutral-900">Mix &amp; match pricing</div> */}
                             <p className="mt-0">
-                                Custom stickers are high-quality, full-bleed (no borders), and finished with matte vinyl laminate for UV protection, 
+                                Custom stickers are high-quality, full-bleed (no borders), and finished with matte vinyl laminate for UV protection,
                                 durability, and water-resistance.
-                                
-                                Stickers are designed for everyday use on smooth surfaces and are hand-wash only (not dishwasher safe). <br/><br/>
-                                
-                                Dimensions: 1.75&quot; (44.5mm) square.<br/><br/>
 
-                                Mix & match custom stickers across collections (minimum of <strong>5 stickers</strong> per order.) <br/>
+                                Stickers are designed for everyday use on smooth surfaces and are hand-wash only (not dishwasher safe). <br /><br />
+
+                                Dimensions: 1.75&quot; (44.5mm) square.<br /><br />
+
+                                Mix & match custom stickers across collections (minimum of <strong>5 stickers</strong> per order.) <br />
                             </p>
 
                             <p className="mt-3 font-semibold">Volume Pricing (per sticker):</p>
