@@ -211,7 +211,7 @@ export const CUSTOM_PRODUCTS: Product[] = [
     image: "/assets/store/stickers/moonbirdsten.png",
     priceId: "price_1So4sv0n54kwZghJcWiv784r",
     giftOnly: false,
-    outOfStock: true,
+    outOfStock: false,
     customCollection: "moonbirds",
     tiers: [
       { minQty: 1, maxQty: 9, unitPrice: 1.50, priceId: "price_1So4sv0n54kwZghJcWiv784r" },
@@ -226,14 +226,14 @@ export const CUSTOM_PRODUCTS: Product[] = [
     priceLabel: "$1.50",
     description: "Custom sticker 1.5 x 1.5 inches",
     image: "/assets/store/stickers/oddityten.png",
-    priceId: "price_1So4sv0n54kwZghJcWiv784r", //
+    priceId: "price_1SpBh10n54kwZghJErEiL0mD", //
     giftOnly: false,
-    outOfStock: true,
+    outOfStock: false,
     customCollection: 'oddities',
     tiers: [
-      { minQty: 1, maxQty: 9, unitPrice: 1.50, priceId: "price_1So4sv0n54kwZghJcWiv784r" },
-      { minQty: 10, maxQty: 19, unitPrice: 1.25, priceId: "price_1So4zP0n54kwZghJTuBXMVxR" },
-      { minQty: 20, unitPrice: 1.00, priceId: "price_1So4zP0n54kwZghJqQDv5G50" },
+      { minQty: 1, maxQty: 9, unitPrice: 1.50, priceId: "price_1SpBh10n54kwZghJErEiL0mD" },
+      { minQty: 10, maxQty: 19, unitPrice: 1.25, priceId: "price_1SpBi20n54kwZghJ3Pslcrmn" },
+      { minQty: 20, unitPrice: 1.00, priceId: "price_1SpBi20n54kwZghJUi2O9V0K" },
     ],
 
   },
@@ -244,14 +244,14 @@ export const CUSTOM_PRODUCTS: Product[] = [
     priceLabel: "$1.25",
     description: "Custom sticker 1.5 x 1.5 inches",
     image: "/assets/store/stickers/mythicsten.png",
-    priceId: "price_1So4sv0n54kwZghJcWiv784r", //
+    priceId: "price_1SpBjc0n54kwZghJI6IvRt0x", //
     giftOnly: false,
-    outOfStock: true,
+    outOfStock: false,
     customCollection: 'mythics',
     tiers: [
-      { minQty: 1, maxQty: 9, unitPrice: 1.50, priceId: "price_1So4sv0n54kwZghJcWiv784r" },
-      { minQty: 10, maxQty: 19, unitPrice: 1.25, priceId: "price_1So4zP0n54kwZghJTuBXMVxR" },
-      { minQty: 20, unitPrice: 1.00, priceId: "price_1So4zP0n54kwZghJqQDv5G50" },
+      { minQty: 1, maxQty: 9, unitPrice: 1.50, priceId: "price_1SpBjc0n54kwZghJI6IvRt0x" },
+      { minQty: 10, maxQty: 19, unitPrice: 1.25, priceId: "price_1SpBk90n54kwZghJ2xW07Gjo" },
+      { minQty: 20, unitPrice: 1.00, priceId: "price_1SpBk90n54kwZghJLnoAMxoV" },
     ],
 
   },
