@@ -1,5 +1,8 @@
 // src/app/shop/products.ts
 export type CustomCollectionKey = 'moonbirds' | 'mythics' | 'oddities' | 'glyders'
+// 🔹 One switch to control ALL custom sticker availability
+export const CUSTOM_STICKERS_IN_STOCK = true
+
 export type Product = {
   id: string;
   name: string;
@@ -208,11 +211,11 @@ export const CUSTOM_PRODUCTS: Product[] = [
     id: "square-moonbird",
     name: "Custom Moonbird Sticker",
     priceLabel: "$1.50",
-    description: "Custom sticker 1.5 x 1.5 inches",
+    description: "Custom sticker, 1.75 inches",
     image: "/assets/store/stickers/moonbirdsten.png",
     priceId: "price_1So4sv0n54kwZghJcWiv784r",
     giftOnly: false,
-    outOfStock: true,
+    outOfStock: !CUSTOM_STICKERS_IN_STOCK,
     customCollection: "moonbirds",
     tiers: [
       { minQty: 1, maxQty: 9, unitPrice: 1.50, priceId: "price_1So4sv0n54kwZghJcWiv784r" },
@@ -225,11 +228,11 @@ export const CUSTOM_PRODUCTS: Product[] = [
     id: "square-oddity",
     name: "Custom Oddity Sticker",
     priceLabel: "$1.50",
-    description: "Custom sticker 1.5 x 1.5 inches",
+    description: "Custom sticker, 1.75 inches",
     image: "/assets/store/stickers/oddityten.png",
     priceId: "price_1SpBh10n54kwZghJErEiL0mD", //
     giftOnly: false,
-    outOfStock: true,
+    outOfStock: !CUSTOM_STICKERS_IN_STOCK,
     customCollection: 'oddities',
     tiers: [
       { minQty: 1, maxQty: 9, unitPrice: 1.50, priceId: "price_1SpBh10n54kwZghJErEiL0mD" },
@@ -243,11 +246,11 @@ export const CUSTOM_PRODUCTS: Product[] = [
     id: "square-mythic",
     name: "Custom Mythic Sticker",
     priceLabel: "$1.25",
-    description: "Custom sticker 1.5 x 1.5 inches",
+    description: "Custom sticker 1.75 inches",
     image: "/assets/store/stickers/mythicsten.png",
     priceId: "price_1SpBjc0n54kwZghJI6IvRt0x", //
     giftOnly: false,
-    outOfStock: true,
+    outOfStock: !CUSTOM_STICKERS_IN_STOCK,
     customCollection: 'mythics',
     tiers: [
       { minQty: 1, maxQty: 9, unitPrice: 1.50, priceId: "price_1SpBjc0n54kwZghJI6IvRt0x" },
@@ -262,7 +265,7 @@ export const CUSTOM_PRODUCTS: Product[] = [
     id: "square-glyder",
     name: "Custom NightGlyder Sticker",
     priceLabel: "",
-    description: "Custom sticker 1.5 x 1.5 inches",
+    description: "Custom sticker 1.75 inches",
     image: "/assets/store/stickers/glydersten.png",
     priceId: "price_1SicHw0n54kwZghJ9xL1JiGl_UPDATE", //
     giftOnly: false,
