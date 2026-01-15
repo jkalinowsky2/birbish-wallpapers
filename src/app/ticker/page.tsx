@@ -243,7 +243,7 @@ export default async function MoonbirdsPredictorPage() {
       {/* Header */}
       <div className="flex flex-col gap-2">
         <h1 className="text-2xl font-semibold">
-          Moonbirds Floor Predictor (Very Serious™)
+          My Quant - Moonbirds Floor Forcaster
         </h1>
 
         <p className="text-sm opacity-80">
@@ -261,7 +261,7 @@ export default async function MoonbirdsPredictorPage() {
       {/* Inputs */}
       <div className="mt-6 rounded-xl border p-4">
         <div className="flex items-baseline justify-between gap-3">
-          <h2 className="text-lg font-medium">Inputs (live from CoinGecko)</h2>
+          {/* <h2 className="text-lg font-medium">Inputs (live from CoinGecko)</h2> */}
           {fetchedAt && (
             <div className="text-xs opacity-70">
               Last updated:{" "}
@@ -321,7 +321,7 @@ export default async function MoonbirdsPredictorPage() {
               <div className="mt-2 text-sm opacity-80">
                 by the end of the year.{" "}
                 <span className="font-semibold">
-                  {projected < 1 ? "It’s over" : writtenMagnitude(projected)}
+                  {/* {projected < 1 ? "It’s over" : writtenMagnitude(projected)} */}
                 </span>
                 
               </div>
