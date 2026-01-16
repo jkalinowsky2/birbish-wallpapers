@@ -1,7 +1,7 @@
 // src/app/shop/products.ts
 export type CustomCollectionKey = 'moonbirds' | 'mythics' | 'oddities' | 'glyders'
 // 🔹 One switch to control ALL custom sticker availability
-export const CUSTOM_STICKERS_IN_STOCK = false
+export const CUSTOM_STICKERS_IN_STOCK = true
 
 export type Product = {
   id: string;
@@ -245,7 +245,7 @@ export const CUSTOM_PRODUCTS: Product[] = [
   {
     id: "square-mythic",
     name: "Custom Mythic Sticker",
-    priceLabel: "$1.25",
+    priceLabel: "$1.50",
     description: "Custom sticker 1.75 inches",
     image: "/assets/store/stickers/mythicsten.png",
     priceId: "price_1SpBjc0n54kwZghJI6IvRt0x", //
