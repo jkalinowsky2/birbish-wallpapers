@@ -702,7 +702,7 @@ export default function ShopPage() {
                             Standard sticker are high-quality, die-cut stickers with white borders, and are finished with matte vinyl laminate for UV protection,
                             durability, and water-resistance.
 
-                            These dishwasher safe stickers are our most durable stickers and perfect for water bottles, laptops, or anywhere you want to stick 'em!<br /><br />
+                            These dishwasher safe stickers are our most durable stickers and perfect for water bottles, laptops, or anywhere you want to stick &apos;em!<br /><br />
                         </p>
                         <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 py-4">
                             {renderProducts(STICKER_PRODUCTS)}
