@@ -1,7 +1,7 @@
 // src/app/shop/products.ts
 export type CustomCollectionKey = 'moonbirds' | 'mythics' | 'oddities' | 'glyders'
 // 🔹 One switch to control ALL custom sticker availability
-export const CUSTOM_STICKERS_IN_STOCK = false
+export const CUSTOM_STICKERS_IN_STOCK = true
 
 export type Product = {
   id: string;

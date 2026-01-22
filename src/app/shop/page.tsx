@@ -696,13 +696,13 @@ export default function ShopPage() {
                     {/* Stickers */}
                     <section className="space-y-2">
                         <h2 className="text-lg font-semibold tracking-wide text-neutral-800">
-                            Stickers
+                            Premium Stickers
                         </h2>
                         <p className="mt-0">
-                            Standard sticker are high-quality, die-cut stickers with white borders, and are finished with matte vinyl laminate for UV protection,
+                            Premium sticker are high-quality, die-cut stickers with white borders, and are finished with matte vinyl laminate for UV protection,
                             durability, and water-resistance.
 
-                            These dishwasher safe stickers are our most durable stickers and perfect for water bottles, laptops, or anywhere you want to stick &apos;em!<br /><br />
+                            These dishwasher safe(ish) stickers are our most durable stickers and perfect for water bottles, laptops, or anywhere you want to stick &apos;em!<br /><br />
                         </p>
                         <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 py-4">
                             {renderProducts(STICKER_PRODUCTS)}
@@ -714,6 +714,11 @@ export default function ShopPage() {
                         <h2 className="text-lg font-semibold tracking-wide text-neutral-800">
                             Transfer Stickers
                         </h2>
+                        <p className="mt-0">
+                            Transfer stickers are precision cut, adhesive backed vinyl supplied on a transfer sheet. These are applied by removing the backing, leaving the vinyl on the 
+                            transfer paper. Then apply to a clean, dry, smooth surface and press firmly using a squeege.
+
+                        </p>
                         <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 py-4">
                             {renderProducts(DECAL_PRODUCTS)}
                         </div>
@@ -732,7 +737,8 @@ export default function ShopPage() {
                                 Custom stickers are high-quality, full-bleed (no borders), and finished with matte vinyl laminate for UV protection,
                                 durability, and water-resistance.
 
-                                These stickers are designed for everyday use on smooth surfaces and are hand-wash only (not dishwasher safe). <br /><br />
+                                These stickers are designed for everyday use on smooth surfaces and are hand-wash only (not dishwasher safe). Great for laptops, smooth phone cases, or glass.
+                                For application to textured surfaces, such as textures or powder-coated water bottles, premium stickers are recommended <br /><br />
 
                                 Dimensions: 1.75&quot; (44.5mm) square.<br /><br />
 
