@@ -15,6 +15,9 @@ const MYTHICS_BASE = `https://proof-nft-image.imgix.net/${MYTHICS_CONTRACT}`
 const GLYDERS_ILLU_BASE = process.env.NEXT_PUBLIC_GLYDERS_ILLU_BASE!
 const GLYDERS_PIXEL_BASE = process.env.NEXT_PUBLIC_GLYDERS_PIXEL_BASE!
 
+const TRENCHERS_PIXEL_BASE = process.env.NEXT_PUBLIC_TRENCHERS_PIXEL_BG_BASE!
+
+
 const ODDITIES_PIXEL_BASE =
   process.env.NEXT_PUBLIC_ODDITIES_PIXEL_BASE!
 
@@ -54,6 +57,13 @@ export const CUSTOM_COLLECTIONS: Record<
     buildUrl: (n) => `${MYTHICS_BASE}/${n}`,
   },
 
+  trenchers: {
+    supportsVariantToggle: false,
+    defaultVariant: 'pixel',
+    defaultPreviewToken: '1962',
+    isValidToken: (n) => n >= 0 && n <= 2222,
+      buildUrl: (n) => `${TRENCHERS_PIXEL_BASE}/${n}.png`,
+  },
 
 
 glyders: {

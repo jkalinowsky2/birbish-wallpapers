@@ -1,5 +1,5 @@
 // src/app/shop/products.ts
-export type CustomCollectionKey = 'moonbirds' | 'mythics' | 'oddities' | 'glyders'
+export type CustomCollectionKey = 'moonbirds' | 'mythics' | 'oddities' | 'glyders' | 'trenchers'
 // 🔹 One switch to control ALL custom sticker availability
 export const CUSTOM_STICKERS_IN_STOCK = true
 
@@ -272,6 +272,23 @@ export const CUSTOM_PRODUCTS: Product[] = [
     outOfStock: true,
     customCollection: 'glyders',
 
+  },
+
+    {
+    id: "square-trencher",
+    name: "Custom Trenchers Sticker",
+    priceLabel: "$1.50",
+    description: "Custom sticker, 1.75 inches",
+    image: "/assets/store/stickers/trenchersten.png",
+    priceId: "price_1SxZDc0n54kwZghJGYKYFsJe",
+    giftOnly: false,
+    outOfStock: !CUSTOM_STICKERS_IN_STOCK,
+    customCollection: "trenchers",
+    tiers: [
+      { minQty: 1, maxQty: 9, unitPrice: 1.50, priceId: "price_1SxZDc0n54kwZghJGYKYFsJe" },
+      { minQty: 10, maxQty: 19, unitPrice: 1.25, priceId: "price_1SxZEg0n54kwZghJGO6Nco6N" },
+      { minQty: 20, unitPrice: 1.00, priceId: "price_1SxZEg0n54kwZghJi4KanVha" },
+    ],
   },
 ]
 
