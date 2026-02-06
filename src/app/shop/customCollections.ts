@@ -13,7 +13,7 @@ const MYTHICS_BASE = `https://proof-nft-image.imgix.net/${MYTHICS_CONTRACT}`
 
 
 const GLYDERS_ILLU_BASE = process.env.NEXT_PUBLIC_GLYDERS_ILLU_BASE!
-const GLYDERS_PIXEL_BASE = process.env.NEXT_PUBLIC_GLYDERS_PIXEL_BASE!
+const GLYDERS_PIXEL_BASE = process.env.NEXT_PUBLIC_GLYDERS_PIXEL_BG_BASE!
 
 const TRENCHERS_PIXEL_BASE = process.env.NEXT_PUBLIC_TRENCHERS_PIXEL_BG_BASE!
 
@@ -67,8 +67,8 @@ export const CUSTOM_COLLECTIONS: Record<
 
 
 glyders: {
-  supportsVariantToggle: true,
-  defaultVariant: 'illustrated',
+  supportsVariantToggle: false,
+  defaultVariant: 'pixel',
   defaultPreviewToken: '925', // pick a token you KNOW exists in your Glyders CDN
   isValidToken: (n) => n >= 1 && n <= 3333, // adjust if Glyders range differs
   buildUrl: (n, variant) => {

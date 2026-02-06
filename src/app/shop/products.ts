@@ -261,17 +261,21 @@ export const CUSTOM_PRODUCTS: Product[] = [
   },
 
 
-  {
+      {
     id: "square-glyder",
-    name: "Custom NightGlyder Sticker",
-    priceLabel: "",
-    description: "Custom sticker 1.75 inches",
+    name: "Custom Glyders Sticker",
+    priceLabel: "$1.50",
+    description: "Custom sticker, 1.75 inches",
     image: "/assets/store/stickers/glydersten.png",
-    priceId: "price_1SicHw0n54kwZghJ9xL1JiGl_UPDATE", //
+    priceId: "price_1Sxqau0n54kwZghJ8rJuJJwY",
     giftOnly: false,
-    outOfStock: true,
-    customCollection: 'glyders',
-
+    outOfStock: !CUSTOM_STICKERS_IN_STOCK,
+    customCollection: "glyders",
+    tiers: [
+      { minQty: 1, maxQty: 9, unitPrice: 1.50, priceId: "price_1Sxqau0n54kwZghJ8rJuJJwY" },
+      { minQty: 10, maxQty: 19, unitPrice: 1.25, priceId: "price_1Sxqbf0n54kwZghJBytySlct" },
+      { minQty: 20, unitPrice: 1.00, priceId: "price_1Sxqbf0n54kwZghJsDn32vy1" },
+    ],
   },
 
     {
