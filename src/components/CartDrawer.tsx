@@ -128,7 +128,12 @@ export function CartDrawer({
 
                             return (
                                 <div key={cartKey} className="flex gap-3 border p-3">
-                                    <div className="relative h-14 w-14 shrink-0 rounded-md overflow-hidden bg-white">
+                                    <div
+                                        className={`
+    relative h-14 w-14 shrink-0 rounded-md overflow-hidden
+    ${collection === 'glyders' && (variant ?? 'illustrated') === 'illustrated' ? 'bg-[#0447af]' : 'bg-white'}
+  `}
+                                    >
                                         {imgSrc ? (
                                             <Image
                                                 src={imgSrc}

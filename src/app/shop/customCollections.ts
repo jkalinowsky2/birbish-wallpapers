@@ -16,6 +16,7 @@ const GLYDERS_ILLU_BASE = process.env.NEXT_PUBLIC_GLYDERS_ILLU_BASE!
 const GLYDERS_PIXEL_BASE = process.env.NEXT_PUBLIC_GLYDERS_PIXEL_BG_BASE!
 
 const TRENCHERS_PIXEL_BASE = process.env.NEXT_PUBLIC_TRENCHERS_PIXEL_BG_BASE!
+const TRENCHERS_ILLUSTRATED_BASE = process.env.NEXT_PUBLIC_TRENCHERS_ILLU_BG_BASE!
 
 
 const ODDITIES_PIXEL_BASE =
@@ -57,17 +58,34 @@ export const CUSTOM_COLLECTIONS: Record<
     buildUrl: (n) => `${MYTHICS_BASE}/${n}`,
   },
 
-  trenchers: {
-    supportsVariantToggle: false,
-    defaultVariant: 'pixel',
-    defaultPreviewToken: '1962',
-    isValidToken: (n) => n >= 0 && n <= 2222,
-      buildUrl: (n) => `${TRENCHERS_PIXEL_BASE}/${n}.png`,
+  // trenchers: {
+  //   supportsVariantToggle: false,
+  //   defaultVariant: 'pixel',
+  //   defaultPreviewToken: '1962',
+  //   isValidToken: (n) => n >= 0 && n <= 2222,
+  //     buildUrl: (n) => `${TRENCHERS_PIXEL_BASE}/${n}.png`,
+  // },
+
+  //VARIATION LISTING - ONLY ILLU WORKS
+trenchers: {
+  supportsVariantToggle: true,
+  defaultVariant: 'pixel',
+  defaultPreviewToken: '1962',
+  isValidToken: (n) => n >= 0 && n <= 9999,
+  buildUrl: (n, variant) => {
+    const ext = variant === 'pixel' ? 'png' : 'jpg'
+    const base =
+      variant === 'pixel'
+        ? TRENCHERS_PIXEL_BASE
+        : TRENCHERS_ILLUSTRATED_BASE
+
+    return `${base}/${n}.${ext}`
   },
+},
 
 
 glyders: {
-  supportsVariantToggle: false,
+  supportsVariantToggle: true,
   defaultVariant: 'pixel',
   defaultPreviewToken: '925', // pick a token you KNOW exists in your Glyders CDN
   isValidToken: (n) => n >= 1 && n <= 3333, // adjust if Glyders range differs

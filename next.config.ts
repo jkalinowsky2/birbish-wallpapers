@@ -25,6 +25,11 @@ const nextConfig: NextConfig = {
         hostname: 'pub-4c3e2129a77841fd8e20ee10a3d9ff99.r2.dev', //Trenchers
         pathname: '/**',
       },
+      {
+        protocol: "https",
+        hostname: "www.trenchersonape.com",
+        pathname: "/**",
+      },
     ],
   },
 };

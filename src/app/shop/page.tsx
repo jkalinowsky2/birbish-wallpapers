@@ -715,7 +715,7 @@ export default function ShopPage() {
                             Transfer Stickers
                         </h2>
                         <p className="mt-0">
-                            Transfer stickers are precision cut, adhesive backed vinyl supplied on a transfer sheet. These are applied by removing the backing, leaving the vinyl on the 
+                            Transfer stickers are precision cut, adhesive backed vinyl supplied on a transfer sheet. These are applied by removing the backing, leaving the vinyl on the
                             transfer paper. Then apply to a clean, dry, smooth surface and press firmly using a squeege.
 
                         </p>
@@ -858,6 +858,48 @@ export default function ShopPage() {
                                                     {tokenPreviewError}
                                                 </div>
                                             ) : (
+                                                <div
+                                                    className={`
+            mx-auto
+            h-40 w-40
+            rounded-xl
+            shadow-[3px_3px_12px_rgba(0,0,0,0.5)]
+            overflow-hidden
+            ${customCollection === 'glyders' && customVariant === 'illustrated'
+                                                            ? 'bg-[#0447af]'
+                                                            : 'bg-white'
+                                                        }
+          `}
+                                                >
+                                                    <img
+                                                        key={`${customCollection}:${customVariant}:${customTokenId.trim()}`}
+                                                        src={tokenPreviewUrl}
+                                                        alt={`Preview #${customTokenId}`}
+                                                        className="h-full w-full object-contain"
+                                                        onError={() =>
+                                                            setTokenPreviewError(
+                                                                'Could not load that image. Check the Token ID.'
+                                                            )
+                                                        }
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <div className="text-xs text-neutral-500">
+                                            Enter a Token ID to see a preview.
+                                        </div>
+                                    )}
+                                </div>
+                                {/* Preview
+                                <div className="mt-4">
+                                    {tokenPreviewUrl ? (
+                                        <div className="rounded-lg p-2">
+                                            {tokenPreviewError ? (
+                                                <div className="text-sm text-red-600">
+                                                    {tokenPreviewError}
+                                                </div>
+                                            ) : (
                                                 <img
                                                     key={`${customCollection}:${customVariant}:${customTokenId.trim()}`}
                                                     src={tokenPreviewUrl}
@@ -883,7 +925,7 @@ export default function ShopPage() {
                                             Enter a Token ID to see a preview.
                                         </div>
                                     )}
-                                </div>
+                                </div> */}
 
                                 {/* Add to cart */}
                                 <div className="mt-4 flex items-center gap-3">
