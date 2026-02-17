@@ -17,8 +17,12 @@ export function UnderConstruction() {
         <div style={{ fontSize: 12, letterSpacing: 2, opacity: 0.8 }}>
           GENERATIONAL MERCH WILL BE
         </div>
-        <h1 style={{ fontSize: 44, margin: "14px 0 10px" }}>BACK SOON(ish)</h1>
+        <h1 style={{ fontSize: 44, margin: "14px 0 30px" }}>BACK SOON(ish)</h1>
+          <p style={{ fontSize: 12, letterSpacing: 2, opacity: 0.8  }}>
+          MESSAGE @_JKNFT_ FOR INQUIRIES
+        </p>
       </div>
+
     </div>
   );
 }
