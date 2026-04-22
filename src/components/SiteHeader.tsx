@@ -110,7 +110,7 @@ export default function Header() {
           </Link>
 
           <Link
-            href="/ticker"
+            href="/mode"
             className={`px-0 py-2 rounded-lg text-sm font-medium 
     ${pathname?.startsWith("/gallery")
                 ? ACTIVE_CLS
@@ -235,8 +235,8 @@ export default function Header() {
               Gallery
             </Link>
             <Link
-              href="/ticker"
-              className={linkClasses("/ticker")}
+              href="/mode"
+              className={linkClasses("/mode")}
               onClick={() => setMobileOpen(false)}
             >
               🧹
