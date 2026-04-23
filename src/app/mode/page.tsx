@@ -17,22 +17,31 @@ function getRandomLogoColor(): LogoColor {
   const roll = Math.random();
 
   if (roll < 0.75) return LOGO_COLORS.red;
-  if (roll < 0.8) return LOGO_COLORS.cream;
+  // if (roll < 0.8) return LOGO_COLORS.cream;
   if (roll < 0.85) return LOGO_COLORS.black;
-  if (roll < 0.90) return LOGO_COLORS.pink;
-  if (roll < 0.95) return LOGO_COLORS.maroon;
-  return LOGO_COLORS.blue;
+  // if (roll < 0.90) return LOGO_COLORS.pink;
+  // if (roll < 0.95) return LOGO_COLORS.maroon;
+  return LOGO_COLORS.pink;
 }
 
 export default function BirbModePage() {
   const [enabled, setEnabled] = useState(false);
   const [logoColor, setLogoColor] = useState<LogoColor>(LOGO_COLORS.red);
-  const [modeCount, setModeCount] = useState(0);
+  const [birbCount, setBirbCount] = useState(0);
 
   function toggleMode() {
     if (!enabled) {
-      setLogoColor(getRandomLogoColor());
-      setModeCount((count) => count + 1);
+      const nextColor = getRandomLogoColor();
+
+      setLogoColor(nextColor);
+
+      if (nextColor === LOGO_COLORS.black) {
+        setBirbCount(0);
+      } else if (nextColor === LOGO_COLORS.pink) {
+        setBirbCount((count) => count + 25);
+      } else if (nextColor === LOGO_COLORS.red) {
+        setBirbCount((count) => count + 5);
+      }
     }
 
     setEnabled((current) => !current);
@@ -40,15 +49,7 @@ export default function BirbModePage() {
 
   return (
     <div className="relative min-h-[calc(100dvh-10rem)] w-full bg-transparent">
-      <input
-        aria-label="BIRB mode toggle count"
-        className="fixed right-4 top-20 z-20 h-9 w-20 rounded border-0 bg-transparent px-2 text-center text-sm font-semibold text-black focus:outline-none"
-        readOnly
-        type="text"
-        value={modeCount.toLocaleString()}
-      />
-
-      <section className="mx-auto flex min-h-[calc(100dvh-10rem)] w-full max-w-2xl flex-col items-center justify-center gap-20 px-6 py-16">
+      <section className="mx-auto flex min-h-[calc(100dvh-10rem)] w-full max-w-2xl flex-col items-center justify-center gap-8 px-6 py-16 sm:gap-10">
         <div
           className={[
             "h-44 w-44 transition duration-500 sm:h-62 sm:w-62",
@@ -67,6 +68,13 @@ export default function BirbModePage() {
             maskSize: "contain",
           }}
         />
+
+        <div
+          className="text-lg font-semibold leading-none tracking-normal text-neutral-200 transition-colors duration-500 sm:text-2xl"
+          style={enabled ? { color: logoColor } : undefined}
+        >
+          {`$birb ${birbCount.toLocaleString()}`}
+        </div>
 
         <div className="flex w-full items-center justify-center gap-5 sm:gap-7">
           <h1
@@ -103,6 +111,12 @@ export default function BirbModePage() {
               ].join(" ")}
             />
           </button>
+        </div>
+
+        <div className="text-center text-sm font-medium leading-6 text-neutral-700">
+          <div>Red: +5 $birb</div>
+          <div>Pink: +25 $birb</div>
+          <div>Black: Rugged!</div>
         </div>
       </section>
     </div>
