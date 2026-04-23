@@ -8,9 +8,27 @@ export default function BirbModePage() {
   return (
     <div className="min-h-[calc(100dvh-10rem)] w-full bg-transparent">
       <section className="mx-auto flex min-h-[calc(100dvh-10rem)] w-full max-w-2xl flex-col items-center justify-center gap-20 px-6 py-16">
-        <div className="flex w-full items-center justify-between gap-8">
-          <h1 className="text-4xl font-semibold tracking-normal text-black sm:text-5xl">
-            $BIRB Mode
+        <div
+          className={[
+            "h-44 w-44 transition duration-500 sm:h-62 sm:w-62",
+            enabled ? "bg-[#c30500] opacity-100" : "bg-neutral-200 opacity-30",
+          ].join(" ")}
+          aria-hidden="true"
+          style={{
+            WebkitMaskImage: "url('/overlays/birblogo.png')",
+            maskImage: "url('/overlays/birblogo.png')",
+            WebkitMaskPosition: "center",
+            maskPosition: "center",
+            WebkitMaskRepeat: "no-repeat",
+            maskRepeat: "no-repeat",
+            WebkitMaskSize: "contain",
+            maskSize: "contain",
+          }}
+        />
+
+        <div className="flex w-full items-center justify-center gap-5 sm:gap-7">
+          <h1 className="whitespace-nowrap text-[2rem] font-semibold leading-none tracking-normal text-black sm:text-5xl">
+            $birb mode
           </h1>
 
           <button
@@ -35,24 +53,6 @@ export default function BirbModePage() {
             />
           </button>
         </div>
-
-        <div
-          className={[
-            "h-36 w-36 transition duration-500 sm:h-44 sm:w-44",
-            enabled ? "bg-[#c30500] opacity-100" : "bg-neutral-200 opacity-30",
-          ].join(" ")}
-          aria-hidden="true"
-          style={{
-            WebkitMaskImage: "url('/overlays/birblogo.png')",
-            maskImage: "url('/overlays/birblogo.png')",
-            WebkitMaskPosition: "center",
-            maskPosition: "center",
-            WebkitMaskRepeat: "no-repeat",
-            maskRepeat: "no-repeat",
-            WebkitMaskSize: "contain",
-            maskSize: "contain",
-          }}
-        />
       </section>
     </div>
   );
