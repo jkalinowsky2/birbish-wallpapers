@@ -2,8 +2,41 @@
 
 import { useState } from "react";
 
+const LOGO_COLORS = {
+  red: "#d12429",
+  black: "#000000",
+  blue: "#1a265e",
+  cream: "#ecd9ba",
+  pink: "#e84294",
+  maroon: "#7d050d"
+} as const;
+
+type LogoColor = (typeof LOGO_COLORS)[keyof typeof LOGO_COLORS];
+
+function getRandomLogoColor(): LogoColor {
+  const roll = Math.random();
+
+  if (roll < 0.75) return LOGO_COLORS.red;
+  if (roll < 0.8) return LOGO_COLORS.cream;
+  if (roll < 0.85) return LOGO_COLORS.black;
+  if (roll < 0.90) return LOGO_COLORS.pink;
+  if (roll < 0.95) return LOGO_COLORS.maroon;
+  return LOGO_COLORS.blue;
+}
+
 export default function BirbModePage() {
   const [enabled, setEnabled] = useState(false);
+  const [logoColor, setLogoColor] = useState<LogoColor>(LOGO_COLORS.red);
+
+  function toggleMode() {
+    setEnabled((current) => {
+      if (!current) {
+        setLogoColor(getRandomLogoColor());
+      }
+
+      return !current;
+    });
+  }
 
   return (
     <div className="min-h-[calc(100dvh-10rem)] w-full bg-transparent">
@@ -11,10 +44,11 @@ export default function BirbModePage() {
         <div
           className={[
             "h-44 w-44 transition duration-500 sm:h-62 sm:w-62",
-            enabled ? "bg-[#c30500] opacity-100" : "bg-neutral-200 opacity-30",
+            enabled ? "opacity-100" : "bg-neutral-200 opacity-30",
           ].join(" ")}
           aria-hidden="true"
           style={{
+            backgroundColor: enabled ? logoColor : undefined,
             WebkitMaskImage: "url('/overlays/birblogo.png')",
             maskImage: "url('/overlays/birblogo.png')",
             WebkitMaskPosition: "center",
@@ -27,7 +61,10 @@ export default function BirbModePage() {
         />
 
         <div className="flex w-full items-center justify-center gap-5 sm:gap-7">
-          <h1 className="whitespace-nowrap text-[2rem] font-semibold leading-none tracking-normal text-black sm:text-5xl">
+          <h1
+            className="whitespace-nowrap text-[2rem] font-semibold leading-none tracking-normal text-neutral-200 transition-colors duration-500 sm:text-5xl"
+            style={enabled ? { color: logoColor } : undefined}
+          >
             $birb mode
           </h1>
 
@@ -36,13 +73,19 @@ export default function BirbModePage() {
             role="switch"
             aria-checked={enabled}
             aria-label="BIRB Mode"
-            onClick={() => setEnabled((current) => !current)}
+            onClick={toggleMode}
             className={[
               "relative h-14 w-28 shrink-0 rounded-full border-2 transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black",
-              enabled
-                ? "border-[#c30500] bg-[#c30500]"
-                : "border-neutral-300 bg-neutral-200",
+              enabled ? "" : "border-neutral-300 bg-neutral-200",
             ].join(" ")}
+            style={
+              enabled
+                ? {
+                    backgroundColor: logoColor,
+                    borderColor: logoColor,
+                  }
+                : undefined
+            }
           >
             <span
               aria-hidden="true"
