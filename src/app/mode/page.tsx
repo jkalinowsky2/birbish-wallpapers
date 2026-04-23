@@ -27,19 +27,27 @@ function getRandomLogoColor(): LogoColor {
 export default function BirbModePage() {
   const [enabled, setEnabled] = useState(false);
   const [logoColor, setLogoColor] = useState<LogoColor>(LOGO_COLORS.red);
+  const [modeCount, setModeCount] = useState(0);
 
   function toggleMode() {
-    setEnabled((current) => {
-      if (!current) {
-        setLogoColor(getRandomLogoColor());
-      }
+    if (!enabled) {
+      setLogoColor(getRandomLogoColor());
+      setModeCount((count) => count + 1);
+    }
 
-      return !current;
-    });
+    setEnabled((current) => !current);
   }
 
   return (
-    <div className="min-h-[calc(100dvh-10rem)] w-full bg-transparent">
+    <div className="relative min-h-[calc(100dvh-10rem)] w-full bg-transparent">
+      <input
+        aria-label="BIRB mode toggle count"
+        className="fixed right-4 top-20 z-20 h-9 w-20 rounded border-0 bg-transparent px-2 text-center text-sm font-semibold text-black focus:outline-none"
+        readOnly
+        type="text"
+        value={modeCount.toLocaleString()}
+      />
+
       <section className="mx-auto flex min-h-[calc(100dvh-10rem)] w-full max-w-2xl flex-col items-center justify-center gap-20 px-6 py-16">
         <div
           className={[
