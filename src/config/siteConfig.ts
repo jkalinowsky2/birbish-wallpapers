@@ -7,7 +7,7 @@ export const siteConfig = {
   limitOrdersToInventory: true,   // 🔥 Set true to limit quantites added to ccart to in-stock items
   shopPopupOn: false,
   
-  allowGifts: true,               // Moonbird gift stickers on/off
+  allowGifts: false,              // Moonbird gift stickers on/off
   enableStickerPackLogic: true,   // Inventory bundling for pack
   maintenanceMode: false,         // Show a banner + disable buying
 

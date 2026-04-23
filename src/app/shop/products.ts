@@ -174,17 +174,17 @@ export const STICKER_PRODUCTS: Product[] = [
 
 
   },
-  {
-    id: "birb-sticker-holo",
-    name: "Holographic birb Logo Sticker",
-    priceLabel: "$5.00",
-    description: "Free for Moonbirds holders w/ $10 purchase *",
-    image: "/assets/store/stickers/birblogosticker-holo.png",
-    priceId: "price_1STSql0n54kwZghJct2G53rB", //
-    giftOnly: true,
-    outOfStock: false,
+  // {
+  //   id: "birb-sticker-holo",
+  //   name: "Holographic birb Logo Sticker",
+  //   priceLabel: "$5.00",
+  //   description: "Free for Moonbirds holders w/ $10 purchase *",
+  //   image: "/assets/store/stickers/birblogosticker-holo.png",
+  //   priceId: "price_1STSql0n54kwZghJct2G53rB", //
+  //   giftOnly: true,
+  //   outOfStock: false,
 
-  },
+  // },
 
 
 ];

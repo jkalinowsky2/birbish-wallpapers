@@ -8,6 +8,7 @@ import {
     getTierForQuantity,
     getBaseUnitPrice,
 } from '@/app/shop/products'
+import { siteConfig } from '@/config/siteConfig'
 import { randomUUID } from 'crypto'
 
 console.log('[checkout] ROUTE VERSION = split-variants-v2')
@@ -290,7 +291,7 @@ export async function POST(request: Request) {
         const wallet = (walletAddress ?? '').toLowerCase().trim()
         let canGrantGift = false
 
-        if (giftEligible && wallet && GIFT_PRICE_ID && GIFT_COUPON_ID) {
+        if (siteConfig.allowGifts && giftEligible && wallet && GIFT_PRICE_ID && GIFT_COUPON_ID) {
             try {
                 const [alreadyClaimed, rawCount] = await Promise.all([
                     kv.get<string | null>(`gift_claimed:${wallet}`),

@@ -173,8 +173,8 @@ export default function ShopPage() {
         let cancelled = false
 
         async function loadHolderStatus() {
-            // wallet disconnected -> reset UI state
-            if (!address) {
+            // wallet disconnected or gifts disabled -> reset UI state
+            if (!siteConfig.allowGifts || !address) {
                 setIsHolder(false)
                 setHasClaimedGift(false)
                 setRemainingGifts(null)
@@ -331,6 +331,7 @@ export default function ShopPage() {
     // Compute eligibility for free sticker
     const REQ_MIN = 10
     const isGiftEligible =
+        siteConfig.allowGifts &&
         isHolder &&
         !hasClaimedGift &&
         totalPrice >= REQ_MIN &&
@@ -595,7 +596,7 @@ export default function ShopPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     items,
-                    giftEligible: isGiftEligible,
+                    giftEligible: siteConfig.allowGifts && isGiftEligible,
                     walletAddress: address ?? '',
                     shippingRegion,             // 👈 add this
                 }),
@@ -650,24 +651,26 @@ export default function ShopPage() {
                             Premium die-cut vinyl stickers and decals for water bottles,
                             laptops, and everywhere you rep the birbs.
                         </p>
-                        <div
-                            className="
+                        {siteConfig.allowGifts && (
+                            <div
+                                className="
     inline-flex items-center gap-2 
     rounded-full bg-black/60 border border-white/10
     px-3 py-[4px]          /* tighter padding on mobile */
     text-[10px] sm:text-xs text-neutral-100 
     mt-4 sm:mt-6
   "
-                        >
+                            >
 
-                            <span className="font-semibold uppercase tracking-[0.18em] text-[11px] text-[#ffd28f]">
-                                NOW OPEN!
-                            </span>
+                                <span className="font-semibold uppercase tracking-[0.18em] text-[11px] text-[#ffd28f]">
+                                    NOW OPEN!
+                                </span>
 
-                            <span className="text-[11px] md:text-xs">
-                                Free Moonbird-exclusive holographic sticker with $10+ order.
-                            </span>
-                        </div>
+                                <span className="text-[11px] md:text-xs">
+                                    Free Moonbird-exclusive holographic sticker with $10+ order.
+                                </span>
+                            </div>
+                        )}
 
                         {/* Paused Message */}
                         {/* <div
@@ -1018,28 +1021,28 @@ export default function ShopPage() {
                                         </div>
                                     )}
 
-                                    {isHolder && hasClaimedGift && (
+                                    {siteConfig.allowGifts && isHolder && hasClaimedGift && (
                                         <div className="text-xs text-neutral-600 mt-1">
                                             You&apos;ve already claimed your free holographic sticker
                                             on a previous order. 🦉
                                         </div>
                                     )}
 
-                                    {isHolder && !hasClaimedGift && (remainingGifts ?? 1) <= 0 && (
+                                    {siteConfig.allowGifts && isHolder && !hasClaimedGift && (remainingGifts ?? 1) <= 0 && (
                                         <div className="text-xs text-neutral-600 mt-1">
                                             This round of holographic stickers have all been claimed.
                                             Thanks, birbs! ❤️
                                         </div>
                                     )}
 
-                                    {isGiftEligible && (remainingGifts ?? 1) > 0 && (
+                                    {siteConfig.allowGifts && isGiftEligible && (remainingGifts ?? 1) > 0 && (
                                         <div className="text-xs font-medium text-green-700 mt-1">
                                             🎁 Congrats, birb! You&apos;re getting a free sticker with
                                             this order for holding a Moonbird.
                                         </div>
                                     )}
 
-                                    {!isGiftEligible && !hasClaimedGift && totalItems > 0 && (
+                                    {siteConfig.allowGifts && !isGiftEligible && !hasClaimedGift && totalItems > 0 && (
                                         <div className="text-xs text-neutral-600 mt-1">
                                             Connect a wallet that holds a Moonbird and spend ${REQ_MIN}
                                             + to unlock a free holographic sticker.

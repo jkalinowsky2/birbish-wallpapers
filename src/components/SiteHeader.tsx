@@ -126,18 +126,18 @@ export default function Header() {
           </Link> */}
 
           {/* 🔌 Connect Wallet – desktop */}
-          <div className="ml-2">
+          {/* <div className="ml-2">
             <ConnectButton />
-          </div>
+          </div> */}
         </nav>
 
         {/* MOBILE RIGHT SIDE: Connect + Hamburger */}
         <div className="flex items-center gap-2 md:hidden">
-          <ConnectButton
+          {/* <ConnectButton
             chainStatus="icon"
             showBalance={false}
             accountStatus="address"
-          />
+          /> */}
           <button
             className="inline-flex items-center justify-center rounded-md p-2 hover:bg-neutral-100"
             onClick={() => setMobileOpen((v) => !v)}
