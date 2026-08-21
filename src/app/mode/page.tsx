@@ -73,7 +73,7 @@ export default function BirbModePage() {
           className="text-lg font-semibold leading-none tracking-normal text-neutral-200 transition-colors duration-500 sm:text-2xl"
           style={enabled ? { color: logoColor } : undefined}
         >
-          {`$birb ${birbCount.toLocaleString()}`}
+          {`Mythics ${birbCount.toLocaleString()}`}
         </div>
 
         <div className="flex w-full items-center justify-center gap-5 sm:gap-7">
@@ -81,14 +81,14 @@ export default function BirbModePage() {
             className="whitespace-nowrap text-[2rem] font-semibold leading-none tracking-normal text-neutral-200 transition-colors duration-500 sm:text-5xl"
             style={enabled ? { color: logoColor } : undefined}
           >
-            $birb mode
+            Mythics Mode
           </h1>
 
           <button
             type="button"
             role="switch"
             aria-checked={enabled}
-            aria-label="BIRB Mode"
+            aria-label="Mythics Mode"
             onClick={toggleMode}
             className={[
               "relative h-14 w-28 shrink-0 rounded-full border-2 transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black",
@@ -114,8 +114,8 @@ export default function BirbModePage() {
         </div>
 
         <div className="text-center text-sm font-medium leading-6 text-neutral-700">
-          <div>Red: +5 $birb</div>
-          <div>Pink: +25 $birb</div>
+          <div>Red: +5 Mythics</div>
+          <div>Pink: +25 Mythics</div>
           <div>Black: Rugged!</div>
         </div>
       </section>
