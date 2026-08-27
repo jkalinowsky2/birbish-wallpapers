@@ -5,6 +5,7 @@ import { kv } from '@vercel/kv'
 import {
     ALL_PRODUCTS,
     CUSTOM_PRODUCTS,
+    LIMITED_EDITION_PRODUCTS,
     getTierForQuantity,
     getBaseUnitPrice,
 } from '@/app/shop/products'
@@ -17,6 +18,7 @@ const MIN_CUSTOM_QTY = 5
 
 // ✅ Identify custom products by *productId* (NOT priceId)
 const CUSTOM_PRODUCT_IDS = new Set(CUSTOM_PRODUCTS.map((p) => p.id))
+const LIMITED_EDITION_PRODUCT_IDS = new Set(LIMITED_EDITION_PRODUCTS.map((p) => p.id))
 
 // ✅ Fast lookup by productId
 const PRODUCT_BY_ID = new Map(ALL_PRODUCTS.map((p) => [p.id, p]))
@@ -236,6 +238,11 @@ export async function POST(request: Request) {
             const tier = getTierForQuantity(product, pricingQty)
             const baseUnit = getBaseUnitPrice(product)
             const unitPrice = tier ? tier.unitPrice : baseUnit
+            const imageUrl = product.image
+                ? (product.image.startsWith('http')
+                    ? product.image
+                    : `${origin}${product.image.startsWith('/') ? '' : '/'}${product.image}`)
+                : undefined
 
             // Which Stripe priceId should we use for this line?
             // - LIVE: use tier priceId
@@ -244,21 +251,25 @@ export async function POST(request: Request) {
                 tier && tier.unitPrice !== baseUnit ? tier.priceId : product.priceId
             const chosenPriceId = IS_TEST ? mapToTestPrice(livePriceId) : livePriceId
 
+            if (LIMITED_EDITION_PRODUCT_IDS.has(product.id)) {
+                lineItems.push({
+                    price_data: {
+                        currency: 'usd',
+                        unit_amount: Math.round(unitPrice * 100),
+                        product_data: {
+                            name: product.name,
+                            description: product.description,
+                            ...(imageUrl ? { images: [imageUrl] } : {}),
+                        },
+                    },
+                    quantity: groupQty,
+                })
+                continue
+            }
+
             // ✅ Moonbird variant lines: force separate display using price_data
             // (Stripe would otherwise combine identical price IDs.)
             if (product.customCollection === 'moonbirds' && variant) {
-                // Stripe requires absolute URLs for images in Checkout
-                const baseUrl =
-                    process.env.NEXT_PUBLIC_SITE_URL ??
-                    request.headers.get('origin') ??
-                    'http://localhost:3000'
-
-                const imageUrl = product.image
-                    ? (product.image.startsWith('http')
-                        ? product.image
-                        : `${baseUrl}${product.image.startsWith('/') ? '' : '/'}${product.image}`)
-                    : undefined
-
                 lineItems.push({
                     price_data: {
                         currency: 'usd',

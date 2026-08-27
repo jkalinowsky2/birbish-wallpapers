@@ -10,6 +10,7 @@ import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import {
     STICKER_PRODUCTS,
+    LIMITED_EDITION_PRODUCTS,
     DECAL_PRODUCTS,
     CUSTOM_PRODUCTS,
     ALL_PRODUCTS,
@@ -341,9 +342,12 @@ export default function ShopPage() {
     const renderProducts = (items: Product[]) =>
         items.map((product) => {
             const isGiftOnly = product.giftOnly === true
+            const isPrintOnDemand = product.printOnDemand === true
 
             // 🔹 Look up inventory from DB using priceId
-            const inventoryQty = inventoryByPriceId[product.priceId]
+            const inventoryQty = isPrintOnDemand
+                ? undefined
+                : inventoryByPriceId[product.priceId]
 
             // 🔹 Treat 0 or negative inventory as out of stock
             const isOutOfStock =
@@ -448,7 +452,7 @@ export default function ShopPage() {
                             </p>
 
                             {/* 🔹 Inventory display */}
-                            {siteConfig.showInventory && typeof inventoryQty === 'number' && (
+                            {siteConfig.showInventory && !isPrintOnDemand && typeof inventoryQty === 'number' && (
                                 <p className="mt-1 text-[11px] text-neutral-500">
                                     {inventoryQty > 0 ? `${inventoryQty} in stock` : 'Out of stock'}
                                 </p>
@@ -539,7 +543,7 @@ export default function ShopPage() {
                                             const clean = Math.max(0, Math.floor(raw) || 0)
 
                                             const finalQty =
-                                                siteConfig.limitOrdersToInventory && typeof inventoryQty === 'number'
+                                                siteConfig.limitOrdersToInventory && !isPrintOnDemand && typeof inventoryQty === 'number'
                                                     ? Math.min(clean, inventoryQty)
                                                     : clean
 
@@ -555,7 +559,7 @@ export default function ShopPage() {
                                             const nextQty = qty + 1
 
                                             const finalQty =
-                                                siteConfig.limitOrdersToInventory && typeof inventoryQty === 'number'
+                                                siteConfig.limitOrdersToInventory && !isPrintOnDemand && typeof inventoryQty === 'number'
                                                     ? Math.min(nextQty, inventoryQty)
                                                     : nextQty
 
@@ -709,6 +713,20 @@ export default function ShopPage() {
                         </p>
                         <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 py-4">
                             {renderProducts(STICKER_PRODUCTS)}
+                        </div>
+                    </section>
+
+                    {/* Limited edition stickers */}
+                    <section className="space-y-2 mt-4">
+                        <h2 className="text-lg font-semibold tracking-wide text-neutral-800">
+                            Limited Edition Stickers
+                        </h2>
+                        <p className="mt-0">
+                            Handmade, limited-run stickers made in-house. These stickers are designed for everyday use on smooth surfaces and are hand-wash only (not dishwasher safe). Great for laptops, smooth phone cases, or glass.
+                            For application to textured surfaces, such as textures or powder-coated water bottles, premium stickers are recommended 
+                        </p>
+                        <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 py-4">
+                            {renderProducts(LIMITED_EDITION_PRODUCTS)}
                         </div>
                     </section>
 

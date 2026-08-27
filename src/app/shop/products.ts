@@ -1,7 +1,7 @@
 // src/app/shop/products.ts
 export type CustomCollectionKey = 'moonbirds' | 'mythics' | 'oddities' | 'glyders' | 'trenchers'
 // 🔹 One switch to control ALL custom sticker availability
-export const CUSTOM_STICKERS_IN_STOCK = false
+export const CUSTOM_STICKERS_IN_STOCK = true
 
 export type Product = {
   id: string;
@@ -12,6 +12,7 @@ export type Product = {
   priceId: string;     // Stripe price ID
   giftOnly?: boolean
   outOfStock?: boolean;
+  printOnDemand?: boolean;
   tiers?: PriceTier[]
   customCollection?: CustomCollectionKey
 };
@@ -189,6 +190,63 @@ export const STICKER_PRODUCTS: Product[] = [
 
 ];
 
+// 🔹 Handmade non-custom stickers
+export const LIMITED_EDITION_PRODUCTS: Product[] = [
+  {
+    id: "bWo",
+    name: "bWo Sticker",
+    priceLabel: "$1.50",
+    description: "bWo sticker. 1 x 1.375 inches.",
+    image: "/assets/store/stickers/bwo.png",
+    priceId: "price_1SgPeq0n54kwZghJSPoehneW", //update
+    outOfStock: false,
+    printOnDemand: true,
+    tiers: [
+      { minQty: 1, maxQty: 9, unitPrice: 1.50, priceId: "price_1U92B90n54kwZghJnaP0uLNG" },
+      { minQty: 10, maxQty: 19, unitPrice: 1.25, priceId: "price_1U92B90n54kwZghJIfi3qguN" },
+      { minQty: 20, unitPrice: 1.00, priceId: "price_1U92B90n54kwZghJVj0S78s3" },
+    ],
+
+
+  },
+
+    {
+    id: "odddmc",
+    name: "ODDITY Sticker",
+    priceLabel: "$1.50",
+    description: "ODDITY sticker. 2 x 2 inches.",
+    image: "/assets/store/stickers/oddity.png",
+    priceId: "price_1SgPeq0n54kwZghJSPoehneW", //update
+    outOfStock: false,
+    printOnDemand: true,
+    tiers: [
+      { minQty: 1, maxQty: 9, unitPrice: 1.50, priceId: "price_1U92L50n54kwZghJUZ2x4XDYr" },
+      { minQty: 10, maxQty: 19, unitPrice: 1.25, priceId: "price_1U92M70n54kwZghJn9Te7rX7" },
+      { minQty: 20, unitPrice: 1.00, priceId: "price_1U92M70n54kwZghJGGAK61td" },
+    ],
+
+
+  },
+
+      {
+    id: "beastie",
+    name: "Beastie Birbs Sticker",
+    priceLabel: "$1.50",
+    description: "Beastie Birbs sticker. 2 x 4 inches.",
+    image: "/assets/store/stickers/beastiebirbs.png",
+    priceId: "price_1SgPeq0n54kwZghJSPoehneW", //update
+    outOfStock: false,
+    printOnDemand: true,
+    tiers: [
+      { minQty: 1, maxQty: 9, unitPrice: 1.50, priceId: "price_1U92OW0n54kwZghJmoNdRvSt" },
+      { minQty: 10, maxQty: 19, unitPrice: 1.25, priceId: "price_1U92OW0n54kwZghJjDMd3ZB5" },
+      { minQty: 20, unitPrice: 1.00, priceId: "price_1U92OW0n54kwZghJ9m93Rk47" },
+    ],
+
+
+  },
+]
+
 
 // 🔹 New transfer decals
 export const DECAL_PRODUCTS: Product[] = [
@@ -206,6 +264,7 @@ export const DECAL_PRODUCTS: Product[] = [
 
 // 🔹 New customized stickers
 export const CUSTOM_PRODUCTS: Product[] = [
+
 
   {
     id: "square-moonbird",
@@ -261,44 +320,45 @@ export const CUSTOM_PRODUCTS: Product[] = [
   },
 
 
-      {
-    id: "square-glyder",
-    name: "Custom Glyders Sticker",
-    priceLabel: "$1.50",
-    description: "Custom sticker, 1.75 inches",
-    image: "/assets/store/stickers/glydersten.png",
-    priceId: "price_1Sxqau0n54kwZghJ8rJuJJwY",
-    giftOnly: false,
-    outOfStock: !CUSTOM_STICKERS_IN_STOCK,
-    customCollection: "glyders",
-    tiers: [
-      { minQty: 1, maxQty: 9, unitPrice: 1.50, priceId: "price_1Sxqau0n54kwZghJ8rJuJJwY" },
-      { minQty: 10, maxQty: 19, unitPrice: 1.25, priceId: "price_1Sxqbf0n54kwZghJBytySlct" },
-      { minQty: 20, unitPrice: 1.00, priceId: "price_1Sxqbf0n54kwZghJsDn32vy1" },
-    ],
-  },
+  //     {
+  //   id: "square-glyder",
+  //   name: "Custom Glyders Sticker",
+  //   priceLabel: "$1.50",
+  //   description: "Custom sticker, 1.75 inches",
+  //   image: "/assets/store/stickers/glydersten.png",
+  //   priceId: "price_1Sxqau0n54kwZghJ8rJuJJwY",
+  //   giftOnly: false,
+  //   outOfStock: !CUSTOM_STICKERS_IN_STOCK,
+  //   customCollection: "glyders",
+  //   tiers: [
+  //     { minQty: 1, maxQty: 9, unitPrice: 1.50, priceId: "price_1Sxqau0n54kwZghJ8rJuJJwY" },
+  //     { minQty: 10, maxQty: 19, unitPrice: 1.25, priceId: "price_1Sxqbf0n54kwZghJBytySlct" },
+  //     { minQty: 20, unitPrice: 1.00, priceId: "price_1Sxqbf0n54kwZghJsDn32vy1" },
+  //   ],
+  // },
 
-    {
-    id: "square-trencher",
-    name: "Custom Trenchers Sticker",
-    priceLabel: "$1.50",
-    description: "Custom sticker, 1.75 inches",
-    image: "/assets/store/stickers/trenchersten.png",
-    priceId: "price_1SxZDc0n54kwZghJGYKYFsJe",
-    giftOnly: false,
-    outOfStock: !CUSTOM_STICKERS_IN_STOCK,
-    customCollection: "trenchers",
-    tiers: [
-      { minQty: 1, maxQty: 9, unitPrice: 1.50, priceId: "price_1SxZDc0n54kwZghJGYKYFsJe" },
-      { minQty: 10, maxQty: 19, unitPrice: 1.25, priceId: "price_1SxZEg0n54kwZghJGO6Nco6N" },
-      { minQty: 20, unitPrice: 1.00, priceId: "price_1SxZEg0n54kwZghJi4KanVha" },
-    ],
-  },
+  //   {
+  //   id: "square-trencher",
+  //   name: "Custom Trenchers Sticker",
+  //   priceLabel: "$1.50",
+  //   description: "Custom sticker, 1.75 inches",
+  //   image: "/assets/store/stickers/trenchersten.png",
+  //   priceId: "price_1SxZDc0n54kwZghJGYKYFsJe",
+  //   giftOnly: false,
+  //   outOfStock: !CUSTOM_STICKERS_IN_STOCK,
+  //   customCollection: "trenchers",
+  //   tiers: [
+  //     { minQty: 1, maxQty: 9, unitPrice: 1.50, priceId: "price_1SxZDc0n54kwZghJGYKYFsJe" },
+  //     { minQty: 10, maxQty: 19, unitPrice: 1.25, priceId: "price_1SxZEg0n54kwZghJGO6Nco6N" },
+  //     { minQty: 20, unitPrice: 1.00, priceId: "price_1SxZEg0n54kwZghJi4KanVha" },
+  //   ],
+  // },
 ]
 
 // 🔹 Helper that includes *everything* for totals, etc.
 export const ALL_PRODUCTS: Product[] = [
   ...STICKER_PRODUCTS,
+  ...LIMITED_EDITION_PRODUCTS,
   ...DECAL_PRODUCTS,
   ...CUSTOM_PRODUCTS,
 ]
@@ -331,6 +391,3 @@ export function getTieredUnitPrice(product: Product, qty: number): number {
   const tier = getTierForQuantity(product, qty);
   return tier?.unitPrice ?? base;
 }
-
-
-
