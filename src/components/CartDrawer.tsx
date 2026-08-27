@@ -63,6 +63,7 @@ type Props = {
     checkoutEnabled?: boolean
     shippingRegion: 'domestic' | 'international'
     setShippingRegion: (v: 'domestic' | 'international') => void
+    getMaxQtyForCartKey?: (cartKey: string) => number | undefined
 }
 
 export function CartDrawer({
@@ -80,6 +81,7 @@ export function CartDrawer({
     checkoutEnabled = true,
     shippingRegion,
     setShippingRegion,
+    getMaxQtyForCartKey,
 }: Props) {
     if (!open) return null
 
@@ -120,6 +122,11 @@ export function CartDrawer({
                     ) : (
                         lines.map(({ cartKey, qty, tokenId, variant, product }) => {
                             const collection = product?.customCollection
+                            const maxQty = getMaxQtyForCartKey?.(cartKey)
+                            const clampQty = (nextQty: number) => {
+                                const clean = Math.max(0, Math.floor(nextQty) || 0)
+                                return typeof maxQty === 'number' ? Math.min(clean, maxQty) : clean
+                            }
 
                             const imgSrc =
                                 tokenId && collection
@@ -179,12 +186,12 @@ export function CartDrawer({
                                             <input
                                                 type="number"
                                                 min={0}
+                                                max={maxQty}
                                                 step={1}
                                                 value={qty}
                                                 onChange={(e) => {
                                                     const raw = Number(e.target.value)
-                                                    const clean = Math.max(0, Math.floor(raw) || 0)
-                                                    setQuantity(cartKey, clean)
+                                                    setQuantity(cartKey, clampQty(raw))
                                                 }}
                                                 className="w-12 h-8 text-center text-sm border rounded-md bg-neutral-50"
                                             />
@@ -192,7 +199,8 @@ export function CartDrawer({
                                             <button
                                                 type="button"
                                                 className="h-7 w-7 rounded-full border bg-neutral-900 text-white text-sm hover:bg-[#b20b2b]"
-                                                onClick={() => setQuantity(cartKey, qty + 1)}
+                                                disabled={typeof maxQty === 'number' && qty >= maxQty}
+                                                onClick={() => setQuantity(cartKey, clampQty(qty + 1))}
                                             >
                                                 +
                                             </button>

@@ -10,6 +10,7 @@ import {
     getBaseUnitPrice,
 } from '@/app/shop/products'
 import { siteConfig } from '@/config/siteConfig'
+import { prisma } from '@/lib/prisma'
 import { randomUUID } from 'crypto'
 
 console.log('[checkout] ROUTE VERSION = split-variants-v2')
@@ -22,6 +23,15 @@ const LIMITED_EDITION_PRODUCT_IDS = new Set(LIMITED_EDITION_PRODUCTS.map((p) => 
 
 // ✅ Fast lookup by productId
 const PRODUCT_BY_ID = new Map(ALL_PRODUCTS.map((p) => [p.id, p]))
+
+const PACK_PRODUCT_ID = 'gm-stickerpack'
+const PACK_COMPONENT_PRODUCT_IDS = [
+    'logo-sticker',
+    'birb-sticker',
+    'head-birb-sticker-must',
+    'i-love-mb-sticker',
+    'toobins-sticker',
+]
 
 const IS_TEST = (process.env.STRIPE_MODE ?? 'live') === 'test'
 
@@ -212,6 +222,73 @@ export async function POST(request: Request) {
             '[checkout] grouped qtyByGroupKey:',
             Array.from(qtyByGroupKey.entries()),
         )
+
+        if (siteConfig.limitOrdersToInventory) {
+            const demandByPriceId = new Map<string, number>()
+
+            function addDemand(priceId: string, qty: number) {
+                demandByPriceId.set(priceId, (demandByPriceId.get(priceId) ?? 0) + qty)
+            }
+
+            for (const item of items) {
+                if (!item.quantity || item.quantity <= 0) continue
+
+                const product = PRODUCT_BY_ID.get(item.productId)
+                if (!product || product.printOnDemand || product.customCollection) continue
+
+                if (product.id === PACK_PRODUCT_ID) {
+                    for (const componentId of PACK_COMPONENT_PRODUCT_IDS) {
+                        const component = PRODUCT_BY_ID.get(componentId)
+                        if (component) addDemand(component.priceId, item.quantity)
+                    }
+                } else {
+                    addDemand(product.priceId, item.quantity)
+                }
+            }
+
+            if (demandByPriceId.size > 0) {
+                const dbProducts = await prisma.product.findMany({
+                    where: {
+                        priceId: {
+                            in: Array.from(demandByPriceId.keys()),
+                        },
+                    },
+                    select: {
+                        name: true,
+                        priceId: true,
+                        inventory: {
+                            select: {
+                                quantity: true,
+                            },
+                        },
+                    },
+                })
+
+                const stockByPriceId = new Map(
+                    dbProducts.map((p) => [p.priceId, p.inventory?.quantity ?? 0]),
+                )
+                const nameByPriceId = new Map(
+                    dbProducts.map((p) => [p.priceId, p.name]),
+                )
+
+                for (const [priceId, requestedQty] of demandByPriceId.entries()) {
+                    const stockQty = stockByPriceId.get(priceId) ?? 0
+
+                    if (requestedQty > stockQty) {
+                        return NextResponse.json(
+                            {
+                                error: `${nameByPriceId.get(priceId) ?? 'An item'} has only ${stockQty} in stock, but this cart requires ${requestedQty}.`,
+                                code: 'INSUFFICIENT_INVENTORY',
+                                priceId,
+                                requestedQty,
+                                stockQty,
+                            },
+                            { status: 400 },
+                        )
+                    }
+                }
+            }
+        }
 
         // -------------------------------
         // Build Stripe line items

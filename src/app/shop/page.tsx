@@ -21,6 +21,14 @@ import {
 } from './products'
 import { useAccount } from 'wagmi'
 
+const PACK_PRODUCT_ID = 'gm-stickerpack'
+const PACK_COMPONENT_PRODUCT_IDS = [
+    'logo-sticker',
+    'birb-sticker',
+    'head-birb-sticker-must',
+    'i-love-mb-sticker',
+    'toobins-sticker',
+]
 
 export default function ShopPage() {
     // cart maps priceId -> quantity
@@ -108,6 +116,49 @@ export default function ShopPage() {
             const parsed = parseCartKey(cartKey)
             return parsed.productId === productId ? sum + (qty ?? 0) : sum
         }, 0)
+    }
+
+    function getStockForProductId(productId: string) {
+        const product = ALL_PRODUCTS.find((p) => p.id === productId)
+        if (!product) return undefined
+        return inventoryByPriceId[product.priceId]
+    }
+
+    function getMaxQtyForProductId(productId: string) {
+        if (!siteConfig.limitOrdersToInventory) return undefined
+
+        const product = ALL_PRODUCTS.find((p) => p.id === productId)
+        if (!product || product.printOnDemand) return undefined
+
+        if (productId === PACK_PRODUCT_ID) {
+            const componentCaps = PACK_COMPONENT_PRODUCT_IDS.map((componentId) => {
+                const stock = getStockForProductId(componentId) ?? 0
+                const individualQty = getTotalQtyForProductId(componentId)
+                return Math.max(0, stock - individualQty)
+            })
+
+            return componentCaps.length > 0 ? Math.min(...componentCaps) : 0
+        }
+
+        if (PACK_COMPONENT_PRODUCT_IDS.includes(productId)) {
+            const stock = getStockForProductId(productId)
+            if (typeof stock !== 'number') return undefined
+            return Math.max(0, stock - getTotalQtyForProductId(PACK_PRODUCT_ID))
+        }
+
+        const stock = getStockForProductId(productId)
+        return typeof stock === 'number' ? Math.max(0, stock) : undefined
+    }
+
+    function getMaxQtyForCartKey(cartKey: string) {
+        const { productId } = parseCartKey(cartKey)
+        return getMaxQtyForProductId(productId)
+    }
+
+    function clampCartQty(cartKey: string, qty: number) {
+        const clean = Math.max(0, Math.floor(qty) || 0)
+        const maxQty = getMaxQtyForCartKey(cartKey)
+        return typeof maxQty === 'number' ? Math.min(clean, maxQty) : clean
     }
 
     // --- Customize modal state ---
@@ -489,7 +540,7 @@ export default function ShopPage() {
                                             {typeof bestTier.maxQty === 'number'
                                                 ? `–${bestTier.maxQty}`
                                                 : '+'}{' '}
-                                            for ${bestTier.unitPrice.toFixed(2)}
+                                            for ${bestTier.unitPrice.toFixed(2)}ea
                                         </span>
                                     )}
                                 </span>
@@ -536,18 +587,12 @@ export default function ShopPage() {
                                     <input
                                         type="number"
                                         min={0}
+                                        max={getMaxQtyForProductId(product.id)}
                                         step={1}
                                         value={qty}
                                         onChange={(e) => {
                                             const raw = Number(e.target.value)
-                                            const clean = Math.max(0, Math.floor(raw) || 0)
-
-                                            const finalQty =
-                                                siteConfig.limitOrdersToInventory && !isPrintOnDemand && typeof inventoryQty === 'number'
-                                                    ? Math.min(clean, inventoryQty)
-                                                    : clean
-
-                                            setQuantity(baseCartKey, finalQty)
+                                            setQuantity(baseCartKey, clampCartQty(baseCartKey, raw))
                                         }}
                                         className="w-10 h-8 text-center text-sm border border-neutral-300 rounded-md bg-neutral-50"
                                     />
@@ -557,13 +602,7 @@ export default function ShopPage() {
                                         className="h-6 w-6 rounded-full border bg-neutral-900 text-white text-sm leading-none hover:bg-[#b20b2b]"
                                         onClick={() => {
                                             const nextQty = qty + 1
-
-                                            const finalQty =
-                                                siteConfig.limitOrdersToInventory && !isPrintOnDemand && typeof inventoryQty === 'number'
-                                                    ? Math.min(nextQty, inventoryQty)
-                                                    : nextQty
-
-                                            setQuantity(baseCartKey, finalQty)
+                                            setQuantity(baseCartKey, clampCartQty(baseCartKey, nextQty))
                                         }}
                                     >
                                         +
@@ -611,7 +650,7 @@ export default function ShopPage() {
                 window.location.href = data.url
             } else {
                 console.error('Checkout error payload:', data)
-                alert('Something went wrong starting checkout.')
+                alert(data.error ?? 'Something went wrong starting checkout.')
             }
         } catch (err) {
             console.error(err)
@@ -795,6 +834,7 @@ export default function ShopPage() {
                     checkoutEnabled={siteConfig.checkoutEnabled}
                     shippingRegion={shippingRegion}
                     setShippingRegion={setShippingRegion}
+                    getMaxQtyForCartKey={getMaxQtyForCartKey}
                 />
 
                 {customizeOpen && (
