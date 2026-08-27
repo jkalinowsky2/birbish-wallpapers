@@ -6,6 +6,7 @@ import SiteFooter from "@/components/SiteFooter";
 import { Merriweather } from "next/font/google";
 import { Web3Provider } from "@/components/Web3Provider";
 import { UnderConstruction } from "@/components/BackSoonish";
+import { Analytics } from "@vercel/analytics/next";
 
 const merriweather = Merriweather({
   subsets: ["latin"],
@@ -43,6 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </>
           )}
         </Web3Provider>
+        <Analytics />
       </body>
     </html>
   );
