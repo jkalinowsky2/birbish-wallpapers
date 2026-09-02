@@ -7,18 +7,18 @@ import ReversiGame from "./ReversiGame";
 import SlidePuzzleGame from "./SlidePuzzleGame";
 import TicTacToeGame from "./TicTacToeGame";
 
-type GameKey = "tic-tac-toe" | "minesweeper" | "reversi" | "memory" | "slide";
+type GameKey = "memory" | "tic-tac-toe" | "minesweeper" | "reversi" | "slide";
 
 const GAMES: Array<{ key: GameKey; label: string }> = [
+  { key: "memory", label: "Memory" },
   { key: "tic-tac-toe", label: "Tic-Tac-Toe" },
   { key: "minesweeper", label: "Minesweeper" },
   { key: "reversi", label: "Reversi" },
-  { key: "memory", label: "Memory" },
   { key: "slide", label: "Slide Puzzle" },
 ];
 
 export default function GamesClient() {
-  const [selectedGame, setSelectedGame] = useState<GameKey>("tic-tac-toe");
+  const [selectedGame, setSelectedGame] = useState<GameKey>("memory");
 
   return (
     <section className="grid gap-5 lg:grid-cols-[170px_minmax(0,1fr)] lg:items-start">
@@ -50,10 +50,10 @@ export default function GamesClient() {
         </div>
       </nav>
 
+      {selectedGame === "memory" ? <MemoryGame /> : null}
       {selectedGame === "tic-tac-toe" ? <TicTacToeGame /> : null}
       {selectedGame === "minesweeper" ? <MinesweeperGame /> : null}
       {selectedGame === "reversi" ? <ReversiGame /> : null}
-      {selectedGame === "memory" ? <MemoryGame /> : null}
       {selectedGame === "slide" ? <SlidePuzzleGame /> : null}
     </section>
   );

@@ -187,14 +187,6 @@ export default function MinesweeperGame() {
           onPlayAgain={resetGame}
         />
       ) : null}
-      {status === "lost" ? (
-        <GameEndOverlay
-          result="lose"
-          title="You lose"
-          message="Droobins got you."
-          onPlayAgain={resetGame}
-        />
-      ) : null}
 
       <div className="rounded-md border bg-white p-4 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-3">
@@ -307,7 +299,12 @@ export default function MinesweeperGame() {
           </div>
         </div>
 
-        <div className="mt-4 flex items-center justify-between gap-3 rounded-md bg-neutral-100 px-4 py-3">
+        <div
+          className={[
+            "mt-4 flex items-center justify-between gap-3 rounded-md px-4 py-3",
+            status === "lost" ? "bg-[#fff1f1]" : "bg-neutral-100",
+          ].join(" ")}
+        >
           <p className="text-sm font-semibold text-neutral-800">{statusText}</p>
           <p className="text-xs font-medium uppercase tracking-[0.16em] text-neutral-500">
             Right-click flags

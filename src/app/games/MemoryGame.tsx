@@ -1,8 +1,7 @@
 "use client";
 
-import Image from "next/image";
-import { useMemo, useState } from "react";
-import { buildCustomTokenUrl } from "@/app/shop/customCollections";
+import { useEffect, useMemo, useState } from "react";
+import { buildCustomTokenUrl, type VariantKey } from "@/app/shop/customCollections";
 import GameEndOverlay from "./GameEndOverlay";
 
 type Card = {
@@ -89,6 +88,8 @@ export default function MemoryGame() {
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
   const [moves, setMoves] = useState(0);
   const [locked, setLocked] = useState(false);
+  const [imagesReady, setImagesReady] = useState(false);
+  const [variant, setVariant] = useState<VariantKey>("illustrated");
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
 
   const pairCount = getPairCount(boardSize);
@@ -98,6 +99,50 @@ export default function MemoryGame() {
     [cards]
   );
   const complete = matchedPairs === pairCount;
+  const preloadUrls = useMemo(() => {
+    const tokenIds = new Set(cards.filter((card) => !card.free).map((card) => card.tokenId));
+
+    return [...tokenIds]
+      .map((tokenId) => buildCustomTokenUrl(tokenId, "moonbirds", variant))
+      .filter(Boolean);
+  }, [cards, variant]);
+
+  useEffect(() => {
+    let active = true;
+
+    if (preloadUrls.length === 0) {
+      setImagesReady(true);
+      return;
+    }
+
+    setImagesReady(false);
+
+    const preloadJobs = preloadUrls.map((url) => {
+      const image = new window.Image();
+      image.decoding = "async";
+      image.src = url;
+
+      return new Promise<void>((resolve) => {
+        image.onload = () => {
+          if (image.decode) {
+            image.decode().then(resolve).catch(resolve);
+            return;
+          }
+
+          resolve();
+        };
+        image.onerror = () => resolve();
+      });
+    });
+
+    Promise.all(preloadJobs).then(() => {
+      if (active) setImagesReady(true);
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [preloadUrls]);
 
   function resetGame() {
     setCards(createDeck(boardSize));
@@ -125,8 +170,15 @@ export default function MemoryGame() {
     setFailedImages(new Set());
   }
 
+  function handleVariantChange(nextVariant: VariantKey) {
+    setVariant(nextVariant);
+    setSelectedIndexes([]);
+    setLocked(false);
+    setFailedImages(new Set());
+  }
+
   function handleCardClick(index: number) {
-    if (locked || complete) return;
+    if (locked || complete || !imagesReady) return;
 
     const card = cards[index];
     if (card.flipped || card.matched || selectedIndexes.includes(index)) return;
@@ -215,6 +267,34 @@ export default function MemoryGame() {
           </div>
         </div>
 
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-md border bg-[#faf7f2] p-3">
+          <p className="text-sm font-bold text-neutral-900">Card art</p>
+          <div className="inline-grid grid-cols-2 rounded-full bg-neutral-200 p-1">
+            <button
+              type="button"
+              onClick={() => handleVariantChange("illustrated")}
+              className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+                variant === "illustrated"
+                  ? "bg-[#d1242a] text-white shadow-sm"
+                  : "text-neutral-700 hover:text-neutral-900"
+              }`}
+            >
+              Illustrated
+            </button>
+            <button
+              type="button"
+              onClick={() => handleVariantChange("pixel")}
+              className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+                variant === "pixel"
+                  ? "bg-[#d1242a] text-white shadow-sm"
+                  : "text-neutral-700 hover:text-neutral-900"
+              }`}
+            >
+              Pixel
+            </button>
+          </div>
+        </div>
+
         <div className="mt-4 grid grid-cols-3 gap-3 rounded-md bg-neutral-100 p-2 text-center">
           <div>
             <div className="text-lg font-black text-neutral-900">{matchedPairs}</div>
@@ -236,7 +316,17 @@ export default function MemoryGame() {
           </div>
         </div>
 
-        <div className="mx-auto mt-4 max-w-[620px] rounded-md border bg-[#faf7f2] p-2">
+        <div className="relative mx-auto mt-4 max-w-[620px] rounded-md border bg-[#faf7f2] p-2">
+          {!imagesReady ? (
+            <div className="absolute inset-2 z-10 flex items-center justify-center rounded-md bg-white/55 backdrop-blur-[1px]">
+              <div className="rounded-md border bg-white px-4 py-3 text-center shadow-sm">
+                <p className="text-sm font-black text-neutral-900">Shuffling cards</p>
+                <p className="mt-1 text-xs font-semibold uppercase tracking-[0.16em] text-[#b20000]">
+                  Loading Moonbirds
+                </p>
+              </div>
+            </div>
+          ) : null}
           <div
             className="grid gap-1.5 sm:gap-2"
             style={{ gridTemplateColumns: `repeat(${boardSize}, minmax(0, 1fr))` }}
@@ -245,7 +335,7 @@ export default function MemoryGame() {
               const visible = card.flipped || card.matched;
               const imageUrl = failedImages.has(card.tokenId)
                 ? ""
-                : buildCustomTokenUrl(card.tokenId, "moonbirds", "illustrated");
+                : buildCustomTokenUrl(card.tokenId, "moonbirds", variant);
 
               return (
                 <button
@@ -254,13 +344,13 @@ export default function MemoryGame() {
                   aria-label={`Memory card ${index + 1}${
                     visible ? `, Moonbird ${card.tokenId}` : ""
                   }`}
-                  disabled={locked || card.matched || card.free}
+                  disabled={locked || !imagesReady || card.matched || card.free}
                   onClick={() => handleCardClick(index)}
                   className={[
                     "relative flex aspect-square min-w-0 items-center justify-center overflow-hidden rounded-md border transition",
                     "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-black",
                     visible
-                      ? "border-neutral-300 bg-white"
+                      ? "border-neutral-300 bg-[#faf7f2]"
                       : "border-neutral-400 bg-gradient-to-b from-[#ce0000] to-[#b20000] hover:brightness-110",
                     card.matched ? "ring-2 ring-[#ce0000]/30" : "",
                   ].join(" ")}
@@ -271,11 +361,9 @@ export default function MemoryGame() {
                     </span>
                   ) : null}
                   {visible && !card.free && imageUrl ? (
-                    <Image
+                    <img
                       src={imageUrl}
                       alt={`Moonbird ${card.tokenId}`}
-                      width={96}
-                      height={96}
                       className="h-[92%] w-[92%] object-contain"
                       onError={() => handleImageError(card.tokenId)}
                     />
@@ -309,7 +397,11 @@ export default function MemoryGame() {
 
         <div className="mt-4 flex items-center justify-between gap-3 rounded-md bg-neutral-100 px-4 py-3">
           <p className="text-sm font-semibold text-neutral-800">
-            {complete ? "All pairs matched" : "Find each matching Moonbird"}
+            {complete
+              ? "All pairs matched"
+              : imagesReady
+                ? "Find each matching Moonbird"
+                : "Shuffling cards"}
           </p>
           <p className="text-xs font-medium uppercase tracking-[0.16em] text-neutral-500">
             {cardCount} cards

@@ -107,7 +107,7 @@ function Piece({
         alt={value}
         width={80}
         height={80}
-        className="h-[82%] w-[82%] object-contain"
+        className="h-[94%] w-[94%] object-contain"
         onError={() => onImageError(imageKey)}
       />
     );
@@ -123,7 +123,7 @@ function Piece({
 export default function TicTacToeGame() {
   const [board, setBoard] = useState<Cell[]>(Array<Cell>(9).fill(null));
   const [lastStarter, setLastStarter] = useState<Player>(PLAYER);
-  const [playerTokenId, setPlayerTokenId] = useState("8209");
+  const [playerTokenId, setPlayerTokenId] = useState("6949");
   const [variant, setVariant] = useState<VariantKey>("illustrated");
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
 
@@ -219,7 +219,7 @@ export default function TicTacToeGame() {
           <div>
             <h2 className="text-lg font-bold text-neutral-900">Moonbirds Tic-Tac-Toe</h2>
             <p className="mt-1 text-sm text-neutral-600">
-              You are Moonbird {tokenIdTrimmed || "X"}. Computer is Tiny King Kapow.
+              Choose your Moonbird to play against Tiny King Kapow.
             </p>
           </div>
           <button type="button" className="btn btn-primary" onClick={resetGame}>
