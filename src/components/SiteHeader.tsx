@@ -98,6 +98,15 @@ export default function Header() {
           <Dropdown label="Wallpapers" items={WALLPAPER_ITEMS} pathname={pathname} />
           <Dropdown label="Banners" items={BANNER_ITEMS} pathname={pathname} />
 
+          <Link
+            href="/games"
+            className={`px-3 py-2 rounded-lg text-sm font-medium 
+    ${pathname?.startsWith("/games")
+                ? ACTIVE_CLS
+                : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100"
+              }`}          >
+            Games
+          </Link>
 
           <Link
             href="/gallery"
@@ -227,6 +236,13 @@ export default function Header() {
             )}
 
             <hr className="my-2 border-neutral-200" />
+            <Link
+              href="/games"
+              className={linkClasses("/games")}
+              onClick={() => setMobileOpen(false)}
+            >
+              Games
+            </Link>
             <Link
               href="/gallery"
               className={linkClasses("/gallery")}
