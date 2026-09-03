@@ -290,7 +290,7 @@ export default function MemoryGame() {
               className="input h-10 w-24 text-sm sm:hidden"
               aria-label="Card art"
             >
-              <option value="illustrated">Art</option>
+              <option value="illustrated">Illustrated</option>
               <option value="pixel">Pixel</option>
             </select>
             <button
