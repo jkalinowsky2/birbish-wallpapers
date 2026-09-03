@@ -257,7 +257,7 @@ export default function ReversiGame() {
         <div className="flex flex-wrap items-center justify-between gap-2 border-b pb-2 sm:gap-3 sm:pb-3">
           <div>
             <h2 className="text-base font-bold text-neutral-900 sm:text-lg">
-              Moonbirds Reversi
+              Toobins Reversi
             </h2>
             <p className="mt-1 hidden text-sm text-neutral-600 sm:block">
               You are Droobins. Toobins plays white.

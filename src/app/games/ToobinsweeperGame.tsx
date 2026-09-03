@@ -111,7 +111,7 @@ function hasWon(board: Cell[]) {
   return board.every((cell) => cell.hasMine || cell.revealed);
 }
 
-export default function MinesweeperGame() {
+export default function ToobinsweeperGame() {
   const [boardSize, setBoardSize] = useState<BoardSize>(DEFAULT_BOARD_SIZE);
   const [board, setBoard] = useState<Cell[]>(() => createBoard(DEFAULT_BOARD_SIZE));
   const [status, setStatus] = useState<GameStatus>("playing");
@@ -232,18 +232,18 @@ export default function MinesweeperGame() {
         <div className="flex flex-wrap items-center justify-between gap-2 border-b pb-2 sm:gap-3 sm:pb-3">
           <div>
             <h2 className="text-base font-bold text-neutral-900 sm:text-lg">
-              Moonbirds Minesweeper
+              Moonbirds Toobinsweeper
             </h2>
             <p className="mt-1 hidden text-sm text-neutral-600 sm:block">
               {boardSize}x{boardSize} grid with Droobins mines.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <label className="sr-only" htmlFor="minesweeper-board-size">
+            <label className="sr-only" htmlFor="toobinsweeper-board-size">
               Board size
             </label>
             <select
-              id="minesweeper-board-size"
+              id="toobinsweeper-board-size"
               value={boardSize}
               onChange={(event) => handleBoardSizeChange(event.target.value)}
               className="input h-10 w-32 text-sm sm:h-auto sm:w-44 sm:text-base"

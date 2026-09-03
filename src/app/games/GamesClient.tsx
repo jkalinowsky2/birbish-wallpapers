@@ -2,17 +2,17 @@
 
 import { useState } from "react";
 import MemoryGame from "./MemoryGame";
-import MinesweeperGame from "./MinesweeperGame";
 import ReversiGame from "./ReversiGame";
 import SlidePuzzleGame from "./SlidePuzzleGame";
 import TicTacToeGame from "./TicTacToeGame";
+import ToobinsweeperGame from "./ToobinsweeperGame";
 
-type GameKey = "memory" | "tic-tac-toe" | "minesweeper" | "reversi" | "slide";
+type GameKey = "memory" | "tic-tac-toe" | "toobinsweeper" | "reversi" | "slide";
 
 const GAMES: Array<{ key: GameKey; label: string }> = [
   { key: "memory", label: "Memory" },
   { key: "tic-tac-toe", label: "Tic-Tac-Toe" },
-  { key: "minesweeper", label: "Minesweeper" },
+  { key: "toobinsweeper", label: "Toobinsweeper" },
   { key: "reversi", label: "Reversi" },
   { key: "slide", label: "Slide Puzzle" },
 ];
@@ -71,7 +71,7 @@ export default function GamesClient() {
 
       {selectedGame === "memory" ? <MemoryGame /> : null}
       {selectedGame === "tic-tac-toe" ? <TicTacToeGame /> : null}
-      {selectedGame === "minesweeper" ? <MinesweeperGame /> : null}
+      {selectedGame === "toobinsweeper" ? <ToobinsweeperGame /> : null}
       {selectedGame === "reversi" ? <ReversiGame /> : null}
       {selectedGame === "slide" ? <SlidePuzzleGame /> : null}
     </section>
