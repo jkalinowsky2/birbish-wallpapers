@@ -11,18 +11,17 @@ export default function GamesPage() {
     <main className="min-h-dvh text-neutral-900">
       <section className="w-screen relative left-1/2 right-1/2 ml-[-50vw] mr-[-50vw] bg-neutral-50">
         <div className="bg-[#faf7f2]">
-          <div className="mx-auto max-w-6xl px-4 py-5 md:px-6 md:py-6">
-            <h1 className="text-3xl font-black tracking-tight md:text-4xl">
-              Games
+          <div className="mx-auto max-w-6xl px-4 py-3 md:px-6 md:py-6">
+            <h1 className="text-2xl font-black tracking-tight md:text-4xl">
+              Birb Games
             </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-neutral-700 md:text-base">
-              Mini games built around Moonbirds IP. Choose a game and play a
-              quick round in the nest.
+            <p className="mt-3 hidden max-w-2xl text-sm leading-6 text-neutral-700 sm:block md:text-base">
+              Mini games built to add another distraction to your life.
             </p>
           </div>
         </div>
 
-        <div className="mx-auto max-w-6xl px-4 py-5 md:px-6 md:py-6">
+        <div className="mx-auto max-w-6xl px-3 py-3 md:px-6 md:py-6">
           <GamesClient />
         </div>
       </section>

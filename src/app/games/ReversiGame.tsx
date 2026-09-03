@@ -253,22 +253,30 @@ export default function ReversiGame() {
         />
       ) : null}
 
-      <div className="rounded-md border bg-white p-4 shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-3">
+      <div className="rounded-md border bg-white p-3 shadow-sm sm:p-4">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b pb-2 sm:gap-3 sm:pb-3">
           <div>
-            <h2 className="text-lg font-bold text-neutral-900">
+            <h2 className="text-base font-bold text-neutral-900 sm:text-lg">
               Moonbirds Reversi
             </h2>
-            <p className="mt-1 text-sm text-neutral-600">
+            <p className="mt-1 hidden text-sm text-neutral-600 sm:block">
               You are Droobins. Toobins plays white.
             </p>
           </div>
-          <button type="button" className="btn btn-primary" onClick={resetGame}>
+          <button
+            type="button"
+            className="btn btn-primary h-10 px-2 text-sm sm:h-auto sm:px-3"
+            onClick={resetGame}
+          >
             New game
           </button>
         </div>
 
-        <div className="mt-4 grid grid-cols-3 gap-3 rounded-md bg-neutral-100 p-2 text-center">
+        <div className="mt-2 rounded-md bg-neutral-100 px-3 py-2 text-center text-sm font-black text-neutral-900 sm:hidden">
+          Droobins {score.black} · Toobins {score.white} · {validMoves.length} moves
+        </div>
+
+        <div className="mt-4 hidden grid-cols-3 gap-3 rounded-md bg-neutral-100 p-2 text-center sm:grid">
           <div>
             <div className="text-lg font-black text-neutral-900">{score.black}</div>
             <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-neutral-500">
@@ -289,7 +297,7 @@ export default function ReversiGame() {
           </div>
         </div>
 
-        <div className="mx-auto mt-4 max-w-[520px] rounded-md border bg-[#faf7f2] p-2 shadow-sm">
+        <div className="mx-auto mt-2 max-w-[520px] rounded-md border bg-[#faf7f2] p-1 shadow-sm sm:mt-4 sm:p-2">
           <div className="grid grid-cols-8 gap-px bg-[#9f0000]">
             {board.map((cell, index) => {
               const playable =
@@ -321,7 +329,7 @@ export default function ReversiGame() {
           </div>
         </div>
 
-        <div className="mt-4 flex items-center justify-between gap-3 rounded-md bg-neutral-100 px-4 py-3">
+        <div className="mt-2 flex items-center justify-between gap-3 rounded-md bg-neutral-100 px-3 py-2 sm:mt-4 sm:px-4 sm:py-3">
           <p className="text-sm font-semibold text-neutral-800">{statusText}</p>
           <p className="text-xs font-medium uppercase tracking-[0.16em] text-neutral-500">
             Flip to win

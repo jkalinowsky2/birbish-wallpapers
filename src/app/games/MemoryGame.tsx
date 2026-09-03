@@ -17,6 +17,12 @@ type BoardSize = 4 | 5 | 6;
 const TOKEN_MIN = 0;
 const TOKEN_MAX = 9999;
 const BOARD_SIZES: BoardSize[] = [4, 5, 6];
+const DEFAULT_BOARD_SIZE: BoardSize = 5;
+const BOARD_SIZE_STORAGE_KEY = "moonbirds-memory-board-size";
+
+function isBoardSize(value: number): value is BoardSize {
+  return BOARD_SIZES.includes(value as BoardSize);
+}
 
 function shuffle<T>(items: T[]) {
   const shuffled = [...items];
@@ -83,8 +89,8 @@ function createDeck(boardSize: BoardSize): Card[] {
 }
 
 export default function MemoryGame() {
-  const [boardSize, setBoardSize] = useState<BoardSize>(6);
-  const [cards, setCards] = useState<Card[]>(() => createDeck(6));
+  const [boardSize, setBoardSize] = useState<BoardSize>(DEFAULT_BOARD_SIZE);
+  const [cards, setCards] = useState<Card[]>(() => createDeck(DEFAULT_BOARD_SIZE));
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
   const [moves, setMoves] = useState(0);
   const [locked, setLocked] = useState(false);
@@ -144,6 +150,18 @@ export default function MemoryGame() {
     };
   }, [preloadUrls]);
 
+  useEffect(() => {
+    const savedBoardSize = Number(window.localStorage.getItem(BOARD_SIZE_STORAGE_KEY));
+    if (!isBoardSize(savedBoardSize) || savedBoardSize === DEFAULT_BOARD_SIZE) return;
+
+    setBoardSize(savedBoardSize);
+    setCards(createDeck(savedBoardSize));
+    setSelectedIndexes([]);
+    setMoves(0);
+    setLocked(false);
+    setFailedImages(new Set());
+  }, []);
+
   function resetGame() {
     setCards(createDeck(boardSize));
     setSelectedIndexes([]);
@@ -162,6 +180,7 @@ export default function MemoryGame() {
 
   function handleBoardSizeChange(value: string) {
     const nextBoardSize = Number(value) as BoardSize;
+    window.localStorage.setItem(BOARD_SIZE_STORAGE_KEY, String(nextBoardSize));
     setBoardSize(nextBoardSize);
     setCards(createDeck(nextBoardSize));
     setSelectedIndexes([]);
@@ -236,11 +255,11 @@ export default function MemoryGame() {
         />
       ) : null}
 
-      <div className="rounded-md border bg-white p-4 shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-3">
+      <div className="rounded-md border bg-white p-3 shadow-sm sm:p-4">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b pb-2 sm:gap-3 sm:pb-3">
           <div>
-            <h2 className="text-lg font-bold text-neutral-900">Moonbirds Memory</h2>
-            <p className="mt-1 text-sm text-neutral-600">
+            <h2 className="text-base font-bold text-neutral-900 sm:text-lg">Moonbirds Memory</h2>
+            <p className="mt-1 hidden text-sm text-neutral-600 sm:block">
               Match {pairCount} randomized Moonbird pairs.
             </p>
           </div>
@@ -252,7 +271,7 @@ export default function MemoryGame() {
               id="memory-board-size"
               value={boardSize}
               onChange={(event) => handleBoardSizeChange(event.target.value)}
-              className="input w-44"
+              className="input h-10 w-28 text-sm sm:h-auto sm:w-44 sm:text-base"
               aria-label="Board size"
             >
               {BOARD_SIZES.map((size) => (
@@ -261,15 +280,34 @@ export default function MemoryGame() {
                 </option>
               ))}
             </select>
-            <button type="button" className="btn btn-primary" onClick={resetGame}>
+            <label className="sr-only" htmlFor="memory-card-art-mobile">
+              Card art
+            </label>
+            <select
+              id="memory-card-art-mobile"
+              value={variant}
+              onChange={(event) => handleVariantChange(event.target.value as VariantKey)}
+              className="input h-10 w-24 text-sm sm:hidden"
+              aria-label="Card art"
+            >
+              <option value="illustrated">Art</option>
+              <option value="pixel">Pixel</option>
+            </select>
+            <button
+              type="button"
+              className="btn btn-primary h-10 px-2 text-sm sm:h-auto sm:px-3"
+              onClick={resetGame}
+            >
               New game
             </button>
           </div>
         </div>
 
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-md border bg-[#faf7f2] p-3">
-          <p className="text-sm font-bold text-neutral-900">Card art</p>
-          <div className="inline-grid grid-cols-2 rounded-full bg-neutral-200 p-1">
+        <div className="mt-2 hidden flex-wrap items-center justify-between gap-2 rounded-md border bg-[#faf7f2] p-2 sm:mt-4 sm:flex sm:gap-3 sm:p-3">
+          <p className="text-sm font-bold text-neutral-900">
+            Card art
+          </p>
+          <div className="hidden grid-cols-2 rounded-full bg-neutral-200 p-1 sm:inline-grid">
             <button
               type="button"
               onClick={() => handleVariantChange("illustrated")}
@@ -295,7 +333,11 @@ export default function MemoryGame() {
           </div>
         </div>
 
-        <div className="mt-4 grid grid-cols-3 gap-3 rounded-md bg-neutral-100 p-2 text-center">
+        <div className="mt-2 rounded-md bg-neutral-100 px-3 py-2 text-center text-sm font-black text-neutral-900 sm:hidden">
+          {matchedPairs}/{pairCount} matches · {moves} moves
+        </div>
+
+        <div className="mt-4 hidden grid-cols-3 gap-3 rounded-md bg-neutral-100 p-2 text-center sm:grid">
           <div>
             <div className="text-lg font-black text-neutral-900">{matchedPairs}</div>
             <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-neutral-500">
@@ -316,9 +358,9 @@ export default function MemoryGame() {
           </div>
         </div>
 
-        <div className="relative mx-auto mt-4 max-w-[620px] rounded-md border bg-[#faf7f2] p-2">
+        <div className="relative mx-auto mt-2 max-w-[620px] rounded-md border bg-[#faf7f2] p-1 sm:mt-4 sm:p-2">
           {!imagesReady ? (
-            <div className="absolute inset-2 z-10 flex items-center justify-center rounded-md bg-white/55 backdrop-blur-[1px]">
+            <div className="absolute inset-0 z-10 flex items-center justify-center rounded-md bg-white/55 backdrop-blur-[1px]">
               <div className="rounded-md border bg-white px-4 py-3 text-center shadow-sm">
                 <p className="text-sm font-black text-neutral-900">Shuffling cards</p>
                 <p className="mt-1 text-xs font-semibold uppercase tracking-[0.16em] text-[#b20000]">
@@ -328,7 +370,7 @@ export default function MemoryGame() {
             </div>
           ) : null}
           <div
-            className="grid gap-1.5 sm:gap-2"
+            className="grid gap-1 sm:gap-2"
             style={{ gridTemplateColumns: `repeat(${boardSize}, minmax(0, 1fr))` }}
           >
             {cards.map((card, index) => {
@@ -395,7 +437,7 @@ export default function MemoryGame() {
           </div>
         </div>
 
-        <div className="mt-4 flex items-center justify-between gap-3 rounded-md bg-neutral-100 px-4 py-3">
+        <div className="mt-2 flex items-center justify-between gap-3 rounded-md bg-neutral-100 px-3 py-2 sm:mt-4 sm:px-4 sm:py-3">
           <p className="text-sm font-semibold text-neutral-800">
             {complete
               ? "All pairs matched"

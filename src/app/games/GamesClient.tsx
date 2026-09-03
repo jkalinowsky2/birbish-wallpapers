@@ -21,10 +21,29 @@ export default function GamesClient() {
   const [selectedGame, setSelectedGame] = useState<GameKey>("memory");
 
   return (
-    <section className="grid gap-5 lg:grid-cols-[170px_minmax(0,1fr)] lg:items-start">
+    <section className="grid gap-3 lg:grid-cols-[170px_minmax(0,1fr)] lg:items-start lg:gap-5">
+      <div className="lg:hidden">
+        <label className="sr-only" htmlFor="mobile-game-selector">
+          Choose a game
+        </label>
+        <select
+          id="mobile-game-selector"
+          value={selectedGame}
+          onChange={(event) => setSelectedGame(event.target.value as GameKey)}
+          className="input w-full"
+          aria-label="Choose a game"
+        >
+          {GAMES.map((game) => (
+            <option key={game.key} value={game.key}>
+              Game: {game.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <nav
         aria-label="Choose a game"
-        className="rounded-md border bg-white p-2 shadow-sm lg:sticky lg:top-20"
+        className="hidden rounded-md border bg-white p-2 shadow-sm lg:sticky lg:top-20 lg:block"
       >
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-5 lg:grid-cols-1">
           {GAMES.map((game) => {

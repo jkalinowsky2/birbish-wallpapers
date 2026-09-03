@@ -105,43 +105,53 @@ export default function SlidePuzzleGame() {
         />
       ) : null}
 
-      <div className="rounded-md border bg-white p-4 shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-3">
+      <div className="rounded-md border bg-white p-3 shadow-sm sm:p-4">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b pb-2 sm:gap-3 sm:pb-3">
           <div>
-            <h2 className="text-lg font-bold text-neutral-900">
+            <h2 className="text-base font-bold text-neutral-900 sm:text-lg">
               Moonbirds Slide Puzzle
             </h2>
-            <p className="mt-1 text-sm text-neutral-600">
+            <p className="mt-1 hidden text-sm text-neutral-600 sm:block">
               Rebuild Moonbird {tokenIdTrimmed || "8209"} by sliding the tiles.
             </p>
           </div>
           <button
             type="button"
-            className="btn btn-primary"
+            className="btn btn-primary h-10 px-2 text-sm sm:h-auto sm:px-3"
             onClick={startNewGame}
           >
             New game
           </button>
         </div>
 
-        <div className="mt-4 flex flex-col gap-3 rounded-md border bg-[#faf7f2] p-3">
+        <div className="mt-2 rounded-md border bg-[#faf7f2] p-2 sm:mt-4 sm:p-3">
           <label
             className="text-sm font-bold text-neutral-900"
             htmlFor="slide-puzzle-moonbird-token"
           >
             Choose your Moonbird
           </label>
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="mt-2 flex flex-wrap items-center gap-2 sm:gap-3">
             <input
               id="slide-puzzle-moonbird-token"
               value={tokenId}
               onChange={(event) => handleTokenChange(event.target.value)}
               placeholder="Token ID"
               inputMode="numeric"
-              className="input max-w-36"
+              className="input h-10 max-w-28 text-sm sm:h-auto sm:max-w-36 sm:text-base"
             />
 
-            <div className="inline-grid grid-cols-2 rounded-full bg-neutral-200 p-1">
+            <select
+              value={variant}
+              onChange={(event) => setVariant(event.target.value as VariantKey)}
+              className="input h-10 w-32 text-sm sm:hidden"
+              aria-label="Puzzle art"
+            >
+              <option value="illustrated">Illustrated</option>
+              <option value="pixel">Pixel</option>
+            </select>
+
+            <div className="hidden grid-cols-2 rounded-full bg-neutral-200 p-1 sm:inline-grid">
               <button
                 type="button"
                 onClick={() => setVariant("illustrated")}
@@ -173,7 +183,11 @@ export default function SlidePuzzleGame() {
           ) : null}
         </div>
 
-        <div className="mt-4 grid grid-cols-3 gap-3 rounded-md bg-neutral-100 p-2 text-center">
+        <div className="mt-2 rounded-md bg-neutral-100 px-3 py-2 text-center text-sm font-black text-neutral-900 sm:hidden">
+          3x3 · {moves} moves · {board.length - 1} tiles
+        </div>
+
+        <div className="mt-4 hidden grid-cols-3 gap-3 rounded-md bg-neutral-100 p-2 text-center sm:grid">
           <div>
             <div className="text-lg font-black text-neutral-900">3x3</div>
             <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-neutral-500">
@@ -194,9 +208,9 @@ export default function SlidePuzzleGame() {
           </div>
         </div>
 
-        <div className="mx-auto mt-4 max-w-[540px] rounded-md border bg-[#faf7f2] p-2">
+        <div className="mx-auto mt-2 max-w-[540px] rounded-md border bg-[#faf7f2] p-1 sm:mt-4 sm:p-2">
           <div
-            className="grid gap-1.5"
+            className="grid gap-1 sm:gap-1.5"
             style={{ gridTemplateColumns: `repeat(${BOARD_SIZE}, minmax(0, 1fr))` }}
           >
             {board.map((tile, index) => {
@@ -236,7 +250,7 @@ export default function SlidePuzzleGame() {
           </div>
         </div>
 
-        <div className="mt-4 flex items-center justify-between gap-3 rounded-md bg-neutral-100 px-4 py-3">
+        <div className="mt-2 flex items-center justify-between gap-3 rounded-md bg-neutral-100 px-3 py-2 sm:mt-4 sm:px-4 sm:py-3">
           <p className="text-sm font-semibold text-neutral-800">
             {complete
               ? "Puzzle solved"

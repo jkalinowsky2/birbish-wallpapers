@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import GameEndOverlay from "./GameEndOverlay";
 
 type Cell = {
@@ -115,6 +115,8 @@ export default function MinesweeperGame() {
   const [boardSize, setBoardSize] = useState<BoardSize>(DEFAULT_BOARD_SIZE);
   const [board, setBoard] = useState<Cell[]>(() => createBoard(DEFAULT_BOARD_SIZE));
   const [status, setStatus] = useState<GameStatus>("playing");
+  const longPressTimer = useRef<number | null>(null);
+  const longPressTriggered = useRef(false);
   const mineCount = getMineCount(boardSize);
 
   const flagsUsed = useMemo(
@@ -177,6 +179,44 @@ export default function MinesweeperGame() {
     );
   }
 
+  function clearLongPressTimer() {
+    if (!longPressTimer.current) return;
+
+    window.clearTimeout(longPressTimer.current);
+    longPressTimer.current = null;
+  }
+
+  function handleTouchStart(index: number) {
+    if (status !== "playing") return;
+
+    longPressTriggered.current = false;
+    clearLongPressTimer();
+    longPressTimer.current = window.setTimeout(() => {
+      longPressTriggered.current = true;
+      handleFlag(index);
+      clearLongPressTimer();
+    }, 450);
+  }
+
+  function handleTouchEnd() {
+    clearLongPressTimer();
+
+    if (longPressTriggered.current) {
+      window.setTimeout(() => {
+        longPressTriggered.current = false;
+      }, 350);
+    }
+  }
+
+  function handleCellClick(index: number) {
+    if (longPressTriggered.current) {
+      longPressTriggered.current = false;
+      return;
+    }
+
+    handleReveal(index);
+  }
+
   return (
     <section className="mx-auto w-full max-w-3xl">
       {status === "won" ? (
@@ -188,13 +228,13 @@ export default function MinesweeperGame() {
         />
       ) : null}
 
-      <div className="rounded-md border bg-white p-4 shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-3">
+      <div className="rounded-md border bg-white p-3 shadow-sm sm:p-4">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b pb-2 sm:gap-3 sm:pb-3">
           <div>
-            <h2 className="text-lg font-bold text-neutral-900">
+            <h2 className="text-base font-bold text-neutral-900 sm:text-lg">
               Moonbirds Minesweeper
             </h2>
-            <p className="mt-1 text-sm text-neutral-600">
+            <p className="mt-1 hidden text-sm text-neutral-600 sm:block">
               {boardSize}x{boardSize} grid with Droobins mines.
             </p>
           </div>
@@ -206,7 +246,7 @@ export default function MinesweeperGame() {
               id="minesweeper-board-size"
               value={boardSize}
               onChange={(event) => handleBoardSizeChange(event.target.value)}
-              className="input w-44"
+              className="input h-10 w-32 text-sm sm:h-auto sm:w-44 sm:text-base"
               aria-label="Board size"
             >
               {BOARD_SIZES.map((size) => (
@@ -215,13 +255,21 @@ export default function MinesweeperGame() {
                 </option>
               ))}
             </select>
-            <button type="button" className="btn btn-primary" onClick={resetGame}>
+            <button
+              type="button"
+              className="btn btn-primary h-10 px-2 text-sm sm:h-auto sm:px-3"
+              onClick={resetGame}
+            >
               New game
             </button>
           </div>
         </div>
 
-        <div className="mt-4 grid grid-cols-3 gap-3 rounded-md bg-neutral-100 p-2 text-center">
+        <div className="mt-2 rounded-md bg-neutral-100 px-3 py-2 text-center text-sm font-black text-neutral-900 sm:hidden">
+          {mineCount} mines · {flagsUsed} flags · {revealedCount} clear
+        </div>
+
+        <div className="mt-4 hidden grid-cols-3 gap-3 rounded-md bg-neutral-100 p-2 text-center sm:grid">
           <div>
             <div className="text-lg font-black text-neutral-900">{mineCount}</div>
             <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-neutral-500">
@@ -242,9 +290,9 @@ export default function MinesweeperGame() {
           </div>
         </div>
 
-        <div className="mx-auto mt-4 max-w-[560px] rounded-md border bg-[#faf7f2] p-2">
+        <div className="mx-auto mt-2 max-w-[560px] rounded-md border bg-[#faf7f2] p-1 sm:mt-4 sm:p-2">
           <div
-            className="grid gap-1"
+            className="grid gap-0.5 sm:gap-1"
             style={{ gridTemplateColumns: `repeat(${boardSize}, minmax(0, 1fr))` }}
           >
             {board.map((cell, index) => {
@@ -258,9 +306,14 @@ export default function MinesweeperGame() {
                   aria-label={`Square ${index + 1}${
                     cell.flagged ? ", flagged" : ""
                   }${open ? ", revealed" : ""}`}
-                  onClick={() => handleReveal(index)}
+                  onClick={() => handleCellClick(index)}
+                  onTouchStart={() => handleTouchStart(index)}
+                  onTouchEnd={handleTouchEnd}
+                  onTouchCancel={handleTouchEnd}
+                  onTouchMove={handleTouchEnd}
                   onContextMenu={(event) => {
                     event.preventDefault();
+                    if (longPressTriggered.current) return;
                     handleFlag(index);
                   }}
                   className={[
@@ -301,13 +354,13 @@ export default function MinesweeperGame() {
 
         <div
           className={[
-            "mt-4 flex items-center justify-between gap-3 rounded-md px-4 py-3",
+            "mt-2 flex items-center justify-between gap-3 rounded-md px-3 py-2 sm:mt-4 sm:px-4 sm:py-3",
             status === "lost" ? "bg-[#fff1f1]" : "bg-neutral-100",
           ].join(" ")}
         >
           <p className="text-sm font-semibold text-neutral-800">{statusText}</p>
           <p className="text-xs font-medium uppercase tracking-[0.16em] text-neutral-500">
-            Right-click flags
+            Tap to reveal · Hold to flag
           </p>
         </div>
       </div>
