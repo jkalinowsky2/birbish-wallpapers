@@ -13,7 +13,7 @@ export default function GamesPage() {
         <div className="bg-[#faf7f2]">
           <div className="mx-auto max-w-6xl px-4 py-3 md:px-6 md:py-6">
             <h1 className="text-2xl font-black tracking-tight md:text-4xl">
-              Birb Games
+              Mini Birb Games
             </h1>
             <p className="mt-3 hidden max-w-2xl text-sm leading-6 text-neutral-700 sm:block md:text-base">
               Mini games built to add another distraction to your life.
