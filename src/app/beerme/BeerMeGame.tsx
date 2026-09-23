@@ -87,6 +87,8 @@ export default function BeerMeGame() {
   const [projectileKind, setProjectileKind] = useState<ProjectileKind>("classic");
   const [tallboysRemaining, setTallboysRemaining] = useState(4);
   const [kegsRemaining, setKegsRemaining] = useState(1);
+  const [opponentTallboysRemaining, setOpponentTallboysRemaining] = useState(4);
+  const [opponentKegsRemaining, setOpponentKegsRemaining] = useState(1);
   const [playerToken, setPlayerToken] = useState(8209);
   const [playerTokenInput, setPlayerTokenInput] = useState("8209");
   const [opponentToken, setOpponentToken] = useState(7041);
@@ -197,6 +199,8 @@ export default function BeerMeGame() {
     setProjectileKind("classic");
     setTallboysRemaining(4);
     setKegsRemaining(1);
+    setOpponentTallboysRemaining(4);
+    setOpponentKegsRemaining(1);
     setTurn("player");
     setPlayerHealth(100);
     setOpponentHealth(100);
@@ -394,6 +398,17 @@ export default function BeerMeGame() {
     if (turn !== "opponent" || projectile || settling || explosion) return;
 
     opponentTimerRef.current = window.setTimeout(() => {
+      const availableProjectiles: ProjectileKind[] = ["classic", "classic", "classic"];
+      if (opponentTallboysRemaining > 0) availableProjectiles.push("tallboy", "tallboy");
+      if (opponentKegsRemaining > 0) availableProjectiles.push("keg");
+      const opponentProjectile = availableProjectiles[Math.floor(Math.random() * availableProjectiles.length)];
+
+      if (opponentProjectile === "tallboy") {
+        setOpponentTallboysRemaining((current) => current - 1);
+      } else if (opponentProjectile === "keg") {
+        setOpponentKegsRemaining((current) => current - 1);
+      }
+
       const dx = opponent.x - player.x;
       const dy = player.y - opponent.y;
       const baseAngle = 42 + Math.random() * 12;
@@ -402,9 +417,11 @@ export default function BeerMeGame() {
         Math.max(1, (dx * GRAVITY) / Math.max(0.2, Math.sin(2 * radians))),
       ) / VELOCITY_SCALE;
       const heightAdjustment = dy / 90;
-      const aiPower = clamp(requiredPower + heightAdjustment + (Math.random() - 0.5) * 14, 48, 92);
+      const projectilePower = (requiredPower + heightAdjustment + (Math.random() - 0.5) * 14) /
+        PROJECTILE_STATS[opponentProjectile].velocity;
+      const aiPower = clamp(projectilePower, 48, 100);
 
-      launchShot("opponent", baseAngle, aiPower);
+      launchShot("opponent", baseAngle, aiPower, opponentProjectile);
     }, 900);
     return () => {
       if (opponentTimerRef.current !== null) {
@@ -412,7 +429,17 @@ export default function BeerMeGame() {
         opponentTimerRef.current = null;
       }
     };
-  }, [launchShot, opponent, player, projectile, turn, settling, explosion]);
+  }, [
+    launchShot,
+    opponent,
+    player,
+    projectile,
+    turn,
+    settling,
+    explosion,
+    opponentTallboysRemaining,
+    opponentKegsRemaining,
+  ]);
 
   const canFire = turn === "player" && !projectile && !settling && !explosion;
 
