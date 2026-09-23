@@ -21,6 +21,7 @@ const PLAYER_START_X = 105;
 const PLAYER_MOVE_LIMIT = WORLD_WIDTH * 0.03;
 const PLAYER_MOVE_STEP = WORLD_WIDTH * 0.01;
 const OPPONENT_X = 895;
+const INITIAL_TERRAIN_SEED = 82097041;
 type Turn = "player" | "opponent" | "game-over";
 
 function randomToken(exclude: number) {
@@ -66,7 +67,7 @@ function blastDamage(impact: Point, target: Point) {
 }
 
 export default function BeerMeGame() {
-  const [terrain, setTerrain] = useState(() => makeTerrain(Date.now()));
+  const [terrain, setTerrain] = useState(() => makeTerrain(INITIAL_TERRAIN_SEED));
   const [playerOffset, setPlayerOffset] = useState(0);
   const [player, setPlayer] = useState<Point>(() => ({ x: PLAYER_START_X, y: terrainYAt(terrain, PLAYER_START_X) }));
   const [opponent, setOpponent] = useState<Point>(() => ({ x: OPPONENT_X, y: terrainYAt(terrain, OPPONENT_X) }));
