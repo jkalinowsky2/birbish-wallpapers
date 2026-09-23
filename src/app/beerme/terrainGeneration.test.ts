@@ -6,7 +6,7 @@ import { terrainYAt } from "./terrainPhysics";
 test("generated terrain stays in the playable vertical range", () => {
   for (let seed = 1; seed <= 200; seed += 1) {
     for (const point of makeTerrain(seed)) {
-      assert.ok(point.y >= 205 && point.y <= 465, `seed ${seed} escaped at ${point.x}`);
+      assert.ok(point.y >= 155 && point.y <= 505, `seed ${seed} escaped at ${point.x}`);
     }
   }
 });

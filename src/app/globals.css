@@ -138,10 +138,27 @@
 .beerme-battlefield { position: relative; width: min(100%, var(--beerme-field-width, calc((100svh - 340px) * 1.85185))); margin-inline: auto; border: 2px solid; border-color: #424c4a #d3d6c9 #d3d6c9 #424c4a; background: #477bac; }
 .beerme-battlefield canvas { display: block; width: 100%; height: auto; aspect-ratio: 50 / 27; image-rendering: pixelated; }
 .beerme-sprite { position: absolute; z-index: 1; height: auto; aspect-ratio: 1; pointer-events: none; image-rendering: pixelated; }
+.beerme-damage {
+  position: absolute; z-index: 2; transform: translate(-50%, -100%);
+  color: #fff4b3; font: 900 clamp(14px, 2.2vw, 26px) "Courier New", monospace;
+  text-shadow: 2px 0 #833c34, -2px 0 #833c34, 0 2px #833c34, 0 -2px #833c34;
+  pointer-events: none; animation: beerme-damage-rise 1.2s steps(6, end) forwards;
+}
+.beerme-winner {
+  position: absolute; z-index: 3; left: 50%; top: 45%; transform: translate(-50%, -50%);
+  min-width: max-content; padding: 10px 16px;
+  color: #fff4b3; background: #27343a;
+  border: 3px solid; border-color: #f4edcf #11191d #11191d #f4edcf;
+  box-shadow: 3px 3px 0 rgb(17 25 29 / 55%);
+  font: 900 clamp(16px, 2.5vw, 30px) "Courier New", monospace;
+  text-align: center; text-transform: uppercase; pointer-events: none;
+}
+@keyframes beerme-damage-rise {
+  0% { opacity: 0; translate: 0 5px; }
+  15%, 72% { opacity: 1; }
+  100% { opacity: 0; translate: 0 -24px; }
+}
 .beerme-asset-error { position: absolute; inset: auto 0 0; margin: 0; padding: 8px; color: #fff; background: #833c34; font-size: 13px; }
-.beerme-status { display: flex; justify-content: space-between; align-items: center; gap: 16px; min-height: 40px; padding: 8px 12px; color: #e9e6cc; background: #343d39; font-size: 13px; }
-.beerme-status p { margin: 0; }
-.beerme-status span { flex-shrink: 0; color: #c5db8e; text-transform: uppercase; font-weight: 700; font-size: 11px; }
 .beerme-controls { box-sizing: border-box; padding: 14px 12px; border: 2px solid; border-color: #d9dccf #555e58 #555e58 #d9dccf; background: #a9ada7; }
 .beerme-controls-heading { margin-bottom: 18px; padding-bottom: 8px; border-bottom: 1px solid #58625c; color: #343d3a; font-size: 12px; font-weight: 900; text-transform: uppercase; }
 .beerme-inputs { display: flex; flex-direction: column; gap: 18px; }
@@ -204,8 +221,6 @@
   .beerme-titlebar > div { gap: 4px; flex-direction: column; }
   .beerme-titlebar > .beerme-title-actions { flex-direction: row; gap: 5px; }
   .beerme-titlebar .beerme-button { padding: 6px 8px; }
-  .beerme-status { gap: 8px; padding: 8px; min-height: 50px; font-size: 11px; }
-  .beerme-status span { font-size: 10px; }
   .beerme-controls { padding: 10px 8px; }
   .beerme-inputs { gap: 10px 16px; }
   .beerme-fire { align-self: end; min-height: 42px; }
@@ -224,7 +239,6 @@
   .beerme-range { height: 21px; }
   .beerme-range::-webkit-slider-thumb { height: 19px; margin-top: -7px; }
   .beerme-range::-moz-range-thumb { height: 17px; }
-  .beerme-status { font-size: 11px; padding: 6px 8px; }
 }
 
 

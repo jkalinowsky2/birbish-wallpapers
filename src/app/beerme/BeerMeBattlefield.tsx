@@ -11,6 +11,7 @@ export type Projectile = Point & {
   kind: ProjectileKind;
 };
 export type Explosion = Point & { id: number; kind: ProjectileKind };
+export type DamageFlash = { id: number; target: "player" | "opponent"; amount: number };
 
 type Scene = {
   terrain: Point[];
@@ -25,6 +26,8 @@ type Scene = {
   opponentHealth: number;
   playerToken: number;
   opponentToken: number;
+  damageFlash: DamageFlash | null;
+  winner: "player" | "opponent" | null;
 };
 
 // One source sprite pixel = one framebuffer pixel. Physics retain world coordinates.
@@ -328,6 +331,11 @@ export default function BeerMeBattlefield(scene: Scene) {
     width: `${(48 / WIDTH) * 100}%`,
   });
 
+  const damageStyle = (position: Point) => ({
+    left: `${(position.x * SCALE / WIDTH) * 100}%`,
+    top: `${((position.y * SCALE - 54) / HEIGHT) * 100}%`,
+  });
+
   return (
     <div className="beerme-battlefield">
       <canvas ref={canvasRef} width={WIDTH} height={HEIGHT} role="img" aria-label="Pixel-art battlefield with rolling green hills, flowers, drifting clouds, and two Moonbird opponents." />
@@ -347,6 +355,21 @@ export default function BeerMeBattlefield(scene: Scene) {
         aria-hidden="true"
         onError={() => setAssetError(true)}
       />
+      {scene.damageFlash && (
+        <span
+          key={scene.damageFlash.id}
+          className="beerme-damage"
+          style={damageStyle(scene.damageFlash.target === "player" ? scene.player : scene.opponent)}
+          aria-hidden="true"
+        >
+          -{scene.damageFlash.amount}
+        </span>
+      )}
+      {scene.winner && (
+        <div className="beerme-winner" role="status">
+          Birb {scene.winner === "player" ? scene.playerToken : scene.opponentToken} wins
+        </div>
+      )}
       {assetError && <p className="beerme-asset-error" role="alert">Sprite artwork could not load. Please reload the page.</p>}
     </div>
   );

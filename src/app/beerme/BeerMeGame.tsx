@@ -7,6 +7,7 @@ import BeerMeBattlefield, {
   type Projectile,
   type ProjectileKind,
   type Explosion,
+  type DamageFlash,
 } from "./BeerMeBattlefield";
 import { bodySettled, stepBody, terrainYAt, type Body } from "./terrainPhysics";
 import { makeTerrain } from "./terrainGeneration";
@@ -22,6 +23,11 @@ const PLAYER_MOVE_LIMIT = WORLD_WIDTH * 0.03;
 const PLAYER_MOVE_STEP = WORLD_WIDTH * 0.01;
 const OPPONENT_X = 895;
 const INITIAL_TERRAIN_SEED = 82097041;
+const PROJECTILE_STATS: Record<ProjectileKind, { damage: number; velocity: number }> = {
+  classic: { damage: 1, velocity: 1 },
+  tallboy: { damage: 1.25, velocity: 1 / 1.25 },
+  keg: { damage: 1.5, velocity: 1 / 1.275 },
+};
 type Turn = "player" | "opponent" | "game-over";
 
 function randomToken(exclude: number) {
@@ -56,14 +62,15 @@ function carveCrater(points: Point[], impact: Point) {
   });
 }
 
-function blastDamage(impact: Point, target: Point) {
+function blastDamage(impact: Point, target: Point, kind: ProjectileKind) {
   const hitDistance = distance(impact, target);
 
   if (hitDistance > CRATER_RADIUS) {
     return 0;
   }
 
-  return Math.round(25 - (hitDistance / CRATER_RADIUS) * 20);
+  const baseDamage = 25 - (hitDistance / CRATER_RADIUS) * 20;
+  return Math.round(baseDamage * PROJECTILE_STATS[kind].damage);
 }
 
 export default function BeerMeGame() {
@@ -78,6 +85,8 @@ export default function BeerMeGame() {
   const [angle, setAngle] = useState(45);
   const [power, setPower] = useState(72);
   const [projectileKind, setProjectileKind] = useState<ProjectileKind>("classic");
+  const [tallboysRemaining, setTallboysRemaining] = useState(4);
+  const [kegsRemaining, setKegsRemaining] = useState(1);
   const [playerToken, setPlayerToken] = useState(8209);
   const [playerTokenInput, setPlayerTokenInput] = useState("8209");
   const [opponentToken, setOpponentToken] = useState(7041);
@@ -86,10 +95,13 @@ export default function BeerMeGame() {
   const [opponentHealth, setOpponentHealth] = useState(100);
   const [projectile, setProjectile] = useState<Projectile | null>(null);
   const [explosion, setExplosion] = useState<Explosion | null>(null);
+  const [damageFlash, setDamageFlash] = useState<DamageFlash | null>(null);
+  const [winner, setWinner] = useState<"player" | "opponent" | null>(null);
   const [status, setStatus] = useState("Your shot. Tune the arc and let it fly.");
   const rafRef = useRef<number | null>(null);
   const opponentTimerRef = useRef<number | null>(null);
   const explosionTimerRef = useRef<number | null>(null);
+  const damageTimerRef = useRef<number | null>(null);
 
   const clearTimers = useCallback(() => {
     if (rafRef.current !== null) {
@@ -110,6 +122,10 @@ export default function BeerMeGame() {
 
   useEffect(() => clearTimers, [clearTimers]);
 
+  useEffect(() => () => {
+    if (damageTimerRef.current !== null) window.clearTimeout(damageTimerRef.current);
+  }, []);
+
   useEffect(() => {
     setOpponentToken(randomToken(8209));
   }, []);
@@ -118,17 +134,16 @@ export default function BeerMeGame() {
     const game = consoleRef.current;
     if (!game) return;
     const title = game.querySelector<HTMLElement>(".beerme-titlebar")!;
-    const statusBar = game.querySelector<HTMLElement>(".beerme-status")!;
     const controls = game.querySelector<HTMLElement>(".beerme-controls")!;
     const fit = () => {
       const sideControls = window.matchMedia("(min-width: 700px)").matches;
       const top = game.getBoundingClientRect().top + window.scrollY;
-      const overhead = top + title.offsetHeight + statusBar.offsetHeight + (sideControls ? 0 : controls.offsetHeight) + 34;
+      const overhead = top + title.offsetHeight + (sideControls ? 0 : controls.offsetHeight) + 28;
       const available = Math.max(80, (window.visualViewport?.height ?? window.innerHeight) - overhead);
       game.style.setProperty("--beerme-field-width", `${Math.floor(available * 50 / 27)}px`);
     };
     const observer = new ResizeObserver(fit);
-    [title, statusBar, controls, game.parentElement!].forEach(element => observer.observe(element));
+    [title, controls, game.parentElement!].forEach(element => observer.observe(element));
     window.addEventListener("resize", fit);
     window.visualViewport?.addEventListener("resize", fit);
     fit();
@@ -167,6 +182,10 @@ export default function BeerMeGame() {
 
   const resetGame = useCallback(() => {
     clearTimers();
+    if (damageTimerRef.current !== null) {
+      window.clearTimeout(damageTimerRef.current);
+      damageTimerRef.current = null;
+    }
     const nextTerrain = makeTerrain(Date.now());
     setTerrain(nextTerrain);
     setSettling(false);
@@ -175,11 +194,16 @@ export default function BeerMeGame() {
     setPlayerOffset(0);
     setAngle(45);
     setPower(72);
+    setProjectileKind("classic");
+    setTallboysRemaining(4);
+    setKegsRemaining(1);
     setTurn("player");
     setPlayerHealth(100);
     setOpponentHealth(100);
     setProjectile(null);
     setExplosion(null);
+    setDamageFlash(null);
+    setWinner(null);
     setOpponentToken(randomToken(playerToken));
     setStatus("New field. Your shot.");
   }, [clearTimers, playerToken]);
@@ -223,7 +247,7 @@ export default function BeerMeGame() {
       }, 1000);
 
       const target = owner === "player" ? opponent : player;
-      const damage = blastDamage(impact, target);
+      const damage = blastDamage(impact, target, shotKind);
 
       if (damage === 0) {
         setStatus(owner === "player" ? "Ground hit. Incoming." : "Ground hit. Your shot.");
@@ -231,11 +255,23 @@ export default function BeerMeGame() {
         return;
       }
 
+      if (damageTimerRef.current !== null) window.clearTimeout(damageTimerRef.current);
+      setDamageFlash({
+        id: Date.now(),
+        target: owner === "player" ? "opponent" : "player",
+        amount: damage,
+      });
+      damageTimerRef.current = window.setTimeout(() => {
+        setDamageFlash(null);
+        damageTimerRef.current = null;
+      }, 1200);
+
       if (owner === "player") {
         setOpponentHealth((current) => {
           const next = Math.max(0, current - damage);
           if (next === 0) {
             setTurn("game-over");
+            setWinner("player");
             setStatus("Direct enough. You win.");
           } else {
             setTurn("opponent");
@@ -248,6 +284,7 @@ export default function BeerMeGame() {
           const next = Math.max(0, current - damage);
           if (next === 0) {
             setTurn("game-over");
+            setWinner("opponent");
             setStatus("You got tagged. New game?");
           } else {
             setTurn("player");
@@ -278,8 +315,9 @@ export default function BeerMeGame() {
       const radians = (shotAngle * Math.PI) / 180;
       let x = origin.x;
       let y = origin.y;
-      const vx = Math.cos(radians) * shotPower * VELOCITY_SCALE * direction;
-      let vy = -Math.sin(radians) * shotPower * VELOCITY_SCALE;
+      const projectileVelocity = PROJECTILE_STATS[shotKind].velocity;
+      const vx = Math.cos(radians) * shotPower * VELOCITY_SCALE * direction * projectileVelocity;
+      let vy = -Math.sin(radians) * shotPower * VELOCITY_SCALE * projectileVelocity;
       let lastTime = performance.now();
 
       setProjectile({ ...origin, owner, kind: shotKind, rotation: (Math.atan2(vy, vx) * 180) / Math.PI });
@@ -293,15 +331,18 @@ export default function BeerMeGame() {
         y += vy * dt + 0.5 * GRAVITY * dt * dt;
         vy += GRAVITY * dt;
 
-        if (x < 0 || x > WORLD_WIDTH || y > WORLD_HEIGHT + 40) {
-          const impactX = clamp(x, 0, WORLD_WIDTH);
-          resolveShot(owner, { x: impactX, y: terrainYAt(terrain, impactX) }, shotKind);
-          return;
-        }
-
+        // Beyond either edge, continue the boundary terrain height so the shot
+        // completes its real arc instead of detonating against the viewport.
         const groundY = terrainYAt(terrain, x);
 
         if (y >= groundY - 6) {
+          resolveShot(owner, { x, y: groundY }, shotKind);
+          return;
+        }
+
+        // This is only a failsafe for pathological trajectories. The impact is
+        // kept far outside the field, so it cannot create an edge explosion.
+        if (x < -WORLD_WIDTH * 4 || x > WORLD_WIDTH * 5) {
           resolveShot(owner, { x, y: groundY }, shotKind);
           return;
         }
@@ -317,6 +358,15 @@ export default function BeerMeGame() {
 
   const firePlayerShot = () => {
     if (turn !== "player" || projectile || settling || explosion) return;
+    if (projectileKind === "tallboy") {
+      if (tallboysRemaining <= 0) return;
+      setTallboysRemaining((current) => current - 1);
+      if (tallboysRemaining === 1) setProjectileKind("classic");
+    } else if (projectileKind === "keg") {
+      if (kegsRemaining <= 0) return;
+      setKegsRemaining((current) => current - 1);
+      if (kegsRemaining === 1) setProjectileKind("classic");
+    }
     setTurn("opponent");
     launchShot("player", angle, power, projectileKind);
   };
@@ -423,9 +473,9 @@ export default function BeerMeGame() {
                 disabled={!canFire}
                 aria-label="Projectile"
               >
-                <option value="classic">Classic can</option>
-                <option value="tallboy">Tallboy</option>
-                <option value="keg">Keg</option>
+                <option value="classic">12oz (unlimited)</option>
+                <option value="tallboy" disabled={tallboysRemaining === 0}>Tallboy ({tallboysRemaining} left)</option>
+                <option value="keg" disabled={kegsRemaining === 0}>Keg ({kegsRemaining} left)</option>
               </select>
             </label>
 
@@ -522,14 +572,12 @@ export default function BeerMeGame() {
             opponentHealth={opponentHealth}
             playerToken={playerToken}
             opponentToken={opponentToken}
+            damageFlash={damageFlash}
+            winner={winner}
           />
-
-          <div className="beerme-status">
-            <p role="status">{status}</p>
-            <span>{settling ? "Settling" : turn === "player" ? "Your turn" : turn === "opponent" ? "Opponent" : "Finished"}</span>
-          </div>
         </div>
       </div>
+      <p className="sr-only" role="status">{status}</p>
     </section>
   );
 }

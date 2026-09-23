@@ -3,6 +3,9 @@ import type { Point } from "./terrainPhysics";
 const WORLD_WIDTH = 1000;
 const TERRAIN_STEP = 20;
 const SPAWN_POINTS = [105, 895];
+const RELIEF_SCALE = 2;
+const MIN_TERRAIN_Y = 155;
+const MAX_TERRAIN_Y = 505;
 
 function seededRandom(seed: number) {
   let value = seed % 2147483647;
@@ -44,8 +47,7 @@ export function makeTerrain(seed: number) {
   const waveOffset = random() * Math.PI * 2;
 
   for (let x = 0; x <= WORLD_WIDTH; x += TERRAIN_STEP) {
-    const ridge =
-      baseHeight +
+    const relief =
       Math.sin(x / 105 + waveOffset) * 30 +
       Math.sin(x / 210 + seed * 0.013) * 35 -
       landform(x, mainHill.center, mainHill.width) * mainHill.height -
@@ -53,7 +55,10 @@ export function makeTerrain(seed: number) {
       landform(x, valley.center, valley.width) * valley.depth +
       (random() - 0.5) * 24;
 
-    points.push({ x, y: clamp(ridge, 205, 465) });
+    points.push({
+      x,
+      y: clamp(baseHeight + relief * RELIEF_SCALE, MIN_TERRAIN_Y, MAX_TERRAIN_Y),
+    });
   }
 
   for (let pass = 0; pass < 2; pass += 1) {
