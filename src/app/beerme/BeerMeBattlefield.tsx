@@ -262,12 +262,6 @@ export default function BeerMeBattlefield(scene: Scene) {
       }
       ctx.drawImage(landscape, 0, 0);
 
-      positions.forEach((position) => {
-        const x = Math.round(position.x * SCALE), y = Math.round(position.y * SCALE);
-        ctx.fillStyle = "#345238";
-        ctx.fillRect(x - 12, y - 1, 24, 2);
-      });
-
       if (state.canFire) {
         const angle = state.angle * Math.PI / 180;
         const length = (22 + state.power * 0.65) * SCALE;
@@ -369,7 +363,7 @@ export default function BeerMeBattlefield(scene: Scene) {
 
   const spriteStyle = (position: Point) => ({
     left: `${((position.x * SCALE - 24) / WIDTH) * 100}%`,
-    top: `${((position.y * SCALE - 46) / HEIGHT) * 100}%`,
+    top: `${((position.y * SCALE - 45) / HEIGHT) * 100}%`,
     width: `${(48 / WIDTH) * 100}%`,
   });
 
