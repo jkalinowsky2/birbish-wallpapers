@@ -4,14 +4,22 @@ import { useEffect, useRef, useState } from "react";
 
 import type { Point } from "./terrainPhysics";
 export type { Point } from "./terrainPhysics";
-export type ProjectileKind = "classic" | "tallboy" | "keg";
+export type ProjectileKind = "classic" | "tallboy" | "keg" | "twelvepack";
 export type Projectile = Point & {
   owner: "player" | "opponent";
   rotation: number;
   kind: ProjectileKind;
 };
 export type Explosion = Point & { id: number; kind: ProjectileKind };
-export type DamageFlash = { id: number; target: "player" | "opponent"; amount: number };
+export type DamageFlash = {
+  id: number;
+  target: "player" | "opponent";
+  amount: number;
+  offsetX: number;
+  offsetY: number;
+};
+export type BurstCan = Point & { id: number; rotation: number };
+export type MiniExplosion = Point & { id: number; startedAt: number };
 
 type Scene = {
   terrain: Point[];
@@ -26,8 +34,10 @@ type Scene = {
   opponentHealth: number;
   playerToken: number;
   opponentToken: number;
-  damageFlash: DamageFlash | null;
+  damageFlashes: DamageFlash[];
   winner: "player" | "opponent" | null;
+  burstCans: BurstCan[];
+  miniExplosions: MiniExplosion[];
 };
 
 // One source sprite pixel = one framebuffer pixel. Physics retain world coordinates.
@@ -40,6 +50,7 @@ const PROJECTILES: Record<ProjectileKind, { image: number; size: number }> = {
   classic: { image: 0, size: 18 },
   tallboy: { image: 1, size: 18 },
   keg: { image: 2, size: 45 },
+  twelvepack: { image: 3, size: 20 },
 };
 
 function spriteUrl(token: number, direction: "east" | "west") {
@@ -104,7 +115,7 @@ function paintTerrain(ctx: CanvasRenderingContext2D, terrain: Point[], original:
   }
   // Stable meadow details are clipped to the current surface; craters remove them.
   for (let x = 3; x < WIDTH - 3; x += 3) {
-    for (let y = 135; y < HEIGHT - 3; y += 4) {
+    for (let y = 3; y < HEIGHT - 3; y += 4) {
       const top = surface(terrain, x);
       if (y < top + 6 || (top > surface(original, x) + 2 && y < top + 13)) continue;
       const pick = noise(x * 3, y * 7);
@@ -208,6 +219,7 @@ export default function BeerMeBattlefield(scene: Scene) {
       "/sprites/beerme-can.png",
       "/sprites/beerme-can-tallboy.png",
       "/sprites/beerme-keg.png",
+      "/sprites/beerme-12-pack.png",
     ].map((src) => {
       const image = new Image();
       image.src = src;
@@ -274,11 +286,37 @@ export default function BeerMeBattlefield(scene: Scene) {
         ctx.save();
         ctx.translate(Math.round(shot.x * SCALE), Math.round(shot.y * SCALE));
         ctx.rotate(Math.round((shot.rotation + now * 0.75) / 15) * Math.PI / 12);
-        const projectileImage = images[projectileArt.image];
-        if (projectileImage?.complete && projectileImage.naturalWidth) {
-          ctx.drawImage(projectileImage, -halfSize, -halfSize, projectileArt.size, projectileArt.size);
+        if (shot.kind === "twelvepack") {
+          const packImage = images[projectileArt.image];
+          if (packImage?.complete && packImage.naturalWidth) {
+            ctx.drawImage(packImage, -10, -7.5, 20, 15);
+          }
+        } else {
+          const projectileImage = images[projectileArt.image];
+          if (projectileImage?.complete && projectileImage.naturalWidth) {
+            ctx.drawImage(projectileImage, -halfSize, -halfSize, projectileArt.size, projectileArt.size);
+          }
         }
         ctx.restore();
+      }
+      const canImage = images[PROJECTILES.classic.image];
+      if (canImage?.complete && canImage.naturalWidth) {
+        for (const can of state.burstCans) {
+          ctx.save();
+          ctx.translate(Math.round(can.x * SCALE), Math.round(can.y * SCALE));
+          ctx.rotate(can.rotation);
+          ctx.drawImage(canImage, -7, -7, 14, 14);
+          ctx.restore();
+        }
+      }
+      for (const burst of state.miniExplosions) {
+        const age = (now - burst.startedAt) / 1000;
+        if (age < 0 || age > 0.55) continue;
+        const bloom = Math.sin((age / 0.55) * Math.PI);
+        const x = burst.x * SCALE;
+        const y = burst.y * SCALE;
+        pixelDisk(ctx, x, y - 2, 2 + bloom * 5, "#f6dfa0");
+        pixelDisk(ctx, x - 1, y - 4, 1 + bloom * 3, "#fffdf0");
       }
       if (state.explosion) {
         if (lastExplosion !== state.explosion.id) {
@@ -287,7 +325,11 @@ export default function BeerMeBattlefield(scene: Scene) {
         }
         const age = (now - explosionStart) / 1000;
         const x = state.explosion.x * SCALE, y = state.explosion.y * SCALE;
-        const explosionScale = state.explosion.kind === "tallboy" ? 1.25 : 1;
+        const explosionScale = state.explosion.kind === "classic"
+          ? 0.7
+          : state.explosion.kind === "tallboy"
+            ? 1.25
+            : 1;
         // Pressurized golden spray, followed by irregular pale foam and droplets.
         if (age < 0.55) {
           const bloom = Math.sin(Math.min(1, age / 0.55) * Math.PI);
@@ -331,9 +373,9 @@ export default function BeerMeBattlefield(scene: Scene) {
     width: `${(48 / WIDTH) * 100}%`,
   });
 
-  const damageStyle = (position: Point) => ({
-    left: `${(position.x * SCALE / WIDTH) * 100}%`,
-    top: `${((position.y * SCALE - 54) / HEIGHT) * 100}%`,
+  const damageStyle = (position: Point, offsetX: number, offsetY: number) => ({
+    left: `${((position.x + offsetX) * SCALE / WIDTH) * 100}%`,
+    top: `${(((position.y + offsetY) * SCALE - 54) / HEIGHT) * 100}%`,
   });
 
   return (
@@ -355,16 +397,20 @@ export default function BeerMeBattlefield(scene: Scene) {
         aria-hidden="true"
         onError={() => setAssetError(true)}
       />
-      {scene.damageFlash && (
+      {scene.damageFlashes.map((damage) => (
         <span
-          key={scene.damageFlash.id}
+          key={damage.id}
           className="beerme-damage"
-          style={damageStyle(scene.damageFlash.target === "player" ? scene.player : scene.opponent)}
+          style={damageStyle(
+            damage.target === "player" ? scene.player : scene.opponent,
+            damage.offsetX,
+            damage.offsetY,
+          )}
           aria-hidden="true"
         >
-          -{scene.damageFlash.amount}
+          -{damage.amount}
         </span>
-      )}
+      ))}
       {scene.winner && (
         <div className="beerme-winner" role="status">
           Birb {scene.winner === "player" ? scene.playerToken : scene.opponentToken} wins
