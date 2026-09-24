@@ -193,6 +193,8 @@
 .beerme-button:hover:not(:disabled) { background: #e6e6d5; }
 .beerme-button:active:not(:disabled) { border-color: #565f59 #f5f3e5 #f5f3e5 #565f59; box-shadow: none; }
 .beerme-button:disabled { opacity: 0.45; cursor: default; }
+.beerme-audio-toggle { width: 42px; padding-inline: 0; }
+.beerme-audio-toggle.is-muted { opacity: 0.55; }
 .beerme-console :focus-visible { outline: 2px solid #fff4b3; outline-offset: 3px; }
 .beerme-fire { width: 100%; min-height: 54px; background: #ebc277; color: #342d27; border-color: #ffe6ac #876c41 #876c41 #ffe6ac; font-size: 16px; }
 .beerme-fire:hover:not(:disabled) { background: #f5d394; }

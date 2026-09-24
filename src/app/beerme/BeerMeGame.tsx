@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, Crosshair, RotateCcw } from "lucide-react";
+import { ArrowLeft, ArrowRight, Crosshair, Music, RotateCcw, Volume2, VolumeX } from "lucide-react";
 import BeerMeBattlefield, {
   type Point,
   type Projectile,
@@ -13,6 +13,21 @@ import BeerMeBattlefield, {
 } from "./BeerMeBattlefield";
 import { bodySettled, stepBody, terrainYAt, type Body } from "./terrainPhysics";
 import { makeTerrain } from "./terrainGeneration";
+import {
+  playDamage,
+  playExplosion,
+  playFire,
+  playMiniExplosion,
+  playMove,
+  playPackOpen,
+  playVictory,
+  setAudioMuted,
+  setMusicMuted,
+  startMusic,
+  stopMusic,
+  storedAudioMuted,
+  storedMusicMuted,
+} from "./audio";
 
 const WORLD_WIDTH = 1000;
 const WORLD_HEIGHT = 540;
@@ -44,6 +59,13 @@ function randomToken(exclude: number) {
   let token = Math.floor(Math.random() * 10000);
   if (token === exclude) token = (token + 1) % 10000;
   return token;
+}
+
+function forcedOpponentFromSearch(search: string) {
+  const value = new URLSearchParams(search).get("opponent");
+  if (value === null || !/^\d+$/.test(value)) return null;
+  const token = Number(value);
+  return token >= 0 && token <= 9999 ? token : null;
 }
 
 function clamp(value: number, min: number, max: number) {
@@ -101,6 +123,7 @@ export default function BeerMeGame() {
   const [opponent, setOpponent] = useState<Point>(() => ({ x: OPPONENT_X, y: terrainYAt(terrain, OPPONENT_X) }));
   const [settling, setSettling] = useState(false);
   const bodiesRef = useRef<Body[]>([]);
+  const forcedOpponentTokenRef = useRef<number | null>(null);
   const consoleRef = useRef<HTMLElement>(null);
 
   const [angle, setAngle] = useState(45);
@@ -124,6 +147,8 @@ export default function BeerMeGame() {
   const [winner, setWinner] = useState<"player" | "opponent" | null>(null);
   const [burstCans, setBurstCans] = useState<BurstCan[]>([]);
   const [miniExplosions, setMiniExplosions] = useState<MiniExplosion[]>([]);
+  const [audioMuted, setAudioMutedState] = useState(false);
+  const [musicMuted, setMusicMutedState] = useState(false);
   const [status, setStatus] = useState("Your shot. Tune the arc and let it fly.");
   const rafRef = useRef<number | null>(null);
   const opponentTimerRef = useRef<number | null>(null);
@@ -154,7 +179,19 @@ export default function BeerMeGame() {
   }, []);
 
   useEffect(() => {
-    setOpponentToken(randomToken(8209));
+    const forcedToken = forcedOpponentFromSearch(window.location.search);
+    forcedOpponentTokenRef.current = forcedToken;
+    setOpponentToken(forcedToken ?? randomToken(8209));
+  }, []);
+
+  useEffect(() => {
+    const savedMuted = storedAudioMuted();
+    setAudioMutedState(savedMuted);
+    setAudioMuted(savedMuted);
+    const savedMusicMuted = storedMusicMuted();
+    setMusicMutedState(savedMusicMuted);
+    setMusicMuted(savedMusicMuted);
+    return stopMusic;
   }, []);
 
   useEffect(() => {
@@ -235,7 +272,7 @@ export default function BeerMeGame() {
     setWinner(null);
     setBurstCans([]);
     setMiniExplosions([]);
-    setOpponentToken(randomToken(playerToken));
+    setOpponentToken(forcedOpponentTokenRef.current ?? randomToken(playerToken));
     setStatus("New field. Your shot.");
   }, [clearTimers, playerToken]);
 
@@ -248,7 +285,9 @@ export default function BeerMeGame() {
     }
 
     setPlayerToken(parsed);
-    if (parsed === opponentToken) setOpponentToken(randomToken(parsed));
+    if (parsed === opponentToken && forcedOpponentTokenRef.current === null) {
+      setOpponentToken(randomToken(parsed));
+    }
     setStatus(`Moonbird ${parsed} ready. Your shot.`);
   };
 
@@ -259,6 +298,7 @@ export default function BeerMeGame() {
       const x = clamp(player.x + offset - playerOffset, 24, WORLD_WIDTH - 24);
       setPlayerOffset(playerOffset + x - player.x);
       const moved = { x, y: terrainYAt(terrain, x) };
+      playMove();
       setPlayer(moved);
       startSettling(moved, opponent);
     },
@@ -294,6 +334,7 @@ export default function BeerMeGame() {
       if (showCombinedDamage) {
         showDamage(owner === "player" ? "opponent" : "player", damage);
       }
+      playDamage(damage);
 
       if (owner === "player") {
         setOpponentHealth((current) => {
@@ -301,6 +342,7 @@ export default function BeerMeGame() {
           if (next === 0) {
             setTurn("game-over");
             setWinner("player");
+            playVictory();
             setStatus("Direct enough. You win.");
           } else {
             setTurn("opponent");
@@ -314,6 +356,7 @@ export default function BeerMeGame() {
           if (next === 0) {
             setTurn("game-over");
             setWinner("opponent");
+            playVictory();
             setStatus("You got tagged. New game?");
           } else {
             setTurn("player");
@@ -327,6 +370,7 @@ export default function BeerMeGame() {
   const launchTwelvePackBurst = useCallback(
     (owner: "player" | "opponent", impact: Point) => {
       setProjectile(null);
+      playPackOpen();
       const count = 4 + Math.floor(Math.random() * 3);
       let cans = Array.from({ length: count }, (_, index) => ({
         id: Date.now() + index,
@@ -367,6 +411,7 @@ export default function BeerMeGame() {
             );
             const canDamage = miniBlastDamage(canImpact, target);
             totalDamage += canDamage;
+            playMiniExplosion();
             if (canDamage > 0) {
               showDamage(
                 owner === "player" ? "opponent" : "player",
@@ -412,6 +457,7 @@ export default function BeerMeGame() {
       setProjectile(null);
       const crater = PROJECTILE_TERRAIN[shotKind];
       setTerrain(carveCrater(terrain, impact, crater.radius, crater.depth));
+      playExplosion(shotKind);
       startSettling(player, opponent);
       setExplosion({ ...impact, id: Date.now(), kind: shotKind });
       explosionTimerRef.current = window.setTimeout(() => {
@@ -433,6 +479,7 @@ export default function BeerMeGame() {
     ) => {
       clearTimers();
       setExplosion(null);
+      playFire(shotKind);
 
       const origin =
         owner === "player"
@@ -584,7 +631,35 @@ export default function BeerMeGame() {
         </div>
 
         <div className="beerme-title-actions">
-          <button type="button" className="beerme-button" onClick={resetGame}>
+          <button
+            type="button"
+            className={`beerme-button beerme-audio-toggle${musicMuted ? " is-muted" : ""}`}
+            onClick={() => {
+              const next = !musicMuted;
+              setMusicMutedState(next);
+              setMusicMuted(next);
+              if (!next) startMusic();
+            }}
+            aria-label={musicMuted ? "Turn music on" : "Turn music off"}
+            title={musicMuted ? "Turn music on" : "Turn music off"}
+          >
+            <Music size={16} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            className="beerme-button beerme-audio-toggle"
+            onClick={() => {
+              const next = !audioMuted;
+              setAudioMutedState(next);
+              setAudioMuted(next);
+              if (!next) playMove();
+            }}
+            aria-label={audioMuted ? "Unmute sound" : "Mute sound"}
+            title={audioMuted ? "Unmute sound" : "Mute sound"}
+          >
+            {audioMuted ? <VolumeX size={16} aria-hidden="true" /> : <Volume2 size={16} aria-hidden="true" />}
+          </button>
+          <button type="button" className="beerme-button" onClick={() => { startMusic(); resetGame(); }}>
             <RotateCcw size={16} aria-hidden="true" />
             New game
           </button>
