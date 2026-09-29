@@ -45,6 +45,8 @@ export default function Header() {
       : "text-neutral-700 hover:bg-neutral-100"
     }`;
 
+  if (pathname === "/creditchecks") return null;
+
   return (
     <header className="border-b bg-white">
       {/* <div className="mx-auto max-w-6xl px-4 md:px-6 h-14 flex items-center justify-between"> */}

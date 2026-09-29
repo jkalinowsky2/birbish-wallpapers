@@ -1,8 +1,13 @@
-// src/components/SiteFooter.tsx
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 export default function SiteFooter() {
+  const pathname = usePathname();
+  if (pathname === "/creditchecks") return null;
+
   return (
     <footer className="border-t mt-12 bg-[#f7f7f7]">
       <div className="mx-auto max-w-6xl px-4 py-6 flex flex-col sm:flex-row items-center justify-between text-xs text-neutral-500">
