@@ -175,7 +175,7 @@ export default function CreditChecksClient() {
   const openXComposer = () => {
     const shareUrl = `${window.location.origin}/creditchecks?token=${tokenId}`;
     const params = new URLSearchParams({
-      text: `I ran a Credit Check on Credit #${tokenId} by @_jknft_.`,
+      text: `I ran a Credit Check on Credit #${tokenId}. Tool by @_jknft_.`,
       url: shareUrl,
     });
     window.open(
