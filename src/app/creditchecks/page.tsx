@@ -2,17 +2,19 @@ import type { Metadata } from "next";
 import CreditChecksClient from "./CreditChecksClient";
 
 type PageProps = {
-  searchParams: Promise<{ token?: string }>;
+  searchParams: Promise<{ token?: string; background?: string }>;
 };
 
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
-  const requestedToken = Number((await searchParams).token);
+  const params = await searchParams;
+  const requestedToken = Number(params.token);
   const token = Number.isInteger(requestedToken) && requestedToken >= 1 && requestedToken <= 122153
     ? requestedToken
     : 1;
   const title = `Credit Check #${token}`;
   const description = `A Credit Check generated from Credit #${token}.`;
-  const image = `https://www.genmerch.xyz/api/creditcheck/card?id=${token}`;
+  const background = params.background === "black" ? "black" : "white";
+  const image = `https://www.genmerch.xyz/api/creditcheck/card?id=${token}&background=${background}`;
 
   return {
     title,

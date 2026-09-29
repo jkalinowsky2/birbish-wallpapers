@@ -21,7 +21,7 @@ function validFill(fill: string) {
   return /^(#[0-9a-f]{3,8}|rgba?\([\d.,%\s]+\)|[a-z]+)$/i.test(fill);
 }
 
-async function composeCreditCheckSvg(creditSvg: string) {
+async function composeCreditCheckSvg(creditSvg: string, background: "white" | "black") {
   const svgTag = creditSvg.match(/<svg\b[^>]*>/i)?.[0] ?? "";
   const viewBox = attribute(svgTag, "viewBox") || "0 0 320 320";
   const checkSvg = await readFile(path.join(process.cwd(), "public/creditcheck/check.svg"), "utf8");
@@ -39,17 +39,19 @@ async function composeCreditCheckSvg(creditSvg: string) {
   });
   if (checks.length === 0) throw new Error("Credit contains no colored cells");
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" width="1200" height="1200"><rect width="100%" height="100%" fill="#fff"/>${checks.join("")}</svg>`;
+  const backgroundFill = background === "black" ? "#111111" : "#fff";
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" width="1200" height="1200"><rect width="100%" height="100%" fill="${backgroundFill}"/>${checks.join("")}</svg>`;
 }
 
 export async function GET(request: Request) {
   const id = Number(new URL(request.url).searchParams.get("id"));
+  const background = new URL(request.url).searchParams.get("background") === "black" ? "black" : "white";
   if (!Number.isInteger(id) || id < 1 || id > 122153) {
     return new Response("Invalid token ID", { status: 400 });
   }
 
   try {
-    const composedSvg = await composeCreditCheckSvg(await getCreditSvg(id));
+    const composedSvg = await composeCreditCheckSvg(await getCreditSvg(id), background);
     const png = await sharp(Buffer.from(composedSvg)).png().toBuffer();
     return new Response(new Uint8Array(png), {
       headers: {

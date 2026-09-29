@@ -20,6 +20,8 @@ type CreditArtwork = {
   viewBox: [number, number, number, number];
 };
 
+type Background = "white" | "black";
+
 function isWhite(fill: string) {
   return ["#fff", "#ffffff", "white", "rgb(255,255,255)"].includes(
     fill.toLowerCase().replace(/\s/g, ""),
@@ -79,8 +81,9 @@ function drawCreditCheck(
   ctx: CanvasRenderingContext2D,
   credit: CreditArtwork,
   checkPath: Path2D,
+  background: Background,
 ) {
-  ctx.fillStyle = "#ffffff";
+  ctx.fillStyle = background === "black" ? "#111111" : "#ffffff";
   ctx.fillRect(0, 0, EXPORT_SIZE, EXPORT_SIZE);
   const [viewX, viewY, viewWidth, viewHeight] = credit.viewBox;
   const scaleX = EXPORT_SIZE / viewWidth;
@@ -106,13 +109,16 @@ export default function CreditChecksClient() {
   const [tokenId, setTokenId] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [background, setBackground] = useState<Background>("white");
 
   useEffect(() => {
-    const sharedToken = Number(new URLSearchParams(window.location.search).get("token"));
+    const params = new URLSearchParams(window.location.search);
+    const sharedToken = Number(params.get("token"));
     if (Number.isInteger(sharedToken) && sharedToken >= MIN_TOKEN_ID && sharedToken <= MAX_TOKEN_ID) {
       setTokenInput(String(sharedToken));
       setTokenId(sharedToken);
     }
+    if (params.get("background") === "black") setBackground("black");
   }, []);
 
   useEffect(() => {
@@ -134,14 +140,20 @@ export default function CreditChecksClient() {
       ctx.imageSmoothingEnabled = false;
       ctx.globalCompositeOperation = "source-over";
       ctx.clearRect(0, 0, EXPORT_SIZE, EXPORT_SIZE);
-      drawCreditCheck(ctx, credit, checkPath);
+      drawCreditCheck(ctx, credit, checkPath, background);
       setLoading(false);
     }).catch(() => {
       if (version !== renderVersionRef.current) return;
       setLoading(false);
       setError(`Credit ${tokenId.toLocaleString()} could not be loaded.`);
     });
-  }, [tokenId]);
+  }, [background, tokenId]);
+
+  const updateUrl = (nextToken: number, nextBackground: Background) => {
+    const params = new URLSearchParams({ token: String(nextToken) });
+    if (nextBackground === "black") params.set("background", "black");
+    window.history.replaceState(null, "", `/creditchecks?${params.toString()}`);
+  };
 
   const selectToken = () => {
     const parsed = Number(tokenInput);
@@ -155,7 +167,12 @@ export default function CreditChecksClient() {
     } else {
       setTokenId(parsed);
     }
-    window.history.replaceState(null, "", `/creditchecks?token=${parsed}`);
+    updateUrl(parsed, background);
+  };
+
+  const selectBackground = (nextBackground: Background) => {
+    setBackground(nextBackground);
+    updateUrl(tokenId, nextBackground);
   };
 
   const download = () => {
@@ -173,7 +190,9 @@ export default function CreditChecksClient() {
   };
 
   const openXComposer = () => {
-    const shareUrl = `${window.location.origin}/creditchecks?token=${tokenId}`;
+    const shareParams = new URLSearchParams({ token: String(tokenId) });
+    if (background === "black") shareParams.set("background", "black");
+    const shareUrl = `${window.location.origin}/creditchecks?${shareParams.toString()}`;
     const params = new URLSearchParams({
       text: `I ran a Credit Check on Credit #${tokenId}. Tool by @_jknft_.`,
       url: shareUrl,
@@ -228,21 +247,40 @@ export default function CreditChecksClient() {
         <div className="relative mt-6 aspect-square w-full max-w-[380px] border border-neutral-300">
           <canvas
             ref={canvasRef}
-            className="block h-auto w-full bg-white"
+            className={`block h-auto w-full ${background === "black" ? "bg-[#111111]" : "bg-white"}`}
             aria-label={`Credit Check for token ${tokenId}`}
           />
           {loading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-white text-[10px] uppercase text-neutral-500">
+            <div className={`absolute inset-0 flex items-center justify-center text-[10px] uppercase ${
+              background === "black" ? "bg-[#111111] text-neutral-400" : "bg-white text-neutral-500"
+            }`}>
               Running credit check
             </div>
           )}
         </div>
 
-        <div className="mt-4 flex min-h-9 items-center justify-center gap-2 text-center">
+        <div className="mt-3 flex min-h-9 w-full max-w-[380px] items-center justify-between gap-2">
+          <div className="flex border border-neutral-300" role="group" aria-label="Image background">
+            {(["white", "black"] as const).map((option) => (
+              <button
+                key={option}
+                type="button"
+                aria-pressed={background === option}
+                onClick={() => selectBackground(option)}
+                className={`h-7 min-w-14 px-3 text-[9px] uppercase transition-colors ${
+                  background === option
+                    ? "bg-black text-white"
+                    : "bg-white text-black hover:bg-neutral-100"
+                }`}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
           {error ? (
-            <p role="alert" className="py-2 text-[10px] uppercase text-red-700">{error}</p>
+            <p role="alert" className="text-right text-[10px] uppercase text-red-700">{error}</p>
           ) : (
-            <>
+            <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={download}
@@ -259,7 +297,7 @@ export default function CreditChecksClient() {
               >
                 Share on X ↗
               </button>
-            </>
+            </div>
           )}
         </div>
       </div>
