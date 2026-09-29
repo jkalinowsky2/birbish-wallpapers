@@ -108,6 +108,14 @@ export default function CreditChecksClient() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    const sharedToken = Number(new URLSearchParams(window.location.search).get("token"));
+    if (Number.isInteger(sharedToken) && sharedToken >= MIN_TOKEN_ID && sharedToken <= MAX_TOKEN_ID) {
+      setTokenInput(String(sharedToken));
+      setTokenId(sharedToken);
+    }
+  }, []);
+
+  useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -147,6 +155,7 @@ export default function CreditChecksClient() {
     } else {
       setTokenId(parsed);
     }
+    window.history.replaceState(null, "", `/creditchecks?token=${parsed}`);
   };
 
   const download = () => {
@@ -162,6 +171,21 @@ export default function CreditChecksClient() {
       URL.revokeObjectURL(url);
     }, "image/png");
   };
+
+  const openXComposer = () => {
+    const shareUrl = `${window.location.origin}/creditchecks?token=${tokenId}`;
+    const params = new URLSearchParams({
+      text: `I ran a Credit Check on Credit #${tokenId}.`,
+      url: shareUrl,
+    });
+    window.open(
+      `https://twitter.com/intent/tweet?${params.toString()}`,
+      "credit-check-share",
+      "popup,width=640,height=520,noopener,noreferrer",
+    );
+  };
+
+  const shareOnX = () => openXComposer();
 
   return (
     <section className="relative left-1/2 min-h-screen w-screen -translate-x-1/2 bg-white font-mono text-xs text-black">
@@ -214,18 +238,28 @@ export default function CreditChecksClient() {
           )}
         </div>
 
-        <div className="mt-4 min-h-9 text-center">
+        <div className="mt-4 flex min-h-9 items-center justify-center gap-2 text-center">
           {error ? (
             <p role="alert" className="py-2 text-[10px] uppercase text-red-700">{error}</p>
           ) : (
-            <button
-              type="button"
-              onClick={download}
-              disabled={loading}
-              className="h-9 border border-neutral-300 bg-white px-4 text-[10px] uppercase text-black transition-colors hover:border-black hover:bg-neutral-100 disabled:opacity-40"
-            >
-              PNG ↓
-            </button>
+            <>
+              <button
+                type="button"
+                onClick={download}
+                disabled={loading}
+                className="h-9 border border-neutral-300 bg-white px-4 text-[10px] uppercase text-black transition-colors hover:border-black hover:bg-neutral-100 disabled:opacity-40"
+              >
+                PNG ↓
+              </button>
+              <button
+                type="button"
+                onClick={shareOnX}
+                disabled={loading}
+                className="h-9 border border-neutral-300 bg-white px-4 text-[10px] uppercase text-black transition-colors hover:border-black hover:bg-neutral-100 disabled:opacity-40"
+              >
+                Share on X ↗
+              </button>
+            </>
           )}
         </div>
       </div>
